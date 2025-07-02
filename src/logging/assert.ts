@@ -1,4 +1,3 @@
-
     export function assertCond(cond: boolean, message?: string) {
         if (!cond) {
             let errStr = "Assertion failed";

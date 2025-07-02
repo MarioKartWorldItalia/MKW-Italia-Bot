@@ -1,10 +1,11 @@
-import {assertCond} from "./logging/assert.js"
+import { assertCond } from "./logging/assert.js"
 import { Client, Events, SlashCommandBuilder } from "discord.js";
 import { log } from "./logging/log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournaments.js";
 import { bindCommands } from "./interaction/slash_commands.js";
-
+import "process"
+import { abort, exit } from "process";
 
 export class Application {
     private static instance: Application | undefined;
@@ -44,15 +45,23 @@ export class Application {
             `Currently into: ${client.guilds.cache.map((guild) => `${guild.name} (${guild.id})`).join(", ")}`
         );
 
-        assertCond(
-            client.guilds.cache.size <= 1
-            && client.guilds.cache.has(Globals.MAIN_GUILD),
-            "Il bot deve essere presente in un solo server, e quest'ultimo deve essere approvato."
-        )
+        if (client.guilds.cache.size > Globals.MAX_SERVERS) {
+            log(`Non possono esserci più di ${Globals.MAX_SERVERS} connessi in contemporanea`);
+            abort();
+        }
+
+        if (client.guilds.cache.size > 0
+            && client.guilds.cache.at(0)?.id != Globals.MAIN_GUILD
+        ) {
+            log("Il client non può essere connesso a server non autorizzati");
+            abort();
+        }
+
 
         Application.setInstance(this);
         bindCommands(this.client);
         log("Comandi aggiunti con successo");
 
     }
+
 }

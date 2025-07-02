@@ -15,7 +15,7 @@ export class Tournament {
             this.uuid = uuid;
         }
 
-        //generate a uuid based on the date and time
+        //generates a uuid based on the date and time
         this.uuid = uuid7();
     }
 

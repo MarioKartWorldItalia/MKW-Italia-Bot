@@ -147,7 +147,7 @@ function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
     const name = interaction.options.getString(NOME_OPTION, true);
     const dateTimeUnaparsed = interaction.options.getString(DATA_ORA_OPTION, true);
     const dateTime = new Date(dateTimeUnaparsed);
-    if (dateTime.valueOf() == Number.NaN) {
+    if (isNaN(dateTime.valueOf())) {
         interaction.reply({
             content: `La data e ora fornita non sono valide. Usa il formato YYYY-MM-DD HH:mm.`,
             ephemeral: true
@@ -207,7 +207,7 @@ function onAggiornaDataOra(interaction: ChatInputCommandInteraction) {
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
 
     let date = new Date(newDateTime);
-    if (date.valueOf() == Number.NaN) {
+    if (isNaN(date)) {
         interaction.reply({
             content: `La data e ora fornita non sono valide. Usa il formato YYYY-MM-DD HH:mm.`,
             ephemeral: true

@@ -1,8 +1,8 @@
-import { ChatInputCommandInteraction, Client, Events, InteractionCollector, ModalAssertions, ModalSubmitInteraction } from "discord.js"
+import { ChatInputCommandInteraction, Client, Events, Interaction, InteractionCollector, ModalAssertions, ModalSubmitInteraction } from "discord.js"
 import { bindTournamentCommands as bindTournamentCommands } from "./tournament_commands";
 import { log } from "../logging/log";
 
-let handlersMap: Map<string, (interaction: ChatInputCommandInteraction) => void> = new Map();
+let handlersMap: Map<string, (interaction: Interaction) => void> = new Map();
 
 function mergeMaps<K, V>(map1: Map<K, V>, map2: Map<K, V>): Map<K, V> {
     for (const [key, value] of map2.entries()) {
@@ -21,29 +21,44 @@ export function bindCommands(client: Client) {
     bindCommandsInner(client);
 
     client.on(Events.InteractionCreate, (interaction) => {
-        if (interaction.isModalSubmit()) {
-            const castInteraction = interaction as ModalSubmitInteraction;
-            castInteraction.reply("Not implemented");
-            return;
+        let interactionName = "";
+        if (interaction instanceof ChatInputCommandInteraction) {
+            interactionName = interaction.commandName;
+        }
+        else if (interaction instanceof ModalSubmitInteraction) {
+            interactionName = interaction.customId.split(" ")[0];
         }
 
-        const castInteraction = interaction as ChatInputCommandInteraction;
-        const handler = handlersMap.get(castInteraction.commandName);
+        const handler = handlersMap.get(interactionName);
+
         if (!handler) {
-            castInteraction.reply("Comando non riconosciuto o non implementato");
-            log(`Comando non riconosciuto: ${castInteraction.commandName}`);
+            if (interaction instanceof ChatInputCommandInteraction || interaction instanceof ModalSubmitInteraction) {
+                interaction.reply({
+                    content: "Comando non riconosciuto",
+                    ephemeral: true
+                });
+            }
+
+            log(`Comando non riconosciuto: ${interactionName}`);
             return;
         }
 
         else {
             try {
-                handler(castInteraction);
-                log(`Comando eseguito: ${castInteraction.commandName}`);
+                handler(interaction);
+                log(`Comando eseguito: ${interactionName}`);
             }
             catch (e) {
-                log(`Errore nell'esecuzione del comando ${castInteraction.commandName}: ${e}`);
-                castInteraction.reply("Si è verificato un errore durante l'esecuzione del comando.");
+                if (interaction instanceof ChatInputCommandInteraction || interaction instanceof ModalSubmitInteraction) {
+                    log(`Errore nell'esecuzione del comando ${interactionName}: ${e instanceof Error ? e.message : e} \n Stack trace:\n ${e instanceof Error && e.stack ? e.stack : "N/A"}`);
+                    interaction.reply(
+                        {
+                            content: "Si è verificato un errore durante l'esecuzione del comando.",
+                            ephemeral: true
+                        }
+                    );
+                }
             }
         }
     });
-} 
+}

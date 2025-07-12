@@ -1,6 +1,5 @@
-import { ChatInputCommandInteraction, Client, Events, ModalAssertions } from "discord.js"
+import { ChatInputCommandInteraction, Client, Events, InteractionCollector, ModalAssertions, ModalSubmitInteraction } from "discord.js"
 import { bindTournamentCommands as bindTournamentCommands } from "./tournament_commands";
-import { Globals } from "../globals";
 import { log } from "../logging/log";
 
 let handlersMap: Map<string, (interaction: ChatInputCommandInteraction) => void> = new Map();
@@ -22,14 +21,16 @@ export function bindCommands(client: Client) {
     bindCommandsInner(client);
 
     client.on(Events.InteractionCreate, (interaction) => {
-        if (!interaction.isCommand()) {
+        if (interaction.isModalSubmit()) {
+            const castInteraction = interaction as ModalSubmitInteraction;
+            castInteraction.reply("Not implemented");
             return;
         }
 
         const castInteraction = interaction as ChatInputCommandInteraction;
         const handler = handlersMap.get(castInteraction.commandName);
         if (!handler) {
-            interaction.reply("Comando non riconosciuto o non implementato");
+            castInteraction.reply("Comando non riconosciuto o non implementato");
             log(`Comando non riconosciuto: ${castInteraction.commandName}`);
             return;
         }
@@ -41,7 +42,7 @@ export function bindCommands(client: Client) {
             }
             catch (e) {
                 log(`Errore nell'esecuzione del comando ${castInteraction.commandName}: ${e}`);
-                interaction.reply("Si è verificato un errore durante l'esecuzione del comando.");
+                castInteraction.reply("Si è verificato un errore durante l'esecuzione del comando.");
             }
         }
     });

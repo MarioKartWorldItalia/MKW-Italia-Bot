@@ -60,6 +60,10 @@ export class Tournament {
     public getUuid(): string {
         return this.uuid;
     }
+
+    public getPlayers(): string[] {
+        return [...this.players];
+    }
 }
 
 export class TournamentManager {

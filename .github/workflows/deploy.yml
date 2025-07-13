@@ -1,0 +1,13 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy with hook
+      run: curl ${{ secrets.DEPLOY_HOOK }}
+    

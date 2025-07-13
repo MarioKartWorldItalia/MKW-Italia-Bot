@@ -1,4 +1,4 @@
-import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags } from "discord.js";
+import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction } from "discord.js";
 import { Tournament } from "../tournaments.js";
 import { Application } from "../application.js";
 import { get } from "http";
@@ -8,12 +8,13 @@ const ISCRIVITI_NAME = "iscriviti";
 const DISISCRIVITI_NAME = "disiscriviti";
 const RIMUOVI_TORNEO_NAME = "rimuovi_torneo";
 
-const MOSTRA_GIOCATORI = "mostra_giocatori"
+const MOSTRA_GIOCATORI_NAME = "mostra_giocatori"
 const AGGIUNGI_TORNEO_NAME = "aggiungi_torneo";
 const AGGIOGRNA_DATA_NAME = "aggiorna_data_torneo";
 const AGGIORNA_NOME_TORNEO_NAME = "aggiorna_nome_torneo";
 const NOME_OPTION = "nome";
 const DATA_ORA_OPTION = "data_ora";
+const EPHEMERAL_OPTION = "ephemeral";
 
 const ISCRIZIONE_TORNEO_MODAL_NAME = "modal_tournament_add_player"
 const REGOLE_LETTE_OPTION = "rules"
@@ -22,7 +23,7 @@ const ESPERIENZA_COMPETITIVA_OPTION = "competitive_experience"
 const TURNAMENT_ID_OPTION = "torneo";
 
 
-export function bindTournamentCommands(client: Client) : Map<string, (interaction: Interaction) => void> {
+export function bindTournamentCommands(client: Client): Map<string, (interaction: Interaction) => void> {
     client.application?.commands.create(
         new SlashCommandBuilder()
             .setName(AGGIUNGI_TORNEO_NAME)
@@ -51,7 +52,13 @@ export function refreshTournaments(tournaments: Tournament[]) {
     commands?.create(createTournamentsCommand(tournaments, ISCRIVITI_NAME, "Iscriviti ad un torneo").toJSON());
     commands?.create(createTournamentsCommand(tournaments, DISISCRIVITI_NAME, "Disiscriviti da un torneo").toJSON());
     commands?.create(createTournamentsCommand(tournaments, RIMUOVI_TORNEO_NAME, "Rimuovi un torneo").toJSON());
-    commands?.create(createTournamentsCommand(tournaments, MOSTRA_GIOCATORI, "Mostra i giocatori partecipanti").toJSON())
+    commands?.create(createTournamentsCommand(tournaments, MOSTRA_GIOCATORI_NAME, "Mostra i giocatori partecipanti")
+        .addBooleanOption(
+            new SlashCommandBooleanOption()
+                .setName(EPHEMERAL_OPTION)
+                .setDescription("False se il messaggio non deve essere effimero")
+                .setRequired(false)
+        ).toJSON());
     commands?.create(
         createTournamentsCommand(tournaments, AGGIORNA_NOME_TORNEO_NAME, "Aggiorna il nome di un torneo")
             .addStringOption(
@@ -98,7 +105,7 @@ function createTournamentsCommand(tournaments: Tournament[], name: string, descr
 
 // ------------- FUNZIONI HANDLER -----------------
 
-export function getTournamentCommandHandlers() : Map<string, (interaction: Interaction) => void> {
+export function getTournamentCommandHandlers(): Map<string, (interaction: Interaction) => void> {
     const handlers = new Map();
 
     handlers.set(ISCRIVITI_NAME, onIscriviti);
@@ -107,16 +114,23 @@ export function getTournamentCommandHandlers() : Map<string, (interaction: Inter
     handlers.set(RIMUOVI_TORNEO_NAME, onRimuoviTorneo);
     handlers.set(AGGIORNA_NOME_TORNEO_NAME, onAggiornaNomeTorneo);
     handlers.set(AGGIOGRNA_DATA_NAME, onAggiornaDataOra);
-    handlers.set(MOSTRA_GIOCATORI, onMostraPartecipanti);
+    handlers.set(MOSTRA_GIOCATORI_NAME, onMostraPartecipanti);
     handlers.set(ISCRIZIONE_TORNEO_MODAL_NAME, onModalIscriviti)
 
     return handlers;
 }
 
-function onIscriviti(interaction: ChatInputCommandInteraction) {
-    const id = interaction.options.getString(TURNAMENT_ID_OPTION, true);
+function onIscriviti(interaction: ChatInputCommandInteraction | ButtonInteraction) {
+    let id = "";
+     if(interaction instanceof ChatInputCommandInteraction){
+        id = interaction.options.getString(TURNAMENT_ID_OPTION, true);
+     } 
+     else if(interaction instanceof ButtonInteraction) {
+        id = interaction.customId.split(" ")[1];
+     }
+     
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
-    
+
     if (tournament?.isPlayerPartecipating(interaction.user.id) === true) {
         interaction.reply({
             content: `Sei già iscritto al torneo **${tournament?.getName()}**`,
@@ -127,13 +141,13 @@ function onIscriviti(interaction: ChatInputCommandInteraction) {
 
     const row1 =
         new TextInputBuilder()
-        .setCustomId(REGOLE_LETTE_OPTION)
-        .setStyle(TextInputStyle.Short)
-        .setLabel("Hai letto le regole?")
-        .setPlaceholder("Se non l'hai fatto, assicurati di leggerle prima di iscriverti al torneo!")
-        .setRequired(true);
+            .setCustomId(REGOLE_LETTE_OPTION)
+            .setStyle(TextInputStyle.Short)
+            .setLabel("Hai letto le regole?")
+            .setPlaceholder("Se non l'hai fatto, assicurati di leggerle prima di iscriverti al torneo!")
+            .setRequired(true);
 
-    const row2 =  new TextInputBuilder()
+    const row2 = new TextInputBuilder()
         .setCustomId(ESPERIENZA_COMPETITIVA_OPTION)
         .setLabel("Esperienza competitiva")
         .setPlaceholder("Inserisci la tua esperienza competitiva")
@@ -144,9 +158,8 @@ function onIscriviti(interaction: ChatInputCommandInteraction) {
     const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(row1);
     const actionRow2 = new ActionRowBuilder<TextInputBuilder>().addComponents(row2);
 
-    const tournamentId = interaction?.options.get(TURNAMENT_ID_OPTION)?.value;
     const modal = new ModalBuilder()
-        .setCustomId(`${ISCRIZIONE_TORNEO_MODAL_NAME} ${tournamentId}`)
+        .setCustomId(`${ISCRIZIONE_TORNEO_MODAL_NAME} ${id}`)
         .setTitle("Iscriviti al torneo")
         .addComponents(actionRow1, actionRow2);
 
@@ -155,16 +168,24 @@ function onIscriviti(interaction: ChatInputCommandInteraction) {
 
 function onMostraPartecipanti(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString(TURNAMENT_ID_OPTION);
+    let ephemeralOption = interaction.options.getBoolean(EPHEMERAL_OPTION);
+    if (ephemeralOption == null) {
+        ephemeralOption = true;
+    }
+
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id || "");
+
+
 
     const players = tournament?.getPlayers() ?? [];
     const response = players.length > 0
         ? players.map((playerId: string) => `<@${playerId}>`).join('\n')
         : "Nessun partecipante al torneo.";
 
+
     interaction.reply({
         content: `Partecipanti al torneo **${tournament?.getName()}**:\n${response}`,
-        ephemeral: true
+        ephemeral: ephemeralOption
     });
 }
 
@@ -208,6 +229,7 @@ function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
     const name = interaction.options.getString(NOME_OPTION, true);
     const dateTimeUnaparsed = interaction.options.getString(DATA_ORA_OPTION, true);
     const dateTime = new Date(dateTimeUnaparsed);
+
     if (isNaN(dateTime.valueOf())) {
         interaction.reply({
             content: `La data e ora fornita non sono valide. Usa il formato YYYY-MM-DD HH:mm.`,
@@ -223,6 +245,17 @@ function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
         content: `Torneo **${tournament.getName()}** aggiunto con successo!`,
         ephemeral: true
     });
+
+
+    const channel = interaction.channel;
+
+    if (channel?.isSendable()) {
+          const retMsg = channel.send(createTournamentMessage(tournament));
+          retMsg.then((val) => tournament.setServerMessage(val));
+    }
+    else {
+        log(`ERRORE: Impossibile mandare messaggi al canale ${channel}`)
+    }
 
     refreshTournaments(Application.getInstance().getTournamentManager().tournaments);
 }
@@ -281,5 +314,40 @@ function onAggiornaDataOra(interaction: ChatInputCommandInteraction) {
         content: `La data e ora del torneo **${id}** sono state aggiornate a **${date.toISOString()}**`,
         ephemeral: true
     });
-    refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());  
+    refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
+}
+
+function createTournamentMessage(tournament: Tournament) {
+    const ts = tournament.getDateTime();
+    const formatDay = ts.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const formatTime = ts.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    
+    const embed = new EmbedBuilder()
+        .setTitle(tournament.getName())
+        .addFields(
+            {
+                name: "Data",
+                value: formatDay
+            },
+            {
+                name: "Ora",
+                value: formatTime
+            }
+
+        )
+        .setColor(Colors.Aqua);
+
+
+    
+    const iscrivitiBtn = new ButtonBuilder()
+        .setCustomId(ISCRIVITI_NAME+" "+tournament.getUuid())
+        .setLabel("Iscriviti")
+        .setStyle(ButtonStyle.Primary);
+    const components = new ActionRowBuilder<ButtonBuilder>().addComponents(iscrivitiBtn);
+
+    return {
+        embeds: [embed],
+        components: [components]
+    };
+
 }

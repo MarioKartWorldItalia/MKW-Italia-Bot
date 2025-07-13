@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, Events, Interaction, InteractionCollector, ModalAssertions, ModalSubmitInteraction } from "discord.js"
+import { ButtonInteraction, ChatInputCommandInteraction, Client, Events, Interaction, InteractionCollector, ModalAssertions, ModalSubmitInteraction } from "discord.js"
 import { bindTournamentCommands as bindTournamentCommands } from "./tournament_commands";
 import { log } from "../logging/log";
 
@@ -25,7 +25,7 @@ export function bindCommands(client: Client) {
         if (interaction instanceof ChatInputCommandInteraction) {
             interactionName = interaction.commandName;
         }
-        else if (interaction instanceof ModalSubmitInteraction) {
+        else if (interaction instanceof ModalSubmitInteraction || interaction instanceof ButtonInteraction) {
             interactionName = interaction.customId.split(" ")[0];
         }
 

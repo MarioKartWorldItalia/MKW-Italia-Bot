@@ -22,7 +22,6 @@ function main() {
 
     process.on("exit", (exitCode) => console.log("Exiting process with code " + exitCode));
 
-
     const app = new Application();
     app.start();
 }

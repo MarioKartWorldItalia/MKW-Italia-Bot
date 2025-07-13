@@ -1,3 +1,4 @@
+import { managerToFetchingStrategyOptions, Message, ThreadMemberFlagsBitField } from "discord.js";
 import { Application } from "./application";
 import { v7 as uuid7 } from "uuid";
 
@@ -6,6 +7,7 @@ export class Tournament {
     private name: string;
     private uuid: string;
     private players: string[] = [];
+    private serverMessage: Message | undefined;
 
     public constructor(dateTime: Date, name: string, uuid?: string) {
         this.dateTime = dateTime;
@@ -17,6 +19,14 @@ export class Tournament {
 
         //generates a uuid based on the date and time
         this.uuid = uuid7();
+    }
+
+    public setServerMessage(msg: Message) {
+        this.serverMessage = msg;
+    }
+
+    public getServerMessage() {
+        return this.serverMessage;
     }
 
     public addPlayer(playerId: string) {

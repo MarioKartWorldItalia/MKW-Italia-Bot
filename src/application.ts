@@ -8,7 +8,7 @@ import "process"
 import { abort, exit } from "process";
 
 export class Application {
-    private static instance: Application | undefined;
+    private static instance: Application;
     private tournamentManager: TournamentManager;
     readonly client: Client;
 
@@ -34,6 +34,8 @@ export class Application {
 
     public start() {
         this.client.once(Events.ClientReady, (client) => this.onReady(client));
+        //the client is not supposed to join guilds
+        this.client.on(Events.GuildCreate, () => exit(1));
         this.client.login(Globals.BOT_TOKEN);
     }
 

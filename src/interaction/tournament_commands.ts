@@ -253,7 +253,7 @@ function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
 
     if (channel?.isSendable()) {
           const retMsg = channel.send(createTournamentMessage(tournament));
-          retMsg.then((val) => tournament.setServerMessage(val));
+//          retMsg.then((val) => tournament.setServerMessage(val));
     }
     else {
         log(`ERRORE: Impossibile mandare messaggi al canale ${channel}`)
@@ -367,6 +367,7 @@ function createTournamentMessage(tournament: Tournament) {
         .setCustomId(ISCRIVITI_NAME+" "+tournament.getUuid())
         .setLabel("Iscriviti")
         .setStyle(ButtonStyle.Primary);
+        
     const components = new ActionRowBuilder<ButtonBuilder>().addComponents(iscrivitiBtn);
 
     return {

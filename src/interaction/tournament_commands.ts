@@ -16,6 +16,8 @@ const NOME_OPTION = "nome";
 const DATA_ORA_OPTION = "data_ora";
 const EPHEMERAL_OPTION = "ephemeral";
 
+const CONFERMA_CANCELLAZIONE_NAME = "confirm_delete";
+
 const ISCRIZIONE_TORNEO_MODAL_NAME = "modal_tournament_add_player"
 const REGOLE_LETTE_OPTION = "rules"
 const ESPERIENZA_COMPETITIVA_OPTION = "competitive_experience"
@@ -272,12 +274,35 @@ function onRimuoviTorneo(interaction: ChatInputCommandInteraction) {
         return;
     }
 
-    Application.getInstance().getTournamentManager().removeTournament(tournament);
+    const confirm = new ButtonBuilder()
+    .setCustomId(`${CONFERMA_CANCELLAZIONE_NAME} true ${tournament.getUuid()}`)
+    .setLabel("Conferma cancellazione")
+    .setStyle(ButtonStyle.Danger);
 
-    interaction.reply({
-        content: `Torneo **${tournament.getName()}** rimosso con successo!`,
-        ephemeral: true
-    });
+    const cancel = new ButtonBuilder()
+    .setCustomId(`${CONFERMA_CANCELLAZIONE_NAME} false`)
+    .setLabel("Annulla")
+    .setStyle(ButtonStyle.Primary);
+
+    const buttons = [
+        new ActionRowBuilder().addComponents(cancel).toJSON(),
+        new ActionRowBuilder().addComponents(confirm).toJSON()
+    ];
+
+    interaction.reply(
+        {
+            content: `Sei sicuro di voler eliminare il torneo ${tournament.getName()}? (id: ${tournament.getUuid()})`,
+            components: buttons,
+            flags: MessageFlags.Ephemeral
+        }
+    )
+
+  //  Application.getInstance().getTournamentManager().removeTournament(tournament);
+
+    //interaction.reply({
+    //    content: `Torneo **${tournament.getName()}** rimosso con successo!`,
+    //    ephemeral: true
+    // });
 
     refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
 }

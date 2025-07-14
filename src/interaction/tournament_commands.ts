@@ -293,7 +293,6 @@ function onRimuoviTorneo(interaction: ChatInputCommandInteraction) {
         {
             content: `Sei sicuro di voler eliminare il torneo ${tournament.getName()}? (id: ${tournament.getUuid()})`,
             components: buttons,
-            flags: MessageFlags.Ephemeral
         }
     )
 

@@ -1,7 +1,7 @@
 import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction } from "discord.js";
 import { Tournament } from "../tournaments.js";
 import { Application } from "../application.js";
-import { get } from "http";
+import { get, maxHeaderSize } from "http";
 import { log } from "console";
 
 const ISCRIVITI_NAME = "iscriviti";
@@ -118,6 +118,7 @@ export function getTournamentCommandHandlers(): Map<string, (interaction: Intera
     handlers.set(AGGIOGRNA_DATA_NAME, onAggiornaDataOra);
     handlers.set(MOSTRA_GIOCATORI_NAME, onMostraPartecipanti);
     handlers.set(ISCRIZIONE_TORNEO_MODAL_NAME, onModalIscriviti)
+    handlers.set(CONFERMA_CANCELLAZIONE_NAME, onConfermaRimozioneTorneo)
 
     return handlers;
 }
@@ -262,6 +263,37 @@ function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
     refreshTournaments(Application.getInstance().getTournamentManager().tournaments);
 }
 
+function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
+    const choiceBool = interaction.customId.split(" ")[1].toLowerCase() == "true";
+    
+    if(choiceBool) {
+        const tournamentId = interaction.customId.split(" ")[2];
+        const tManager = Application.getInstance().getTournamentManager();
+        const tournament = tManager.getTournamentById(tournamentId);
+   
+        if(!tournament) {
+            interaction.reply(
+                {
+                    content: `Il torneo con id **${tournamentId} non è stato trovato`,
+                    flags: MessageFlags.Ephemeral
+                }
+            )
+            return;
+        }
+
+        tManager.removeTournament(tournament);
+        interaction.reply(`Il torneo "**${tournament.getName()}"** con id: **${tournament.getUuid()} è stato eliminato**`);
+        return;
+    }
+
+    else {
+        let msg = interaction.message;
+        if(msg && msg.deletable) {
+            msg.delete();
+        }
+    }
+}
+
 function onRimuoviTorneo(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString(TURNAMENT_ID_OPTION, true);
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
@@ -291,7 +323,7 @@ function onRimuoviTorneo(interaction: ChatInputCommandInteraction) {
 
     interaction.reply(
         {
-            content: `Sei sicuro di voler eliminare il torneo ${tournament.getName()}? (id: ${tournament.getUuid()})`,
+            content: `Sei sicuro di voler eliminare il torneo "${tournament.getName()}"? (id: ${tournament.getUuid()})`,
             components: buttons,
         }
     )
@@ -367,7 +399,7 @@ function createTournamentMessage(tournament: Tournament) {
         .setCustomId(ISCRIVITI_NAME+" "+tournament.getUuid())
         .setLabel("Iscriviti")
         .setStyle(ButtonStyle.Primary);
-        
+
     const components = new ActionRowBuilder<ButtonBuilder>().addComponents(iscrivitiBtn);
 
     return {

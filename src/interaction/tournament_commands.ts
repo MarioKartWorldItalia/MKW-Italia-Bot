@@ -282,7 +282,8 @@ function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
         }
 
         tManager.removeTournament(tournament);
-        interaction.reply(`Il torneo "**${tournament.getName()}"** con id: **${tournament.getUuid()} è stato eliminato**`);
+        refreshTournaments(tManager.getTournaments());
+        interaction.reply(`Il torneo "**${tournament.getName()}"** con id: **${tournament.getUuid()}** è stato eliminato`);
         return;
     }
 

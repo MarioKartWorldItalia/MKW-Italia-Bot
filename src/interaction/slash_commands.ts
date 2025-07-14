@@ -2,7 +2,7 @@ import { ButtonInteraction, ChatInputCommandInteraction, Client, Events, Interac
 import { bindTournamentCommands as bindTournamentCommands } from "./tournament_commands";
 import { log } from "../logging/log";
 
-let handlersMap: Map<string, (interaction: Interaction) => void> = new Map();
+let handlersMap: Map<string, (interaction: Interaction) => Promise<void>> = new Map();
 
 function mergeMaps<K, V>(map1: Map<K, V>, map2: Map<K, V>): Map<K, V> {
     for (const [key, value] of map2.entries()) {
@@ -20,7 +20,7 @@ export function bindCommands(client: Client) {
 
     bindCommandsInner(client);
 
-    client.on(Events.InteractionCreate, (interaction) => {
+    client.on(Events.InteractionCreate, async (interaction) => {
         let interactionName = "";
         if (interaction instanceof ChatInputCommandInteraction) {
             interactionName = interaction.commandName;
@@ -29,7 +29,7 @@ export function bindCommands(client: Client) {
             interactionName = interaction.customId.split(" ")[0];
         }
 
-        const handler = handlersMap.get(interactionName);
+        const handler: ((i: Interaction) => Promise<void>) | undefined = handlersMap.get(interactionName);
 
         if (!handler) {
             if (interaction instanceof ChatInputCommandInteraction || interaction instanceof ModalSubmitInteraction) {
@@ -44,21 +44,19 @@ export function bindCommands(client: Client) {
         }
 
         else {
-            try {
-                handler(interaction);
-                log(`Comando eseguito: ${interactionName}`);
-            }
-            catch (e) {
-                if (interaction instanceof ChatInputCommandInteraction || interaction instanceof ModalSubmitInteraction) {
-                    log(`Errore nell'esecuzione del comando ${interactionName}: ${e instanceof Error ? e.message : e} \n Stack trace:\n ${e instanceof Error && e.stack ? e.stack : "N/A"}`);
-                    interaction.reply(
-                        {
-                            content: "Si è verificato un errore durante l'esecuzione del comando.",
-                            ephemeral: true
-                        }
-                    );
-                }
-            }
+            handler(interaction)
+                .then((v) => log(`Comando eseguito: ${interactionName}`))
+                .catch((e) => {
+                    if (interaction instanceof ChatInputCommandInteraction || interaction instanceof ModalSubmitInteraction) {
+                        log(`Errore nell'esecuzione del comando ${interactionName}: ${e instanceof Error ? e.message : e} \n Stack trace:\n ${e instanceof Error && e.stack ? e.stack : "N/A"}`);
+                        interaction.reply(
+                            {
+                                content: "Si è verificato un errore durante l'esecuzione del comando.",
+                                ephemeral: true
+                            }
+                        );
+                    }
+                });
         }
     });
 }

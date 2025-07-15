@@ -251,6 +251,8 @@ async function onModalIscriviti(interaction: Interaction) {
         return;
     }
 
+    tournament.addPlayer(interaction.user.id);
+
     const roleAdd = Globals.DEBUG_TOURNAMENT_ROLE_ADD;
     if (roleAdd != "") {
         const role = await interaction.guild?.roles.fetch(roleAdd);

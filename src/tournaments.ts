@@ -29,22 +29,22 @@ export class Tournament {
         return this.serverMessage;
     }
 
-    public addPlayer(playerId: string) {
-        if (!this.players.includes(playerId)) {
-            this.players.push(playerId);
+    public addPlayer(userId: string) {
+        if (!this.players.includes(userId)) {
+            this.players.push(userId);
         }
     }
 
-    public removePlayer(playerId: string) {
-        const index = this.players.indexOf(playerId);
+    public removePlayer(userId: string) {
+        const index = this.players.indexOf(userId);
         if (index !== -1) {
             this.players.splice(index, 1);
         }
     }
 
-    public isPlayerPartecipating(playerId: string): boolean {
+    public isPlayerPartecipating(userId: string): boolean {
         for (const player of this.players) {
-            if (player === playerId) {
+            if (player === userId) {
                 return true;
             }
         }

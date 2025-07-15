@@ -139,6 +139,15 @@ async function onIscriviti(interaction: Interaction) {
 
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
 
+    if(!tournament) {
+        if(interaction.isRepliable()) {
+            interaction.reply({
+                content: "Errore, torneo non trovato",
+                flags: MessageFlags.Ephemeral
+            })
+        }
+    }
+
     if (tournament?.isPlayerPartecipating(interaction.user.id) === true) {
         interaction.reply({
             content: `Sei già iscritto al torneo **${tournament?.getName()}**`,
@@ -231,7 +240,16 @@ async function onModalIscriviti(interaction: Interaction) {
     const castInteraction = interaction as ModalSubmitInteraction;
     const id = castInteraction.customId.split(" ")[1];
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
-    tournament?.addPlayer(interaction.user.id);
+    
+    if(!tournament) {
+        if(interaction.isRepliable()) {
+            interaction.reply({
+                content: "Errore, torneo non trovato",
+                flags: MessageFlags.Ephemeral
+            });
+        }
+        return;
+    }
 
     const roleAdd = Globals.DEBUG_TOURNAMENT_ROLE_ADD;
     if (roleAdd != "") {

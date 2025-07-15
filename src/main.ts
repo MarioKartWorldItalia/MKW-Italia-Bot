@@ -3,17 +3,19 @@ import { log } from "./logging/log.js";
 import express from "express"
 
 function handleError(error: Error) {
-    log(`\nFATAL ERROR:\n{error.message}\n`);
+    log(`\nFATAL ERROR:\n${error.message}`);
     log(`Stack trace:\n${error.stack}`);
     process.exit(1);
 }
 
 function main() {
     process.on("uncaughtException", (e) => {
+        log("ERROR: uncaughtException");
         handleError(e);
     });
 
     process.on("unhandledRejection", (e) => {
+        log("ERROR: unhandledRejection");
         if (e instanceof Error) {
             handleError(e);
         } else {

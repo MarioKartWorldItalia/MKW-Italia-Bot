@@ -4,6 +4,7 @@ import { env } from "process";
 export class Globals {
     static readonly DEFAULT_INTENTS = [
             IntentsBitField.Flags.Guilds,
+            IntentsBitField.Flags.GuildMembers //TODO, verificare sia giusto
     ]
 
     static readonly MAX_SERVERS = 1;

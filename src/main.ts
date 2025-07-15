@@ -1,5 +1,6 @@
 import { Application } from "./application";
 import { log } from "./logging/log.js";
+import express from "express"
 
 function handleError(error: Error) {
     log(`\nFATAL ERROR:\n{error.message}\n`);
@@ -20,9 +21,14 @@ function main() {
         }
     });
 
-    process.on("exit", (exitCode) => console.log("Exiting process with code " + exitCode));
+    process.on("exit", (exitCode) => { console.log("Exiting process with code " + exitCode); });
 
     const app = new Application();
+
+    const server = express();
+    server.get("/ping", (req, res) => { res.send("pong") });
+    server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
+
     app.start();
 }
 

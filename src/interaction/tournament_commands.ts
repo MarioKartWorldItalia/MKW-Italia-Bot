@@ -1,10 +1,10 @@
-import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role } from "discord.js";
+import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role, InteractionCollector } from "discord.js";
 import { Tournament } from "../tournaments.js";
 import { Application } from "../application.js";
-import { get, maxHeaderSize } from "http";
 import { log } from "console";
 import { Globals } from "../globals.js";
 import { assertCond } from "../logging/assert.js";
+import { replyEphemeral } from "../utils.js";
 
 const ISCRIVITI_NAME = "iscriviti";
 const DISISCRIVITI_NAME = "disiscriviti";
@@ -210,6 +210,11 @@ async function onDisiscriviti(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString(TURNAMENT_ID_OPTION, true);
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
 
+    if(!tournament) {
+        replyEphemeral(interaction, "Torneo non trovato");
+        return;
+    }
+
     if (tournament?.isPlayerPartecipating(interaction.user.id) === false) {
         interaction.reply({
             content: `Non sei iscritto al torneo **${tournament?.getName()}**`,
@@ -242,12 +247,7 @@ async function onModalIscriviti(interaction: Interaction) {
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
     
     if(!tournament) {
-        if(interaction.isRepliable()) {
-            interaction.reply({
-                content: "Errore, torneo non trovato",
-                flags: MessageFlags.Ephemeral
-            });
-        }
+        replyEphemeral(interaction, "Torneo non trovato");
         return;
     }
 

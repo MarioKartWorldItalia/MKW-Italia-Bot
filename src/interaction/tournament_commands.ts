@@ -27,7 +27,7 @@ const ESPERIENZA_COMPETITIVA_OPTION = "competitive_experience"
 const TURNAMENT_ID_OPTION = "torneo";
 
 
-export function bindTournamentCommands(client: Client): Map<string, (interaction: Interaction) => Promise<void>> {
+export async function bindTournamentCommands(client: Client): Promise<Map<string, (interaction: Interaction) => Promise<void>>> {
     client.application?.commands.create(
         new SlashCommandBuilder()
             .setName(AGGIUNGI_TORNEO_NAME)
@@ -47,23 +47,23 @@ export function bindTournamentCommands(client: Client): Map<string, (interaction
             .toJSON(),
     );
 
-    refreshTournaments(Application.getInstance().getTournamentManager().tournaments);
+    await refreshTournaments(Application.getInstance().getTournamentManager().tournaments);
     return getTournamentCommandHandlers();
 }
 
-export function refreshTournaments(tournaments: Tournament[]) {
+export async function refreshTournaments(tournaments: Tournament[]) {
     let commands = Application.getInstance().client.application?.commands;
-    commands?.create(createTournamentsCommand(tournaments, ISCRIVITI_NAME, "Iscriviti ad un torneo").toJSON());
-    commands?.create(createTournamentsCommand(tournaments, DISISCRIVITI_NAME, "Disiscriviti da un torneo").toJSON());
-    commands?.create(createTournamentsCommand(tournaments, RIMUOVI_TORNEO_NAME, "Rimuovi un torneo").toJSON());
-    commands?.create(createTournamentsCommand(tournaments, MOSTRA_GIOCATORI_NAME, "Mostra i giocatori partecipanti")
+    await commands?.create(createTournamentsCommand(tournaments, ISCRIVITI_NAME, "Iscriviti ad un torneo").toJSON());
+    await commands?.create(createTournamentsCommand(tournaments, DISISCRIVITI_NAME, "Disiscriviti da un torneo").toJSON());
+    await commands?.create(createTournamentsCommand(tournaments, RIMUOVI_TORNEO_NAME, "Rimuovi un torneo").toJSON());
+    await commands?.create(createTournamentsCommand(tournaments, MOSTRA_GIOCATORI_NAME, "Mostra i giocatori partecipanti")
         .addBooleanOption(
             new SlashCommandBooleanOption()
                 .setName(EPHEMERAL_OPTION)
                 .setDescription("False se il messaggio non deve essere effimero")
                 .setRequired(false)
         ).toJSON());
-    commands?.create(
+    await commands?.create(
         createTournamentsCommand(tournaments, AGGIORNA_NOME_TORNEO_NAME, "Aggiorna il nome di un torneo")
             .addStringOption(
                 new SlashCommandStringOption()
@@ -73,7 +73,7 @@ export function refreshTournaments(tournaments: Tournament[]) {
             )
             .toJSON()
     );
-    commands?.create(
+    await commands?.create(
         createTournamentsCommand(tournaments, AGGIOGRNA_DATA_NAME, "Aggiorna la data e l'ora di un torneo")
             .addStringOption(
                 new SlashCommandStringOption()
@@ -139,13 +139,14 @@ async function onIscriviti(interaction: Interaction) {
 
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
 
-    if(!tournament) {
-        if(interaction.isRepliable()) {
-            interaction.reply({
+    if (!tournament) {
+        if (interaction.isRepliable()) {
+            await interaction.reply({
                 content: "Errore, torneo non trovato",
                 flags: MessageFlags.Ephemeral
             })
         }
+        return;
     }
 
     if (tournament?.isPlayerPartecipating(interaction.user.id) === true) {
@@ -210,7 +211,7 @@ async function onDisiscriviti(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString(TURNAMENT_ID_OPTION, true);
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
 
-    if(!tournament) {
+    if (!tournament) {
         replyEphemeral(interaction, "Torneo non trovato");
         return;
     }
@@ -245,9 +246,9 @@ async function onModalIscriviti(interaction: Interaction) {
     const castInteraction = interaction as ModalSubmitInteraction;
     const id = castInteraction.customId.split(" ")[1];
     const tournament = Application.getInstance().getTournamentManager().getTournamentById(id);
-    
-    if(!tournament) {
-        replyEphemeral(interaction, "Torneo non trovato");
+
+    if (!tournament) {
+        await replyEphemeral(interaction, "Torneo non trovato");
         return;
     }
 
@@ -279,7 +280,7 @@ async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
     const dateTime = new Date(dateTimeUnaparsed);
 
     if (isNaN(dateTime.valueOf())) {
-        interaction.reply({
+        await interaction.reply({
             content: `La data e ora fornita non sono valide. Usa il formato YYYY-MM-DD HH:mm.`,
             ephemeral: true
         });
@@ -289,7 +290,7 @@ async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
     const tournament = new Tournament(dateTime, name);
     Application.getInstance().getTournamentManager().addTournament(tournament);
 
-    interaction.reply({
+    await interaction.reply({
         content: `Torneo **${tournament.getName()}** aggiunto con successo!`,
         ephemeral: true
     });
@@ -305,7 +306,7 @@ async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
         log(`ERRORE: Impossibile mandare messaggi al canale ${channel}`)
     }
 
-    refreshTournaments(Application.getInstance().getTournamentManager().tournaments);
+    await refreshTournaments(Application.getInstance().getTournamentManager().tournaments);
 }
 
 async function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
@@ -319,7 +320,7 @@ async function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
         if (!tournament) {
             interaction.reply(
                 {
-                    content: `Il torneo con id **${tournamentId} non è stato trovato`,
+                    content: `Il torneo con id **${tournamentId}** non è stato trovato`,
                     flags: MessageFlags.Ephemeral
                 }
             )
@@ -327,8 +328,8 @@ async function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
         }
 
         tManager.removeTournament(tournament);
-        refreshTournaments(tManager.getTournaments());
-        interaction.reply(`Il torneo "**${tournament.getName()}"** con id: **${tournament.getUuid()}** è stato eliminato`);
+        await refreshTournaments(tManager.getTournaments());
+        await interaction.reply(`Il torneo "**${tournament.getName()}"** con id: **${tournament.getUuid()}** è stato eliminato`);
         return;
     }
 
@@ -374,7 +375,7 @@ async function onRimuoviTorneo(interaction: ChatInputCommandInteraction) {
         }
     )
 
-    refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
+    await refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
 }
 
 async function onAggiornaNomeTorneo(interaction: ChatInputCommandInteraction) {
@@ -387,7 +388,7 @@ async function onAggiornaNomeTorneo(interaction: ChatInputCommandInteraction) {
         content: `Il nome del torneo **${id}** è stato aggiornato a **${newName}**`,
         ephemeral: true
     });
-    refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
+    await refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
 }
 
 async function onAggiornaDataOra(interaction: ChatInputCommandInteraction) {
@@ -409,7 +410,7 @@ async function onAggiornaDataOra(interaction: ChatInputCommandInteraction) {
         content: `La data e ora del torneo **${id}** sono state aggiornate a **${date.toISOString()}**`,
         ephemeral: true
     });
-    refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
+    await refreshTournaments(Application.getInstance().getTournamentManager().getTournaments());
 }
 
 async function createTournamentMessage(tournament: Tournament) {

@@ -13,14 +13,14 @@ function mergeMaps<K, V>(map1: Map<K, V>, map2: Map<K, V>): Map<K, V> {
     return map1;
 }
 
-function bindCommandsInner(client: Client) {
-    let map = bindTournamentCommands(client);
-    handlersMap = mergeMaps(handlersMap, map);
+async function bindCommandsInner(client: Client) {
+    let map = await bindTournamentCommands(client);
+    handlersMap = await mergeMaps(handlersMap, map);
 }
 
-export function bindCommands(client: Client) {
+export async function bindCommands(client: Client) {
 
-    bindCommandsInner(client);
+    await bindCommandsInner(client);
 
     client.on(Events.InteractionCreate, async (interaction) => {
         let interactionName = "";
@@ -35,7 +35,7 @@ export function bindCommands(client: Client) {
 
         if (handler === undefined) {
             if (interaction instanceof ChatInputCommandInteraction || interaction instanceof ModalSubmitInteraction) {
-                interaction.reply({
+                await interaction.reply({
                     content: "Comando non riconosciuto",
                     ephemeral: true
                 });
@@ -58,7 +58,7 @@ export function bindCommands(client: Client) {
                 log(`Comando eseguito: ${interactionName}`);
             } catch (e) {
                 log(`Errore durante l'esecuzione di ${interactionName}: ${e}`);
-                if(e instanceof Error) {
+                if (e instanceof Error) {
                     log("Stack trace: " + e.stack);
                 }
                 try {

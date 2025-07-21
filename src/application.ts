@@ -6,16 +6,28 @@ import { TournamentManager } from "./tournaments.js";
 import { bindCommands } from "./interaction/slash_commands.js";
 import "process"
 import { abort, exit } from "process";
+import { Database } from "./database.js";
+import express from "express"
+import { Server } from "http";
 
 export class Application {
     private static instance: Application;
     private tournamentManager: TournamentManager;
-    readonly client: Client;
+    private client: Client;
+    private webServer: Server;
+    private db: Database;
 
 
     public constructor() {
+        let server = express();
+        server.get("/ping", (req, res) => { res.send("pong") });
+        this.webServer = server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
+
+
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS });
         this.tournamentManager = new TournamentManager();
+
+        this.db = new Database(undefined);
     }
 
     public getTournamentManager(): TournamentManager {
@@ -30,6 +42,10 @@ export class Application {
     public static getInstance(): Application {
         assertCond(Application.instance !== undefined, "instance non presente");
         return Application.instance as Application;
+    }
+
+    public getClient(): Client {
+        return this.client;
     }
 
     public start() {
@@ -60,10 +76,23 @@ export class Application {
         }
 
 
-        Application.setInstance(this);
         bindCommands(this.client);
         log("Comandi aggiunti con successo");
 
     }
 
+    public async shutdown() {
+        log("Starting application shutdown...");
+        await this.client.destroy();
+        log("Discord client correctly closed");
+        this.db.dispose();
+        log("Database connection closed");
+        this.webServer.close((err) => {
+            if (err) {
+                log(`Error closing web server: ${err.message}`);
+                exit(1);
+            }
+            log("Web server closed successfully");
+        });
+    }
 }

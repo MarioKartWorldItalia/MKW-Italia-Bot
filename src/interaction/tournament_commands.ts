@@ -3,7 +3,7 @@ import { Tournament } from "../tournaments.js";
 import { Application } from "../application.js";
 import { log } from "console";
 import { Globals } from "../globals.js";
-import { assertCond } from "../logging/assert.js";
+import  moment from "moment-timezone";
 import { replyEphemeral } from "../utils.js";
 
 const ISCRIVITI_NAME = "iscriviti";
@@ -52,7 +52,7 @@ export async function bindTournamentCommands(client: Client): Promise<Map<string
 }
 
 export async function refreshTournaments(tournaments: Tournament[]) {
-    let commands = Application.getInstance().client.application?.commands;
+    let commands = Application.getInstance().getClient().application?.commands;
     await commands?.create(createTournamentsCommand(tournaments, ISCRIVITI_NAME, "Iscriviti ad un torneo").toJSON());
     await commands?.create(createTournamentsCommand(tournaments, DISISCRIVITI_NAME, "Disiscriviti da un torneo").toJSON());
     await commands?.create(createTournamentsCommand(tournaments, RIMUOVI_TORNEO_NAME, "Rimuovi un torneo").toJSON());
@@ -170,7 +170,7 @@ async function onIscriviti(interaction: Interaction) {
         .setLabel("Esperienza competitiva")
         .setPlaceholder("Inserisci la tua esperienza competitiva")
         .setStyle(TextInputStyle.Paragraph)
-        .setRequired(true);
+        .setRequired(false);
 
 
     const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(row1);
@@ -277,7 +277,7 @@ async function onModalIscriviti(interaction: Interaction) {
 async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
     const name = interaction.options.getString(NOME_OPTION, true);
     const dateTimeUnaparsed = interaction.options.getString(DATA_ORA_OPTION, true);
-    const dateTime = new Date(dateTimeUnaparsed);
+    const dateTime = moment.tz(dateTimeUnaparsed, Globals.STANDARD_TIMEZONE).toDate();
 
     if (isNaN(dateTime.valueOf())) {
         await interaction.reply({
@@ -414,25 +414,27 @@ async function onAggiornaDataOra(interaction: ChatInputCommandInteraction) {
 }
 
 async function createTournamentMessage(tournament: Tournament) {
+    
+    //TODO: REFACTORING COMPLETO, Aggiugnere le emoji custom in qualche enum
+    
     const ts = tournament.getDateTime();
     const formatDay = ts.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
     const formatTime = ts.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
 
+    
+    const emoji = Application.getInstance().getClient().emojis.cache.filter(e => e.name === "bandierina").first();
+
     const embed = new EmbedBuilder()
-        .setTitle(tournament.getName())
+        .setTitle(`${emoji} ${tournament.getName()}`)
         .addFields(
             {
-                name: "Data",
-                value: formatDay
-            },
-            {
-                name: "Ora",
-                value: formatTime
+                name: "Data e ora:",
+                value: `<t:${Math.floor(ts.getTime() / 1000)}:R>`,
+                inline: true
             }
-
         )
-        .setColor(Colors.Aqua);
-
+        .setColor(Globals.STANDARD_HEX_COLOR);
+        
     const iscrivitiBtn = new ButtonBuilder()
         .setCustomId(ISCRIVITI_NAME + " " + tournament.getUuid())
         .setLabel("Iscriviti")

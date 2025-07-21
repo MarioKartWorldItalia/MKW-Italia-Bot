@@ -1,6 +1,6 @@
 import { Application } from "./application";
 import { log } from "./logging/log.js";
-import express from "express"
+import express, { application } from "express"
 
 function handleError(error: Error) {
     log(`\nFATAL ERROR:\n${error.message}`);
@@ -25,13 +25,23 @@ function main() {
 
     process.on("exit", (exitCode) => { console.log("Exiting process with code " + exitCode); });
 
+    process.on("SIGTERM", (_) => processTermination(app, "SIGTERM"));
+    process.on("SIGINT", (_) => processTermination(app, "SIGINT"));
+
     const app = new Application();
-
-    const server = express();
-    server.get("/ping", (req, res) => { res.send("pong") });
-    server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
-
+    Application.setInstance(app);
     app.start();
+}
+
+function processTermination(app: Application, signal: string) {
+    log(`Received ${signal}. Cleaning up...`);
+    app.shutdown().then(() => {
+        log("Cleanup complete. Exiting...");
+        process.exit(0);
+    }).catch((error) => {
+        log(`Error during cleanup: ${error.message}`);
+        process.exit(1);
+    });
 }
 
 //-------------ENTRY POINT----------------

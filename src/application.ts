@@ -2,11 +2,11 @@ import { assertCond } from "./logging/assert.js"
 import { Client, Events, SlashCommandBuilder } from "discord.js";
 import { log } from "./logging/log.js";
 import { Globals } from "./globals.js";
-import { TournamentManager } from "./tournaments.js";
+import { TournamentManager } from "./tournament_manager/tournaments.js";
 import { bindCommands } from "./interaction/slash_commands.js";
 import "process"
 import { abort, exit } from "process";
-import { Database } from "./database.js";
+import { Database } from "./database/database.js";
 import express from "express"
 import { Server } from "http";
 
@@ -48,7 +48,12 @@ export class Application {
         return this.client;
     }
 
+    public getDb(): Database {
+        return this.db;
+    }
+
     public start() {
+        this.db.init();
         this.client.once(Events.ClientReady, (client) => this.onReady(client));
         //the client is not supposed to join guilds
         this.client.on(Events.GuildCreate, () => exit(1));
@@ -85,7 +90,7 @@ export class Application {
         log("Starting application shutdown...");
         await this.client.destroy();
         log("Discord client correctly closed");
-        this.db.dispose();
+        await this.db.close();
         log("Database connection closed");
         this.webServer.close((err) => {
             if (err) {

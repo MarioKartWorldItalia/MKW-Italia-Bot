@@ -1,5 +1,5 @@
 import { managerToFetchingStrategyOptions, Message, ThreadMemberFlagsBitField } from "discord.js";
-import { Application } from "./application";
+import { Application } from "../application";
 import { v7 as uuid7 } from "uuid";
 
 export class Tournament {

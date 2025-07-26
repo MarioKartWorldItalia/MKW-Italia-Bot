@@ -1,9 +1,11 @@
 {
   "dependencies": {
+    "@typegoose/typegoose": "^12.17.0",
     "discord.js": "^14.21.0",
     "express": "^5.1.0",
     "moment-timezone": "^0.6.0",
     "mongodb": "6.17",
+    "mongoose": "^8.16.5",
     "tsx": "^4.20.3",
     "uuid": "^11.1.0"
   },

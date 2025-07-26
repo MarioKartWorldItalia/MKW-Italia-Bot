@@ -1,5 +1,5 @@
 import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role, InteractionCollector } from "discord.js";
-import { Tournament } from "../tournaments.js";
+import { Tournament } from "../tournament_manager/tournaments.js";
 import { Application } from "../application.js";
 import { log } from "console";
 import { Globals } from "../globals.js";

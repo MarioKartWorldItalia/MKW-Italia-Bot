@@ -1,6 +1,8 @@
 import { Application } from "./application";
 import { log } from "./logging/log.js";
 import express, { application } from "express"
+import dotenv from "dotenv"
+import { Globals } from "./globals";
 
 function handleError(error: Error) {
     log(`\nFATAL ERROR:\n${error.message}`);
@@ -9,6 +11,7 @@ function handleError(error: Error) {
 }
 
 function main() {
+
     process.on("uncaughtException", (e) => {
         log("ERROR: uncaughtException");
         handleError(e);

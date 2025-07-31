@@ -1,18 +1,33 @@
-import { getModelForClass } from "@typegoose/typegoose";
+import { getModelForClass, getModelWithString } from "@typegoose/typegoose";
 import { Application } from "../../application";
 import { DbCollection } from "../database";
-import tournamentSchema, { TournamentSchema } from "./tournament_model";
-import { model, Model } from "mongoose";
-import { getCachedSchema } from "@typegoose/typegoose/lib/internal/utils";
+import { TournamentSchema } from "./tournament_model";
+import { Connection, model, Model, Mongoose } from "mongoose";
+import { Tournament } from "../../tournament_manager/tournaments";
+import { BotDefaultsSchema } from "./defaults";
 
 export class Models {
     public readonly tournamentModel;
+    public readonly botDefaultsModel;
 
-    public constructor() {
-    let db = Application.getInstance().getDb();
+    public constructor(connection: Connection) {
+        this.tournamentModel = getModelForClass(TournamentSchema, {
+            existingConnection: connection,
+            schemaOptions: {
+                collection: DbCollection.TOURNAMENT.toString(),
+                strict: true,
+            }
+        })
 
-    const schema = getCachedSchema(TournamentSchema);
-    this.tournamentModel = getModelForClass(TournamentSchema);
-    this.tournamentModel.insertOne({})
+        this.botDefaultsModel = getModelForClass(BotDefaultsSchema, {
+            existingConnection: connection,
+            schemaOptions: {
+                collection: DbCollection.BOT_DEFAULTS.toString(),
+                capped: {
+                    max: 1
+                },
+                strict: true,
+            }
+        })
     }
 }

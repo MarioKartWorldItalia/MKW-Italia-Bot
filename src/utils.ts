@@ -25,6 +25,10 @@ export async function replyEphemeral(interaction: Interaction, msg: string) {
         else return;
 
         logError(`Error: ${interactionName} (id: ${(interaction as Interaction).id}) is not repliable, or already replied`)
-        log(`Further details, print stack...\n ${new Error().stack || "No data available"}`);
+        log(`Further details, printing stack...\n ${new Error().stack || "No data available"}`);
     }
+}
+
+export function standardDiscordTimeFormat(ts: Date): string {
+    return `<t:${Math.floor(ts.getTime() / 1000)}:f>`;
 }

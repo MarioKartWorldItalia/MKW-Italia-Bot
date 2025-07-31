@@ -9,7 +9,7 @@ import { BotDefaultsSchema } from "./defaults";
 export class Models {
     public readonly tournamentModel;
     public readonly botDefaultsModel;
-
+    
     public constructor(connection: Connection) {
         this.tournamentModel = getModelForClass(TournamentSchema, {
             existingConnection: connection,

@@ -7,6 +7,7 @@ import { Models } from "./models/models";
 import { exit } from "process";
 import { Model } from "mongoose";
 import { SimpleShardingStrategy } from "discord.js";
+import { ReadConcern } from "mongodb";
 
 export enum DbCollection {
     TOURNAMENT = "tournaments",
@@ -30,19 +31,24 @@ export class Database {
 
         this.db = mongoose.createConnection(uri, options);
         this.db = this.db.useDb(Globals.DATABASE_NAME);
-        log(`Db connection enstablished, using db: ${this.db.name}`);
+    }
+
+    public dbInner() {
+        return this.db.db;
     }
 
     public getModels(): Models {
         return this.models as Models;
     }
     
-    public init() {
+    public async init() {
         if(!this.db) {
             logError("Database is not connected");
             exit(1);
         }
-        
+
+        await this.db.getClient().connect();
+        log(`Db connection enstablished, using db: ${this.db.name}`);
         this.models = new Models(this.db);
     }
 

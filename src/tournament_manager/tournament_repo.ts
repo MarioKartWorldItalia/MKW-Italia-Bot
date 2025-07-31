@@ -14,18 +14,20 @@ export class TournamentRepo {
     }
 
     public async updateTournament(tournament: Tournament) {
+        let schema = new TournamentSchema();
+        schema.setValues(tournament);
         const update = await this.tournaments.updateOne(
             {_id: tournament.getId()},
-            {$set: new TournamentSchema(tournament)},
+            {$set: schema},
             {upsert: true}
-        );
+        ).exec();
     }
 
     public async removeTournament(tournament: Tournament) {
         await this.tournaments.findByIdAndDelete(tournament.getId()).exec();
     }
 
-    public async getAllTournaments(): Promise<Tournament[]> {
+    public async getAllTournaments(includeOtherEvents: boolean): Promise<Tournament[]> {
         let res = await this.tournaments.find().exec();
 
         let tArr = new Array<Tournament>();

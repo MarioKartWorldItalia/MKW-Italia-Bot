@@ -10,7 +10,7 @@ function handleError(error: Error) {
     process.exit(1);
 }
 
-function main() {
+async function main() {
 
     process.on("uncaughtException", (e) => {
         log("ERROR: uncaughtException");
@@ -33,7 +33,7 @@ function main() {
 
     const app = new Application();
     Application.setInstance(app);
-    app.start();
+    await app.start();
 }
 
 function processTermination(app: Application, signal: string) {

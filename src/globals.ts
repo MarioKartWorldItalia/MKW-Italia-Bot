@@ -15,7 +15,7 @@ export class Globals {
 
     static readonly MAX_SERVERS = 1;
     static readonly BOT_TOKEN = env.DISCORD_BOT_TOKEN;
-    static readonly VERSION = "0.1";
+    static readonly VERSION = "0.5";
     static readonly MAIN_GUILD = env.APPROVED_GUILD || (() => { throw new Error("APPROVED_GUILD environment variable is not set") })();
     
     //DB
@@ -68,10 +68,11 @@ export class BotDefaults {
     public static async getDefaults(): Promise<BotDefaultsSchema> {
         BotDefaults.populateSchema();
 
-        const query = await BotDefaults.model?.findOne({}).exec();
-        if(!query) {
+        const query = await BotDefaults.model?.find({});
+
+        if(!query || query.length != 1) {
             throw new Error("Defaults not valid");
         }
-        return query as BotDefaultsSchema;
+        return query[0] as BotDefaultsSchema;
     }
 }

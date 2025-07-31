@@ -1,6 +1,6 @@
 import { assertCond } from "./logging/assert.js"
 import { Client, Events, Guild, SlashCommandBuilder } from "discord.js";
-import { log } from "./logging/log.js";
+import { log, logError } from "./logging/log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
 import { bindCommands } from "./interaction/slash_commands.js";
@@ -14,16 +14,11 @@ export class Application {
     private static instance: Application;
     private tournamentManager!: TournamentManager;
     private client: Client;
-    private webServer: Server;
+    private webServer!: Server;
     private db: Database;
 
 
     public constructor() {
-        let server = express();
-        server.get("/ping", (req, res) => { res.send("pong") });
-        this.webServer = server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
-
-
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS });
 
         this.db = new Database(undefined);
@@ -50,18 +45,25 @@ export class Application {
     public getClient(): Client {
         return this.client;
     }
-
+    
     public getDb(): Database {
         return this.db;
     }
 
-    public start() {
-        this.db.init();
+    public async start() {
+        await this.db.init();
         this.tournamentManager = new TournamentManager();
         this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
         //the client is not supposed to join guilds
         this.client.on(Events.GuildCreate, () => exit(1));
-        this.client.login(Globals.BOT_TOKEN);
+
+        this.client.on(Events.Warn, log);
+        this.client.on(Events.Error, logError);
+        await this.client.login(Globals.BOT_TOKEN);
+
+        let server = express();
+        server.get("/ping", (req, res) => { res.send("pong") });
+        this.webServer = server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
     }
 
 
@@ -84,10 +86,8 @@ export class Application {
             abort();
         }
 
-
-        log("Aggiuta comandi in corso...");
         await bindCommands(this.client);
-        log("Comandi aggiunti con successo");
+        log("Aggiornamento comandi in corso...");
 
     }
 

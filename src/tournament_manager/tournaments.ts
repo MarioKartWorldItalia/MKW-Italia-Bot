@@ -1,32 +1,59 @@
 import { managerToFetchingStrategyOptions, Message, ThreadMemberFlagsBitField } from "discord.js";
 import { Application } from "../application";
-import { v7 as uuid7 } from "uuid";
+import { ObjectId } from "mongodb";
+import { TournamentRepo } from "./tournament_repo";
+import { TournamentSchema } from "../database/models/tournament_model";
+import { log } from "../logging/log";
 
 export class Tournament {
     private dateTime: Date;
     private name: string;
-    private uuid: string;
+    private id?: ObjectId;
     private players: string[] = [];
+    private description?: string;
     private serverMessage: Message | undefined;
 
-    public constructor(dateTime: Date, name: string, uuid?: string) {
+    public constructor(dateTime: Date, name: string) {
         this.dateTime = dateTime;
         this.name = name;
-
-        if (uuid) {
-            this.uuid = uuid;
-        }
-
-        //generates a uuid based on the date and time
-        this.uuid = uuid7();
+        
+        this.id = new ObjectId();
     }
 
-    public setServerMessage(msg: Message) {
+    public setId(id: ObjectId) {
+        this.id = id; 
+    }
+
+    public static async fromSchema(doc: TournamentSchema): Promise<Tournament> {
+        let ret = new Tournament(doc.startDateTime, doc.tournamentName.toString());
+        ret.setId(doc._id);
+        ret.setDescription(doc.description?.toString());
+        if (doc.serverMessageId && doc.serverMessageChannelId) {
+            const mainGuild = await Application.getInstance().getMainGuild();
+            const channel = await mainGuild.channels.fetch(doc.serverMessageChannelId.toString());
+            if (channel?.isTextBased()) {
+                const msg = await channel.messages.fetch(doc.serverMessageId.toString());
+                ret.serverMessage = msg;
+            }
+        }
+        ret.players = doc.parteciparingPlayers as string[];
+        return ret;
+    }
+
+    public setServerMessage(msg?: Message) {
         this.serverMessage = msg;
     }
 
     public getServerMessage() {
         return this.serverMessage;
+    }
+
+    public getDescription() {
+        return this.description;
+    }
+
+    public setDescription(str?: string) {
+        this.description = str;
     }
 
     public addPlayer(userId: string) {
@@ -67,8 +94,8 @@ export class Tournament {
         return this.dateTime;
     }
 
-    public getUuid(): string {
-        return this.uuid;
+    public getId() {
+        return this.id;
     }
 
     public getPlayers(): string[] {
@@ -77,30 +104,39 @@ export class Tournament {
 }
 
 export class TournamentManager {
-    readonly tournaments: Tournament[];
+    tournaments: TournamentRepo;
 
     public constructor() {
-        this.tournaments = [];
+        this.tournaments = new TournamentRepo();
     }
 
-    public addTournament(tournament: Tournament) {
-        this.tournaments.push(tournament);
-
-
+    public async setDefaultAddRole(id: string) {
+        const db = Application.getInstance().getDb();
+        db.getModels();
     }
 
-    public removeTournament(tournament: Tournament) {
-        const index = this.tournaments.indexOf(tournament);
-        if (index !== -1) {
-            this.tournaments.splice(index, 1);
+    public async addTournament(tournament: Tournament) {
+        this.tournaments.updateTournament(tournament);
+    }
+
+    public async updateTournament(tournament: Tournament) {
+        this.addTournament(tournament);
+    }
+
+    public async removeTournament(tournament: Tournament) {
+        return this.tournaments.removeTournament(tournament);
+    }
+
+    public async getTournaments(): Promise<Tournament[]> {
+        return this.tournaments.getAllTournaments();
+    }
+
+    public async getTournamentById(uuid: ObjectId | string): Promise<Tournament | undefined> {
+        if (uuid instanceof String) {
+            uuid = new ObjectId(uuid);
         }
+        
+        return this.tournaments.getTouruamentById(uuid as ObjectId);
     }
 
-    public getTournaments(): Tournament[] {
-        return this.tournaments;
-    }
-
-    public getTournamentById(uuid: string): Tournament | undefined {
-        return this.tournaments.find(tournament => tournament.getUuid() === uuid);
-    }
 }

@@ -1,6 +1,11 @@
 import { IntentsBitField } from "discord.js";
 import { env } from "process";
 import { logError } from "./logging/log";
+import { BotDefaultsSchema as BotDefaultsSchema } from "./database/models/defaults";
+import { Application } from "./application";
+import { ReturnModelType } from "@typegoose/typegoose";
+import { BeAnObject } from "@typegoose/typegoose/lib/types";
+import { log } from "console";
 
 export class Globals {
     static readonly DEFAULT_INTENTS = [
@@ -14,13 +19,11 @@ export class Globals {
     static readonly MAIN_GUILD = env.APPROVED_GUILD || (() => { throw new Error("APPROVED_GUILD environment variable is not set") })();
     
     //DB
-    static readonly DB_CONNECTION_URI = env.DB_CONNECTION_URI || (() => { throw new Error("DB_CONNECTION_URI environment variable is not set") })();
+    static readonly DB_CONNECTION_URI = env.DB_CONNECTION_URI?.replace(new RegExp("\"","g"),"") || (() => { throw new Error("DB_CONNECTION_URI environment variable is not set") })();
     static readonly DATABASE_NAME = getDbNameFromEnv();
 
     static readonly STANDARD_HEX_COLOR = "#ffc809";
     static readonly STANDARD_TIMEZONE = "Europe/Rome";
-
-    static readonly DEBUG_TOURNAMENT_ROLE_ADD = env.DEBUG_TOURNAMENT_ROLE_ADD || "";
 }
 
 function getDbNameFromEnv(): string {
@@ -30,4 +33,45 @@ function getDbNameFromEnv(): string {
         return "unknown";
     }
     return dbName;
+}
+
+export class BotDefaults {
+    private static model: ReturnModelType<typeof BotDefaultsSchema, BeAnObject> | undefined = undefined;
+
+    private static populateSchema() {
+        BotDefaults.model = Application.getInstance().getDb().getModels().botDefaultsModel;
+    }
+
+    public static async clearDefaults() {
+        BotDefaults.populateSchema();
+        const res = await BotDefaults.model?.deleteOne({});
+        log("Bot defaults cleared:");
+        log(res);
+    }
+
+    public static async setDefaults(defaults: BotDefaultsSchema) {
+        BotDefaults.populateSchema();
+
+        const found = await BotDefaults.model?.findOne({}).exec();
+        if(!found) {
+            const res = await BotDefaults.model?.insertOne(defaults);
+            log("Default bot settings changed:");
+            log(res);
+        }
+        else {
+            const res = await found.updateOne(defaults).exec();
+            log("Default bot settings changed:");
+            log(res);
+        }
+    }
+
+    public static async getDefaults(): Promise<BotDefaultsSchema> {
+        BotDefaults.populateSchema();
+
+        const query = await BotDefaults.model?.findOne({}).exec();
+        if(!query) {
+            throw new Error("Defaults not valid");
+        }
+        return query as BotDefaultsSchema;
+    }
 }

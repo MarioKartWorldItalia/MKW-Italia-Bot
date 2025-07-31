@@ -1,5 +1,5 @@
 import { assertCond } from "./logging/assert.js"
-import { Client, Events, SlashCommandBuilder } from "discord.js";
+import { Client, Events, Guild, SlashCommandBuilder } from "discord.js";
 import { log } from "./logging/log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
@@ -12,7 +12,7 @@ import { Server } from "http";
 
 export class Application {
     private static instance: Application;
-    private tournamentManager: TournamentManager;
+    private tournamentManager!: TournamentManager;
     private client: Client;
     private webServer: Server;
     private db: Database;
@@ -25,9 +25,12 @@ export class Application {
 
 
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS });
-        this.tournamentManager = new TournamentManager();
 
         this.db = new Database(undefined);
+    }
+
+    public async getMainGuild(): Promise<Guild> {
+        return this.client.guilds.fetch(Globals.MAIN_GUILD);
     }
 
     public getTournamentManager(): TournamentManager {
@@ -54,14 +57,15 @@ export class Application {
 
     public start() {
         this.db.init();
-        this.client.once(Events.ClientReady, (client) => this.onReady(client));
+        this.tournamentManager = new TournamentManager();
+        this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
         //the client is not supposed to join guilds
         this.client.on(Events.GuildCreate, () => exit(1));
         this.client.login(Globals.BOT_TOKEN);
     }
 
 
-    private onReady(client: Client) {
+    private async onReady(client: Client) {
         log(`Logged in as ${client.user?.tag}`);
         log(`Version ${Globals.VERSION}`);
         log(
@@ -81,7 +85,8 @@ export class Application {
         }
 
 
-        bindCommands(this.client);
+        log("Aggiuta comandi in corso...");
+        await bindCommands(this.client);
         log("Comandi aggiunti con successo");
 
     }

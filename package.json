@@ -2,15 +2,17 @@
   "dependencies": {
     "@typegoose/typegoose": "^12.17.0",
     "discord.js": "^14.21.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "moment-timezone": "^0.6.0",
     "mongodb": "6.17",
     "mongoose": "^8.16.5",
-    "tsx": "^4.20.3",
+    "node.js": "^0.0.1-security",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/uuid": "^10.0.0"
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.20.3"
   }
 }

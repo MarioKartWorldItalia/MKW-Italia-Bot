@@ -281,26 +281,21 @@ async function onAdminAggiungiGiocatore(interaction: Interaction) {
     if (!(interaction instanceof ChatInputCommandInteraction)) {
         throw new Error();
     }
-    let castInteraction = interaction as ChatInputCommandInteraction;
-    const tournamentId = interaction.options.getString(TOURNAMENT_ID_OPTION) as string;
-    const tournament = await Application.getInstance().getTournamentManager().getTournamentById(tournamentId);
+    const castInteraction = interaction as ChatInputCommandInteraction;
+    
     const user = castInteraction.options.getUser(USER_OPTION);
     if (!user) {
         await replyEphemeral(interaction, "Giocatore non valido");
         return;
     }
-    if (!tournament) {
-        await replyEphemeral(interaction, "Torneo non esistente");
-        return;
+
+    // modifica la proprità user di interaction temporaneamente
+    const originalUser = interaction.user;
+    Object.defineProperty(interaction, 'user', { value: user, configurable: true });
+
+    await onIscriviti(interaction);
+    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true });
     }
-    if (tournament.isPlayerPartecipating(user.id)) {
-        await replyEphemeral(interaction, "Il giocatore sta già partecipando");
-        return;
-    }
-    tournament.addPlayer(user.id);
-    await Application.getInstance().getTournamentManager().updateTournament(tournament);
-    replyEphemeral(interaction, `Il giocatore ${user.username} (${user.id}) è stato aggiunto`)
-}
 
 async function onAdminRimuoviGiocatore(interaction: Interaction) {
     if (await checkAndPopulateAutocomplete(interaction)) {
@@ -311,24 +306,12 @@ async function onAdminRimuoviGiocatore(interaction: Interaction) {
         throw new Error();
     }
     let castInteraction = interaction as ChatInputCommandInteraction;
-    const tournamentId = interaction.options.getString(TOURNAMENT_ID_OPTION) as string;
-    const tournament = await Application.getInstance().getTournamentManager().getTournamentById(tournamentId);
     const user = castInteraction.options.getUser(USER_OPTION);
-    if (!user) {
-        await replyEphemeral(interaction, "Giocatore non valido");
-        return;
-    }
-    if (!tournament) {
-        await replyEphemeral(interaction, "Torneo non esistente");
-        return;
-    }
-    if (tournament.isPlayerPartecipating(user.id)) {
-        await replyEphemeral(interaction, "Il giocatore sta già partecipando");
-        return;
-    }
-    tournament.removePlayer(user.id);
-    await Application.getInstance().getTournamentManager().updateTournament(tournament);
-    await replyEphemeral(interaction, `Il giocatore ${user.username} (${user.id}) è stato rimosso`)
+
+    const originalUser = interaction.user;
+    Object.defineProperty(interaction, 'user', { value: user, configurable: true });
+    await onDisiscriviti(interaction as ChatInputCommandInteraction);
+    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true });
 }
 
 async function onBotSetupModalSubmit(interaction: Interaction) {

@@ -33,7 +33,7 @@ async function main() {
 
     const app = new Application();
     Application.setInstance(app);
-    await app.start();
+    app.start();
 }
 
 function processTermination(app: Application, signal: string) {

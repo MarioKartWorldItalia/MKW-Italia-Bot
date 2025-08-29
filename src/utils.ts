@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction, GuildMember, Interaction, MessageFlags, ModalSubmitInteraction, Role } from "discord.js";
+import { ButtonInteraction, ChatInputCommandInteraction, GuildMember, Interaction, MessageFlags, ModalSubmitInteraction, Role, User } from "discord.js";
 import { log, logError } from "./logging/log";
 import { Application } from "./application";
 
@@ -46,5 +46,16 @@ export async function resetRole(roleId: string) {
 
     for (const member of members.values()) {
         await member.roles.remove(role);
+    }
+}
+
+export async function utilFetchUser(userId: string): Promise<User | undefined> {
+    const guild = await Application.getInstance().getMainGuild();
+    await guild.members.fetch();
+    if(guild.members.cache.has(userId)) {
+        return guild.members.cache.get(userId)?.user;
+    }
+    else {
+        return undefined;
     }
 }

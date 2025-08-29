@@ -6,7 +6,7 @@ import { BotDefaults, Globals } from "../globals.js";
 import moment from "moment-timezone";
 import { replyEphemeral, standardDiscordTimeFormat } from "../utils.js";
 import { ObjectId } from "mongodb";
-import { BotDefaultsSchema } from "../database/models/defaults.js";
+import { BotDefaultsSchema, FriendCodesDbDefaults } from "../database/models/defaults.js";
 import { assertCond } from "../logging/assert.js";
 import { BotEmojis, EmojisManager } from "../emoijs_manager.js";
 import { randomUUID } from "crypto";
@@ -243,6 +243,7 @@ async function checkAndPopulateAutocomplete(interaction: Interaction): Promise<b
 }
 
 async function onBotSetup(interaction: Interaction) {
+    //TODO: Spostare questo metodo in un altro file più appropriato(1)
     const options = [];
 
     options.push(new TextInputBuilder()
@@ -257,6 +258,13 @@ async function onBotSetup(interaction: Interaction) {
         .setLabel("Conferma iscrizione torneo")
         .setPlaceholder("Dove vengono mandati i messaggi di conferma di iscrizione")
         .setStyle(TextInputStyle.Short)
+        .setRequired(false));
+
+    options.push(new TextInputBuilder()
+        .setCustomId("friend_codes_channel")
+        .setLabel("Canale codici amico")
+        .setPlaceholder("Canale dove il bot manda i codici amico")
+        .setStyle(TextInputStyle.Paragraph)
         .setRequired(false));
 
     const actionRows = [];
@@ -282,7 +290,7 @@ async function onAdminAggiungiGiocatore(interaction: Interaction) {
         throw new Error();
     }
     const castInteraction = interaction as ChatInputCommandInteraction;
-    
+
     const user = castInteraction.options.getUser(USER_OPTION);
     if (!user) {
         await replyEphemeral(interaction, "Giocatore non valido");
@@ -291,11 +299,11 @@ async function onAdminAggiungiGiocatore(interaction: Interaction) {
 
     // modifica la proprità user di interaction temporaneamente
     const originalUser = interaction.user;
-    Object.defineProperty(interaction, 'user', { value: user, configurable: true });
+    Object.defineProperty(interaction, 'user', { value: user, configurable: true, writable: true });
 
     await onIscriviti(interaction);
-    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true });
-    }
+    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true, writable: true });
+}
 
 async function onAdminRimuoviGiocatore(interaction: Interaction) {
     if (await checkAndPopulateAutocomplete(interaction)) {
@@ -309,9 +317,9 @@ async function onAdminRimuoviGiocatore(interaction: Interaction) {
     const user = castInteraction.options.getUser(USER_OPTION);
 
     const originalUser = interaction.user;
-    Object.defineProperty(interaction, 'user', { value: user, configurable: true });
+    Object.defineProperty(interaction, 'user', { value: user, configurable: true, writable: true });
     await onDisiscriviti(interaction as ChatInputCommandInteraction);
-    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true });
+    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true, writable: true });
 }
 
 async function onBotSetupModalSubmit(interaction: Interaction) {
@@ -322,6 +330,10 @@ async function onBotSetupModalSubmit(interaction: Interaction) {
 
     const roleAdd = modalSubmit?.fields.getTextInputValue(DEFAULT_TOURNAMENT_ROLE_ADD_OPTION);
     const modalConfirmChannel = modalSubmit?.fields.getTextInputValue(ON_ISCRIVITI_CHANNEL_OPTION);
+    const friendCodesChannel = modalSubmit?.fields.getTextInputValue("friend_codes_channel");
+
+    //TODO: Spostare questo metodo in un altro file più appropriato(2)
+
 
     const defaults = new BotDefaultsSchema();
     if (roleAdd) {
@@ -330,6 +342,14 @@ async function onBotSetupModalSubmit(interaction: Interaction) {
 
     if (modalConfirmChannel) {
         defaults.tournamentFormCompiledChannel = modalConfirmChannel;
+    }
+
+    if (friendCodesChannel) {
+        let defaultFC = defaults.friendCodesDbDefaults;
+        if (!defaultFC) {
+            defaultFC = new FriendCodesDbDefaults();
+        }
+        defaults.friendCodesDbDefaults.channelId = friendCodesChannel;
     }
 
     await BotDefaults.setDefaults(defaults);
@@ -406,11 +426,11 @@ async function onIscriviti(interaction: Interaction) {
             .setRequired(true);
 
     const row2 = new TextInputBuilder()
-    .setCustomId("display_name")
-    .setLabel("Nome in game")
-    .setPlaceholder("Inserisci il tuo nome in game (lo stesso della console)")
-    .setStyle(TextInputStyle.Short)
-    .setRequired(true);
+        .setCustomId("display_name")
+        .setLabel("Nome in game")
+        .setPlaceholder("Inserisci il tuo nome in game (lo stesso della console)")
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true);
 
     const row3 = new TextInputBuilder()
         .setCustomId(ESPERIENZA_COMPETITIVA_OPTION)
@@ -512,12 +532,12 @@ async function onDisiscriviti(interaction: ChatInputCommandInteraction) {
         const confirmChannel = await interaction.guild?.channels.fetch(confirmChannelId) as Channel;
         if (confirmChannel?.isTextBased() && confirmChannel?.isSendable()) {
             const embed = new EmbedBuilder()
-            .setTitle("Disiscrizione torneo")
-            .setColor(Colors.Red)
-            .setDescription(`L'utente <@${interaction.user.id}> si è disiscritto dal torneo **${tournament?.getName()}**`)
-            .setTimestamp(new Date())
-            .setThumbnail(interaction.user.displayAvatarURL());
-            await confirmChannel.send({embeds: [embed]});
+                .setTitle("Disiscrizione torneo")
+                .setColor(Colors.Red)
+                .setDescription(`L'utente <@${interaction.user.id}> si è disiscritto dal torneo **${tournament?.getName()}**`)
+                .setTimestamp(new Date())
+                .setThumbnail(interaction.user.displayAvatarURL());
+            await confirmChannel.send({ embeds: [embed] });
         }
     }
 }
@@ -716,10 +736,10 @@ async function onModalIscriviti(interaction: Interaction) {
         if (sendTo && sendTo.isSendable()) {
             let embed = new EmbedBuilder()
                 .setTitle("Nuova iscrizione")
-                .setTimestamp(Date.now())
-                .setDescription(`Il giocatore <@${interaction.user.id}> si è iscritto al torneo **${tournament.getName()}**`)
+                .setDescription(`<@${interaction.user.id}> si è iscritto al torneo **${tournament.getName()}**`)
                 .setColor(Globals.STANDARD_HEX_COLOR)
-                .setThumbnail(interaction.user.displayAvatarURL());
+                .setAuthor({ iconURL: interaction.user.displayAvatarURL(), name: interaction.user.username });
+            //.setThumbnail(interaction.user.displayAvatarURL());
 
             for (const field of castInteraction.fields.fields) {
                 if (field[1].value == "" || field[1].value == undefined) {
@@ -731,7 +751,8 @@ async function onModalIscriviti(interaction: Interaction) {
                 const nameStr = name.join(" ");
                 embed.addFields({
                     name: nameStr,
-                    value: field[1].value
+                    value: field[1].value,
+                    inline: true
                 })
             }
             sendTo.send({ embeds: [embed] });

@@ -311,11 +311,11 @@ function createFriendCodesMessageEmbed(friendCodes: Map<string, FriendCode>): AP
     }
 
     let description = `
-        ### Lista Codici Amico
-        Usa i pulsanti in basso per aggiungere (o rimuovere) il tuo codice amico alla lista. Con il pulsante **\"Cerca Utente\"** puoi digitare l'username di un utente e ottenere il suo codice amico (se presente in lista).
+### Lista Codici Amico
+Usa i pulsanti in basso per aggiungere (o rimuovere) il tuo codice amico alla lista. Con il pulsante **\"Cerca Utente\"** puoi digitare l'username di un utente e ottenere il suo codice amico (se presente in lista).
 
-        **Codici amico presenti:**
-        ${joinFriendCodes(friendCodes)}
+**Codici amico presenti:**
+${joinFriendCodes(friendCodes)}
     `;
 
     let embed = new EmbedBuilder()

@@ -277,10 +277,11 @@ async function refreshFriendCodesMessage() {
 
     if (!msgId) {
         const sentMsg = await channel.send({
-            embeds: [createFriendCodesMessageEmbed(allFCs)],
+            embeds: [await createFriendCodesMessageEmbed(allFCs)],
             components: [createFriendCodesButtons()]
         });
         defaults.friendCodesDbDefaults.messageId = sentMsg.id;
+        await BotDefaults.setDefaults(defaults);
     }
     else {
         const msg = await channel.messages.fetch(msgId);
@@ -289,22 +290,29 @@ async function refreshFriendCodesMessage() {
         }
 
         await msg.edit({
-            embeds: [createFriendCodesMessageEmbed(allFCs)],
+            embeds: [await createFriendCodesMessageEmbed(allFCs)],
             components: [createFriendCodesButtons()]
         })
     }
-    await BotDefaults.setDefaults(defaults);
 }
 
 
-function createFriendCodesMessageEmbed(friendCodes: Map<string, FriendCode>): APIEmbed {
+async function createFriendCodesMessageEmbed(friendCodes: Map<string, FriendCode>): Promise<APIEmbed> {
 
-    function joinFriendCodes(fcs: Map<string, FriendCode>): string {
+    const guild = await Application.getInstance().getMainGuild();
+    await guild.members.fetch();
+
+    async function joinFriendCodes(fcs: Map<string, FriendCode>): Promise<string> {
         let ret = "";
         let append = "";
 
         fcs.forEach((value, key) => {
-            ret = ret.concat(`${append}${inlineCode("-")} <@${key}> — ${inlineCode(value.toString())}`);
+            const member = guild.members.cache.get(key);
+            if (!member) {
+                throw new Error("Member not found");
+            }
+
+            ret = ret.concat(`${append}${inlineCode("-")} <@${key}> (${member.nickname || member.displayName}) — ${inlineCode(value.toString())}`);
             append = "\n";
         });
         return ret;
@@ -315,7 +323,7 @@ function createFriendCodesMessageEmbed(friendCodes: Map<string, FriendCode>): AP
 Usa i pulsanti in basso per aggiungere (o rimuovere) il tuo codice amico alla lista. Con il pulsante **\"Cerca Utente\"** puoi digitare l'username di un utente e ottenere il suo codice amico (se presente in lista).
 
 **Codici amico presenti:**
-${joinFriendCodes(friendCodes)}
+${await joinFriendCodes(friendCodes)}
     `;
 
     let embed = new EmbedBuilder()

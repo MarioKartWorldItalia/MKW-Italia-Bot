@@ -1,5 +1,5 @@
 import { assertCond } from "./logging/assert.js"
-import { Client, Events, Guild, SlashCommandBuilder } from "discord.js";
+import { APIEmbedField, ApplicationEmoji, Client, EmbedBuilder, Events, Guild, GuildEmoji, SlashCommandBuilder, TextChannel } from "discord.js";
 import { log, logError } from "./logging/log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
@@ -9,6 +9,7 @@ import { abort, exit } from "process";
 import { Database } from "./database/database.js";
 import express from "express"
 import { Server } from "http";
+import { Collection } from "mongoose";
 
 export class Application {
     private static instance: Application;
@@ -45,7 +46,7 @@ export class Application {
     public getClient(): Client {
         return this.client;
     }
-    
+
     public getDb(): Database {
         return this.db;
     }
@@ -60,6 +61,125 @@ export class Application {
         this.client.on(Events.Warn, log);
         this.client.on(Events.Error, logError);
         await this.client.login(Globals.BOT_TOKEN);
+
+
+        //TODO: TEMPORANEO
+        //IN ORDINE: SCEGLI_FAZIONE
+        const CHANNEL_IDS = ["1412775711105875968"];
+        const MSG_IDS: string[] = ["1416807683285061633"];
+        const fetchChannels = await (await this.getMainGuild()).channels.fetch();
+        const channels = CHANNEL_IDS.map((c) => fetchChannels.find((c1) => c1!.id == c));
+        const roles = await (await this.getMainGuild()).roles.fetch();
+        const confirmedRole = roles.find((val) => val.id == "1409561282755166218");
+
+        const cymRoles = roles.filter((val) => {
+            return val.id == "1402793516500783124"
+                || val.id == "1402793599661506590"
+                || val.id == "1402793806558134323"
+                || val.id == "1402793755211464786";
+        }
+        );
+        log("LENGTH: " + cymRoles.size);
+        const guildEmojis = await (await this.getMainGuild()).emojis.fetch();
+        const botEmojis = await this.client.application?.emojis.fetch();
+        const bulletMk = guildEmojis.find((e) => e.name == "bulletmk");
+        const cross = botEmojis?.find((e)=>e.name == "cross");
+        const check = botEmojis?.find((e)=>e.name=="check");
+
+        await (await this.getMainGuild()).members.fetch();
+        await this.client.application?.emojis.fetch();
+        const emojis = this.client.application?.emojis.cache;
+        let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
+        roleToEmoji.set("1402793516500783124", emojis!.find((val) => val.id == "1412791661737803907"));
+        roleToEmoji.set("1402793599661506590", emojis!.find((val) => val.id == "1412791639017128007"));
+        roleToEmoji.set("1402793806558134323", emojis!.find((val) => val.id == "1412791619320676414"));
+        roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
+
+        async function refreshChooseYourMemeMsg() {
+            await (await Application.getInstance().getMainGuild()).members.fetch();
+            let castChannels!: Array<TextChannel>;
+
+            castChannels = channels.map((c) => c as TextChannel);
+            if (true) {
+                let msgs = [];
+                for (let i = 0; i < castChannels.length; i++) {
+                    msgs.push(await castChannels[i].messages.fetch(MSG_IDS[i]));
+                }
+
+                let rolesMembers = new Map<String, String>();
+
+                for (const _role of cymRoles) {
+                    const role = _role[1];
+                    let msg = "";
+
+                    const members = role.members;
+                    const confirmedMembers = confirmedRole?.members.filter((m) => members.find((m1) => m1.id == m.id) != undefined);
+                    let unconfirmedMembers = undefined;
+                    if (confirmedMembers != undefined) {
+                        unconfirmedMembers = members.difference(confirmedMembers);
+                    }
+
+                    if (confirmedMembers && confirmedMembers.size != 0) {
+                        let trail = "";
+                        msg += `> ${check} Confermati: `
+                        for (const m of confirmedMembers) {
+                            msg += trail;
+                            msg += `<@${m[1].id}>`;
+                            trail = ", "
+                        }
+                        msg+="\n";
+                    }
+
+                    if (unconfirmedMembers && unconfirmedMembers.size != 0) {
+                        let trail = "";
+                        msg += `> ${cross} Non confermati: `
+                        for (const m of unconfirmedMembers) {
+                            msg += trail;
+                            msg += `<@${m[1].id}>`;
+                            trail = ", "
+                        }
+                    }
+
+                    rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
+                }
+
+                let finalMsg = "";
+                let trail = "";
+                finalMsg += "## TABELLA LIVE ISCRIZIONI\n\u200b\n";
+                for (const entry of rolesMembers) {
+                    finalMsg += trail;
+                    finalMsg += entry[0] + "\n";
+                    finalMsg += entry[1];
+                    trail = "\n\n";
+                }
+
+                const embed = new EmbedBuilder()
+                .setColor(Globals.STANDARD_HEX_COLOR)
+                .setDescription(finalMsg)
+                .toJSON();
+
+                for (const msg of msgs) {
+                    if (!msg) {
+                        return;
+                    }
+                    await msg.edit({
+                        content: null,
+                        embeds: [embed]
+                    })
+                }
+            }
+
+            else {
+                for (const ch of castChannels) { await ch.send({ content: "." }); }
+            }
+        }
+        refreshChooseYourMemeMsg();
+        this.client.on("guildMemberUpdate", refreshChooseYourMemeMsg);
+
+
+
+        //TODO END
+
 
         let server = express();
         server.get("/ping", (req, res) => { res.send("pong") });

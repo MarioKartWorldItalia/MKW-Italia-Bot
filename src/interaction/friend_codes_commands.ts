@@ -113,7 +113,7 @@ async function onAddFc(interaction: Interaction) {
     try {
         const fc = new FriendCode(code);
         await dBAddFriendCode(interaction.user, fc);
-        await replyEphemeral(replyInteraction, `Codice amico ${fc.toString()} aggiunto correttamente`);
+        await replyEphemeral(replyInteraction, `Codice amico ${fc.toString()} aggiunto correttamente. Se era già presente un codice amico, questo verrà sovrascritto`);
     }
     catch (e) {
         if (e instanceof InvalidFriendCode) {

@@ -121,7 +121,7 @@ export class Application {
 
                     if (confirmedMembers && confirmedMembers.size != 0) {
                         let trail = "";
-                        msg += `> ${check} Confermati(${confirmedMembers.size}): `
+                        msg += `> ${check} Confermati (${confirmedMembers.size}): `
                         for (const m of confirmedMembers) {
                             msg += trail;
                             msg += `<@${m[1].id}>`;
@@ -132,7 +132,7 @@ export class Application {
 
                     if (unconfirmedMembers && unconfirmedMembers.size != 0) {
                         let trail = "";
-                        msg += `> ${cross} Non confermati(${unconfirmedMembers.size}): `
+                        msg += `> ${cross} Non confermati (${unconfirmedMembers.size}): `
                         for (const m of unconfirmedMembers) {
                             msg += trail;
                             msg += `<@${m[1].id}>`;

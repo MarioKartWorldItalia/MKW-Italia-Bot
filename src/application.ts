@@ -121,7 +121,7 @@ export class Application {
 
                     if (confirmedMembers && confirmedMembers.size != 0) {
                         let trail = "";
-                        msg += `> ${check} Confermati(${confirmedMembere.size}): `
+                        msg += `> ${check} Confermati(${confirmedMembers.size}): `
                         for (const m of confirmedMembers) {
                             msg += trail;
                             msg += `<@${m[1].id}>`;

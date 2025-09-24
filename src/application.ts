@@ -76,7 +76,8 @@ export class Application {
             return val.id == "1402793516500783124"
                 || val.id == "1402793599661506590"
                 || val.id == "1402793806558134323"
-                || val.id == "1402793755211464786";
+                || val.id == "1402793755211464786"
+                || val.name == "Jolly";
         }
         );
         log("LENGTH: " + cymRoles.size);
@@ -139,8 +140,10 @@ export class Application {
                             trail = ", "
                         }
                     }
-
-                    rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
+                    if(roleToEmoji.get(role.id) != undefined)
+                        rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
+                    else
+                        rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
                 }
 
                 let finalMsg = "";

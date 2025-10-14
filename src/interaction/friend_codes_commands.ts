@@ -199,7 +199,8 @@ async function onAdminGetAllFc(interaction: Interaction) {
     if (!interaction.isChatInputCommand()) {
         return;
     }
-
+    
+    const guild = await Application.getInstance().getMainGuild();
     let friendCodes = await dbGetAllFriendCodes();
     await guild.members.fetch();
 

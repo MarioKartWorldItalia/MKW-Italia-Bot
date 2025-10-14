@@ -201,6 +201,7 @@ async function onAdminGetAllFc(interaction: Interaction) {
     }
 
     let friendCodes = await dbGetAllFriendCodes();
+    await guild.members.fetch();
 
     if (friendCodes.size == 0) {
         await replyEphemeral(interaction, "Nessun codice amico registrato");
@@ -209,6 +210,8 @@ async function onAdminGetAllFc(interaction: Interaction) {
 
     let reply = "Lista codici amico:\n";
     friendCodes.forEach((value, key) => {
+        if(!guild.members.cache.get(key))
+            return;
         reply = reply.concat(`<@${key}>: ${value.toString()}\n`);
     });
     await replyEphemeral(interaction, reply);
@@ -309,7 +312,7 @@ async function createFriendCodesMessageEmbed(friendCodes: Map<string, FriendCode
         fcs.forEach((value, key) => {
             const member = guild.members.cache.get(key);
             if (!member) {
-                throw new Error("Member not found");
+                return;
             }
 
             ret = ret.concat(`${append}${inlineCode("-")} <@${key}> (${member.nickname || member.displayName}) — ${inlineCode(value.toString())}`);

@@ -1,4 +1,4 @@
-import { IntentsBitField } from "discord.js";
+import { IntentsBitField, GatewayIntentBits } from "discord.js";
 import { env } from "process";
 import { logError } from "./logging/log";
 import { BotDefaultsSchema as BotDefaultsSchema } from "./database/models/defaults";
@@ -11,6 +11,7 @@ export class Globals {
     static readonly DEFAULT_INTENTS = [
             IntentsBitField.Flags.Guilds,
             IntentsBitField.Flags.GuildMembers,
+            GatewayIntentBits.GuildMembers
     ]
 
     static readonly MAX_SERVERS = 1;

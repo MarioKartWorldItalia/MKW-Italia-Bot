@@ -7,7 +7,7 @@ import { Globals } from "./globals";
 function handleError(error: Error) {
     log(`\nFATAL ERROR:\n${error.message}`);
     log(`Stack trace:\n${error.stack}`);
-    process.exit(1);
+    //process.exit(1);
 }
 
 async function main() {

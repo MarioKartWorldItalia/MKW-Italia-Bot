@@ -11,7 +11,7 @@ export class Globals {
     static readonly DEFAULT_INTENTS = [
             IntentsBitField.Flags.Guilds,
             IntentsBitField.Flags.GuildMembers,
-            GatewayIntentBits.GuildMembers
+            GatewayIntentBits.GuildMembers,
     ]
 
     static readonly MAX_SERVERS = 1;

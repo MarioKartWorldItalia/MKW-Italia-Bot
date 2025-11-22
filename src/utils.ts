@@ -35,7 +35,6 @@ export function standardDiscordTimeFormat(ts: Date): string {
 }
 export async function resetRole(roleId: string) {
     const guild = await Application.getInstance().getMainGuild();
-    await guild.members.fetch({time: 60000});
     const role = await guild.roles.fetch(roleId);
 
     if (!role) {
@@ -51,7 +50,6 @@ export async function resetRole(roleId: string) {
 
 export async function utilFetchUser(userId: string): Promise<User | undefined> {
     const guild = await Application.getInstance().getMainGuild();
-    await guild.members.fetch({time: 60000});
     if(guild.members.cache.has(userId)) {
         return guild.members.cache.get(userId)?.user;
     }

@@ -20,8 +20,7 @@ export class Application {
 
 
     public constructor() {
-        this.client = new Client({ intents: Globals.DEFAULT_INTENTS });
-
+        this.client = new Client({ intents: Globals.DEFAULT_INTENTS, ws: {large_threshold: 250} });
         this.db = new Database(undefined);
     }
 

@@ -6,8 +6,8 @@ import { Globals } from "./globals";
 
 function handleError(error: Error) {
     logError(`\nFATAL ERROR:\n${error.message}`
-        +`\nStack trace:\n${error.stack}`
-    );
+        +`\n\nStack trace:\n${error.stack}`
+    ).catch(print);
     //process.exit(1);
 }
 

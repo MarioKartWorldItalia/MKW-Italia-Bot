@@ -1,12 +1,13 @@
 import { Application } from "./application";
-import { log } from "./logging/log.js";
+import { log, logError } from "./logging/log.js";
 import express, { application } from "express"
 import dotenv from "dotenv"
 import { Globals } from "./globals";
 
 function handleError(error: Error) {
-    log(`\nFATAL ERROR:\n${error.message}`);
-    log(`Stack trace:\n${error.stack}`);
+    logError(`\nFATAL ERROR:\n${error.message}`
+        +`\nStack trace:\n${error.stack}`
+    );
     //process.exit(1);
 }
 

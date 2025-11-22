@@ -23,6 +23,10 @@ export class Globals {
     static readonly DB_CONNECTION_URI = env.DB_CONNECTION_URI?.replace(new RegExp("\"","g"),"") || (() => { throw new Error("DB_CONNECTION_URI environment variable is not set") })();
     static readonly DATABASE_NAME = getDbNameFromEnv();
 
+    //ERR_REPORTING
+    static readonly ERR_REPORT_CHANNEL_ID = env.ERROR_LOGS_CHANNEL;
+    static readonly ERR_REPORT_USER_ID = env.ERROR_REPORTS_USER
+
     static readonly STANDARD_HEX_COLOR = "#ffc809";
     static readonly STANDARD_TIMEZONE = "Europe/Rome";
 }

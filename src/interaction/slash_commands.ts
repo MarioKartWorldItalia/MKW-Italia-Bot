@@ -21,7 +21,7 @@ async function bindCommandsInner(client: Client) {
         process.emit("SIGTERM");
         return;
     });
-    
+
     mergeMaps(handlersMap, await bindGeneralCommands(client))
     mergeMaps(handlersMap, await bindTournamentCommands(client));
     mergeMaps(handlersMap, await bindFCCommands(client));
@@ -76,10 +76,11 @@ export async function bindCommands(client: Client) {
                 await result;
                 log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
             } catch (e) {
-                log(`Errore durante l'esecuzione di ${interactionName}: ${e}`);
+                let err = `Errore durante l'esecuzione di ${interactionName}: ${e}`;
                 if (e instanceof Error) {
-                    log("Stack trace: " + e.stack);
+                    err += `\nStack trace:\n${e.stack}`;
                 }
+                logError(err);
                 try {
                     if (interaction.isRepliable() && !interaction.replied) {
                         await interaction.reply({

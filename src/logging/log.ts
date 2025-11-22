@@ -11,7 +11,7 @@ class Logger {
     static async logError(...args: any[]) {
         console.error(...args);
 
-        if(Application.getInstance()) {
+        if (Application.getInstance()) {
             await Logger.printErrToServer(args);
         }
     }
@@ -20,18 +20,18 @@ class Logger {
         let server = await Application.getInstance().getMainGuild();
         let channel = await server.channels.fetch(Globals.ERR_REPORT_CHANNEL_ID!);
         let user = "";
-        if(Globals.ERR_REPORT_USER_ID) {
+        if (Globals.ERR_REPORT_USER_ID) {
             user = `<@${Globals.ERR_REPORT_USER_ID}>`;
         }
 
-        if(channel && channel.isTextBased()) {
+        if (channel && channel.isTextBased()) {
             let embed = new EmbedBuilder()
-            .setTitle("Error Report")
-            .setColor(Colors.Red)
-            .setDescription("Error content:\n" + args +"\n\n" + user)
-            .setTimestamp(new Date());
+                .setTitle("Error Report")
+                .setColor(Colors.Red)
+                .setDescription("Error content:\n" + args + "\n\n" + user)
+                .setTimestamp(new Date());
             await channel.send({ embeds: [embed] });
-        }   
+        }
     }
 }
 
@@ -40,5 +40,6 @@ export function log(...args: any[]) {
 }
 
 export async function logError(...args: any[]) {
-    await Logger.logError(...args);
+    try { await Logger.logError(...args); }
+    catch (e) { console.error("Failed to log error:", e); }
 }

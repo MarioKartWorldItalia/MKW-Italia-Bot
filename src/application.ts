@@ -20,8 +20,7 @@ export class Application {
 
 
     public constructor() {
-        this.client = new Client({ intents: Globals.DEFAULT_INTENTS });
-
+        this.client = new Client({ intents: Globals.DEFAULT_INTENTS, ws: {large_threshold: 250} });
         this.db = new Database(undefined);
     }
 
@@ -87,7 +86,7 @@ export class Application {
         const cross = botEmojis?.find((e)=>e.name == "cross");
         const check = botEmojis?.find((e)=>e.name=="check");
 
-        await (await this.getMainGuild()).members.fetch();
+        await (await this.getMainGuild()).members.fetch({time: 60000});
         await this.client.application?.emojis.fetch();
         const emojis = this.client.application?.emojis.cache;
         let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
@@ -97,7 +96,7 @@ export class Application {
         roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
 
         async function refreshChooseYourMemeMsg() {
-            await (await Application.getInstance().getMainGuild()).members.fetch();
+            await (await Application.getInstance().getMainGuild()).members.fetch({time: 60000});
             let castChannels!: Array<TextChannel>;
 
             castChannels = channels.map((c) => c as TextChannel);

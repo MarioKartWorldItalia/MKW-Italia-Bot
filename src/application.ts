@@ -51,6 +51,7 @@ export class Application {
     }
 
     public async start() {
+        
         await this.db.init();
         this.tournamentManager = new TournamentManager();
         this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
@@ -60,6 +61,10 @@ export class Application {
         this.client.on(Events.Warn, log);
         this.client.on(Events.Error, logError);
         await this.client.login(Globals.BOT_TOKEN);
+        
+        //initial fetch, then refresh every 35 secs to avoid rate limits
+        (await this.getMainGuild()).members.fetch();
+        setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch().catch(log)}, 35*1000);
 
 
         //TODO: TEMPORANEO
@@ -86,7 +91,6 @@ export class Application {
         const cross = botEmojis?.find((e)=>e.name == "cross");
         const check = botEmojis?.find((e)=>e.name=="check");
 
-        await (await this.getMainGuild()).members.fetch({time: 60000});
         await this.client.application?.emojis.fetch();
         const emojis = this.client.application?.emojis.cache;
         let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
@@ -96,7 +100,6 @@ export class Application {
         roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
 
         async function refreshChooseYourMemeMsg() {
-            await (await Application.getInstance().getMainGuild()).members.fetch({time: 60000});
             let castChannels!: Array<TextChannel>;
 
             castChannels = channels.map((c) => c as TextChannel);

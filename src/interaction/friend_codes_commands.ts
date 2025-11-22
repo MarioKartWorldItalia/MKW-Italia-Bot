@@ -202,7 +202,6 @@ async function onAdminGetAllFc(interaction: Interaction) {
     
     const guild = await Application.getInstance().getMainGuild();
     let friendCodes = await dbGetAllFriendCodes();
-    await guild.members.fetch({time: 60000});
 
     if (friendCodes.size == 0) {
         await replyEphemeral(interaction, "Nessun codice amico registrato");
@@ -238,7 +237,7 @@ async function onSearchFc(interaction: Interaction) {
     const userTag = replyInteraction.fields.getTextInputValue("user_tag").toLowerCase();
 
     const guild = await Application.getInstance().getMainGuild();
-    await guild.members.fetch({time: 60000});
+
     let member = guild.members.cache.find(m => m.user.tag.toLowerCase() === userTag);
     if (!member) {
         member = guild.members.cache.find(m => m.user.displayName.toLowerCase() === userTag)
@@ -304,7 +303,6 @@ async function refreshFriendCodesMessage() {
 async function createFriendCodesMessageEmbed(friendCodes: Map<string, FriendCode>): Promise<APIEmbed> {
 
     const guild = await Application.getInstance().getMainGuild();
-    await guild.members.fetch({time: 60000});
 
     async function joinFriendCodes(fcs: Map<string, FriendCode>): Promise<string> {
         let ret = "";

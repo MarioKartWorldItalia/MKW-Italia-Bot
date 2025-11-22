@@ -742,7 +742,7 @@ async function onModalIscriviti(interaction: Interaction) {
             //.setThumbnail(interaction.user.displayAvatarURL());
 
             for (const field of castInteraction.fields.fields) {
-                if (field[1].value == "" || field[1].value == undefined) {
+                if (field[1].customId == "" || field[1].customId == undefined) {
                     continue;
                 }
 
@@ -751,7 +751,7 @@ async function onModalIscriviti(interaction: Interaction) {
                 const nameStr = name.join(" ");
                 embed.addFields({
                     name: nameStr,
-                    value: field[1].value,
+                    value: field[1].customId,
                     inline: true
                 })
             }

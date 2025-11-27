@@ -108,7 +108,7 @@ export async function refreshTournaments(tournaments: Tournament[]) {
                 .setDescription("Il giocatore da aggiungere")
                 .setRequired(true))))
 
-    apiCalls.push(commands?.create(createTournamentsCommand(tournaments, ADMIN_RIMUOVI_GIOCAORE_NAME, "ADMIN: Rimuovi un giocatore")
+    apiCalls.push(commands?.create(createTournamentsCommand(tournaments, ADMIN_RIMUOVI_GIOCATORE_NAME, "ADMIN: Rimuovi un giocatore")
         .addUserOption(
             new SlashCommandUserOption()
                 .setName(USER_OPTION)

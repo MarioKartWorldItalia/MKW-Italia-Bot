@@ -137,7 +137,7 @@ export async function refreshTournaments(tournaments: Tournament[]) {
             .toJSON()
     ));
     apiCalls.push(commands?.create(
-        createTournamentsCommand(tournaments, AGGIOGRNA_DATA_NAME, "Aggiorna la data e l'ora di un torneo")
+        createTournamentsCommand(tournaments, AGGIORNA_DATA_NAME, "Aggiorna la data e l'ora di un torneo")
             .addStringOption(
                 new SlashCommandStringOption()
                     .setName(DATA_ORA_OPTION)

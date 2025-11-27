@@ -61,7 +61,7 @@ export async function bindTournamentCommands(client: Client): Promise<Map<string
     client.application?.commands.create(
         new SlashCommandBuilder()
             .setName(CLEAR_BOT_SETUP_NAME)
-            .setDescription("Reimposta i valori di defults del bot")
+            .setDescription("Reimposta i valori di defaults del bot")
             .toJSON()
     )
 

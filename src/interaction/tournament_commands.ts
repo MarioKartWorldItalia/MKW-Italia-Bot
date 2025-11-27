@@ -68,7 +68,7 @@ export async function bindTournamentCommands(client: Client): Promise<Map<string
     client.application?.commands.create(
         new SlashCommandBuilder()
             .setName(AGGIUNGI_EVENTO_NAME)
-            .setDescription("Aggiungi un evento")
+            .setDescription("Aggiungii un evento")
             .addBooleanOption(
                 new SlashCommandBooleanOption()
                     .setName(IS_TOURNAMENT_OPTION)

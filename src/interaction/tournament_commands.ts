@@ -29,7 +29,7 @@ const MOSTRA_EVENTO_NAME = "mostra_evento";
 
 const MOSTRA_GIOCATORI_NAME = "mostra_partecipanti"
 const AGGIUNGI_EVENTO_NAME = "aggiungi_evento";
-const AGGIOGRNA_DATA_NAME = "aggiorna_data_evento";
+const AGGIORNA_DATA_NAME = "aggiorna_data_evento";
 const AGGIORNA_NOME_TORNEO_NAME = "aggiorna_nome_evento";
 const AGGIUNGI_DETTAGLI_NAME = "aggiungi_dettagli";
 const AGGIUNGI_DETTAGLI_MODAL_SUBMIT_NAME = "aggiungi_dettagli_submit";

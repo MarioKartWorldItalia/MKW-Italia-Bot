@@ -28,9 +28,9 @@ class Logger {
             let embed = new EmbedBuilder()
                 .setTitle("Error Report")
                 .setColor(Colors.Red)
-                .setDescription("Error content:\n" + args + "\n\n" + user)
+                .setDescription("Error content:\n" + args)
                 .setTimestamp(new Date());
-            await channel.send({ embeds: [embed] });
+            await channel.send({ content: user, embeds: [embed] });
         }
     }
 }

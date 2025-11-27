@@ -18,7 +18,7 @@ const DEFAULT_TOURNAMENT_ROLE_ADD_OPTION = "default_role_add";
 const ON_ISCRIVITI_CHANNEL_OPTION = "conferma_iscrizione"
 
 const ADMIN_AGGIUNGI_GIOCATORE_NAME = "admin_aggiungi_giocatore";
-const ADMIN_RIMUOVI_GIOCAORE_NAME = "admin_rimuovi_giocatore";
+const ADMIN_RIMUOVI_GIOCATORE_NAME = "admin_rimuovi_giocatore";
 const USER_OPTION = "player_id";
 
 const ISCRIVITI_NAME = "iscriviti";

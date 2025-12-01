@@ -64,7 +64,7 @@ export class Application {
         
         //initial fetch, then refresh every 35 secs to avoid rate limits
         (await this.getMainGuild()).members.fetch();
-        setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch().catch(log)}, 35*1000);
+        setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch().catch(logError)}, 35*1000);
 
 
         //TODO: TEMPORANEO
@@ -84,7 +84,7 @@ export class Application {
                 || val.name == "Jolly";
         }
         );
-        log("LENGTH: " + cymRoles.size);
+        //log("LENGTH: " + cymRoles.size);
         const guildEmojis = await (await this.getMainGuild()).emojis.fetch();
         const botEmojis = await this.client.application?.emojis.fetch();
         const bulletMk = guildEmojis.find((e) => e.name == "bulletmk");

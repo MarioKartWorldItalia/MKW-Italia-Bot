@@ -64,7 +64,7 @@ export class Application {
         
         //initial fetch, then refresh every 35 secs to avoid rate limits
         (await this.getMainGuild()).members.fetch();
-        setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch().catch(logError)}, 35*1000);
+        setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch().catch(logError)}, 60*1000);
 
 
         //TODO: TEMPORANEO

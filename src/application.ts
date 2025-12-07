@@ -63,8 +63,10 @@ export class Application {
         await this.client.login(Globals.BOT_TOKEN);
         
         //initial fetch, then refresh every 35 secs to avoid rate limits
-        (await this.getMainGuild()).members.fetch();
-        setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch().catch(logError)}, 60*1000);
+        await (await this.getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError);
+        
+        //comment out to updates the cache periodically
+        //setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError)}, 300*1000);
 
 
         //TODO: TEMPORANEO

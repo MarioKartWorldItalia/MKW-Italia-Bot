@@ -12,23 +12,33 @@ class Logger {
         console.error(...args);
 
         if (Application.getInstance()) {
-            await Logger.printErrToServer(args);
+            for (let i = 0; i < args.length; i++) {
+                this.printErrToServer(args[i]);
+            }
         }
     }
 
-    static async printErrToServer(args: any[]) {
+    static async printErrToServer(arg: any) {
         let server = await Application.getInstance().getMainGuild();
         let channel = await server.channels.fetch(Globals.ERR_REPORT_CHANNEL_ID!);
         let user = "";
         if (Globals.ERR_REPORT_USER_ID) {
             user = `<@${Globals.ERR_REPORT_USER_ID}>`;
         }
+        let content = arg as string;
 
         if (channel && channel.isTextBased()) {
+
+            if (arg instanceof Error
+                && arg.stack != undefined
+                && (!content.toLowerCase().includes("stack"))) {
+                content = content.concat("\nStack trace:\n" + arg.stack);
+            }
+
             let embed = new EmbedBuilder()
                 .setTitle("Error Report")
                 .setColor(Colors.Red)
-                .setDescription("Error content:\n" + args)
+                .setDescription("Error content:\n" + content)
                 .setTimestamp(new Date());
             await channel.send({ content: user, embeds: [embed] });
         }

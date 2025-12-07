@@ -11,10 +11,13 @@ class Logger {
     static async logError(...args: any[]) {
         console.error(...args);
 
-        if (Application.getInstance()) {
+        try {
             for (let i = 0; i < args.length; i++) {
-                this.printErrToServer(args[i]);
+                await this.printErrToServer(args[i]);
             }
+        }
+        catch(e) {
+            console.error("Failed to log error to server:", e);
         }
     }
 

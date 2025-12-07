@@ -28,7 +28,7 @@ class Logger {
         if (Globals.ERR_REPORT_USER_ID) {
             user = `<@${Globals.ERR_REPORT_USER_ID}>`;
         }
-        let content = arg as string;
+        let content = String(arg);
 
         if (channel && channel.isTextBased()) {
 

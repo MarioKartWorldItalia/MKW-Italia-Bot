@@ -1,6 +1,6 @@
-import { assertCond } from "./logging/assert.js"
+import { assertCond } from "./assert.js"
 import { APIEmbedField, ApplicationEmoji, Client, EmbedBuilder, Events, Guild, GuildEmoji, SlashCommandBuilder, TextChannel } from "discord.js";
-import { log, logError } from "./logging/log.js";
+import { log, logError } from "./log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
 import { bindCommands } from "./interaction/slash_commands.js";

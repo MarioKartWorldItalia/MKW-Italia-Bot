@@ -2,7 +2,7 @@ import { model, Model, omitUndefined, Schema, SchemaType, SchemaTypes, Types } f
 import { ObjectId } from "mongodb";
 import { Tournament, TournamentManager, TournamentPlayerEntry } from "../../tournament_manager/tournaments";
 import { mongoose, prop } from "@typegoose/typegoose";
-import { log } from "../../logging/log";
+import { log } from "../../log";
 
 export class TournamentSchema {
     public constructor() { }

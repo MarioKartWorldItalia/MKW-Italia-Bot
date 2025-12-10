@@ -1,6 +1,6 @@
 import { Colors, EmbedBuilder } from "discord.js";
-import { Application } from "../application";
-import { Globals } from "../globals";
+import { Application } from "./application";
+import { Globals } from "./globals";
 import { tz } from "moment-timezone";
 
 class Logger {

@@ -1,5 +1,5 @@
 import { Application } from "./application";
-import { log, logError } from "./logging/log.js";
+import { log, logError } from "./log.js";
 import express, { application } from "express"
 import dotenv from "dotenv"
 import { Globals } from "./globals";

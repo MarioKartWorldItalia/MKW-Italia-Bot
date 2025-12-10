@@ -1,6 +1,6 @@
 import { User } from "discord.js";
 import { Application } from "./application";
-import { log } from "./logging/log";
+import { log } from "./log";
 
 const FC_COLLECTION = "friend_codes";
 

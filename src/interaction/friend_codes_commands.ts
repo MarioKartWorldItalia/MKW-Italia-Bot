@@ -1,7 +1,7 @@
 import { ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, ChannelType, Client, codeBlock, EmbedBuilder, inlineCode, Interaction, ModalBuilder, ModalSubmitInteraction, Options, SlashCommandBuilder, SlashCommandStringOption, TextChannel, TextInputBuilder, TextInputStyle } from "discord.js";
 import { dBAddFriendCode, dbGetAllFriendCodes, dBGetFriendCode, dBRemoveFriendCode, FriendCode, FriendCodeResult, InvalidFriendCode } from "../frend_codes";
 import { replyEphemeral } from "../utils";
-import { log, logError } from "../logging/log";
+import { log, logError } from "../log";
 import { BotDefaults, Globals } from "../globals";
 import { Application } from "../application";
 import { randomUUID } from "crypto";

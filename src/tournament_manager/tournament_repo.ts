@@ -4,7 +4,7 @@ import { Application } from "../application";
 import { Tournament } from "./tournaments";
 import { ObjectId } from "mongodb";
 import { errors } from "@typegoose/typegoose";
-import { log } from "../logging/log";
+import { log } from "../log";
 
 export class TournamentRepo {
     private tournaments;

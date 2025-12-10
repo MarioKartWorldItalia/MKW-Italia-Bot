@@ -1,5 +1,5 @@
 import { ButtonInteraction, ChatInputCommandInteraction, GuildMember, Interaction, MessageFlags, ModalSubmitInteraction, Role, User } from "discord.js";
-import { log, logError } from "./logging/log";
+import { log, logError } from "./log";
 import { Application } from "./application";
 
 export async function replyEphemeral(interaction: Interaction, msg: string) {

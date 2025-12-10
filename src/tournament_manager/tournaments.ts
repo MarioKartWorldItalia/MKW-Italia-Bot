@@ -3,7 +3,7 @@ import { Application } from "../application";
 import { ObjectId } from "mongodb";
 import { TournamentRepo } from "./tournament_repo";
 import { TournamentSchema } from "../database/models/tournament_model";
-import { log } from "../logging/log";
+import { log } from "../log";
 import { prop } from "@typegoose/typegoose";
 
 export class TournamentPlayerEntry {

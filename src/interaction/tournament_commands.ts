@@ -7,7 +7,7 @@ import moment from "moment-timezone";
 import { replyEphemeral, standardDiscordTimeFormat } from "../utils.js";
 import { ObjectId } from "mongodb";
 import { BotDefaultsSchema, FriendCodesDbDefaults } from "../database/models/defaults.js";
-import { assertCond } from "../logging/assert.js";
+import { assertCond } from "../assert.js";
 import { BotEmojis, EmojisManager } from "../emoijs_manager.js";
 import { randomUUID } from "crypto";
 

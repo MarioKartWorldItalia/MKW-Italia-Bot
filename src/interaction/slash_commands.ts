@@ -1,7 +1,7 @@
 import { ApplicationIntegrationType, AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Events, Interaction, InteractionCollector, ModalAssertions, ModalSubmitInteraction, SlashCommandBuilder } from "discord.js"
 import { bindTournamentCommands as bindTournamentCommands } from "./tournament_commands";
-import { log, logError } from "../logging/log";
-import { assertCond } from "../logging/assert";
+import { log, logError } from "../log";
+import { assertCond } from "../assert";
 import { bindFCCommands } from "./friend_codes_commands";
 import { bindGeneralCommands } from "./util_commands";
 

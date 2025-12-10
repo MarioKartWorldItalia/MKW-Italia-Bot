@@ -1,7 +1,7 @@
 
 import mongoose, { CompileModelOptions, Connection, ConnectOptions, Mongoose, Schema } from "mongoose";
 import { Globals } from "../globals";
-import { logError } from "../logging/log";
+import { logError } from "../log";
 import { log } from "console";
 import { Models } from "./models/models";
 import { exit } from "process";

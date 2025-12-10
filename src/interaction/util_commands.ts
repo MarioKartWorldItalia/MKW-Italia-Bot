@@ -1,5 +1,5 @@
 import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, Interaction, Message, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { log, logError } from "../logging/log";
+import { log, logError } from "../log";
 import { Application } from "../application";
 import { resetRole } from "../utils";
 

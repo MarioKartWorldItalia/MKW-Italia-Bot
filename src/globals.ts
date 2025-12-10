@@ -1,6 +1,6 @@
 import { IntentsBitField, GatewayIntentBits } from "discord.js";
 import { env } from "process";
-import { logError } from "./logging/log";
+import { logError } from "./log";
 import { BotDefaultsSchema as BotDefaultsSchema } from "./database/models/defaults";
 import { Application } from "./application";
 import { ReturnModelType } from "@typegoose/typegoose";
@@ -14,6 +14,7 @@ export class Globals {
             GatewayIntentBits.GuildMembers,
     ]
 
+    static readonly FEATURE_FLAGS_PROJ_NAME = "MkWorldItalia";
     static readonly MAX_SERVERS = 1;
     static readonly BOT_TOKEN = env.DISCORD_BOT_TOKEN;
     static readonly VERSION = "0.6";

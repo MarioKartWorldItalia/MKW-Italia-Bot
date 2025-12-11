@@ -76,7 +76,7 @@ export async function bindCommands(client: Client) {
                 await result;
                 log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
             } catch (e) {
-                throw e;
+                throw new Error();
                 // let err = `Errore durante l'esecuzione di ${interactionName}: ${e}`;
                 // if (e instanceof Error) {
                 //     err += `\nStack trace:\n${e.stack}`;

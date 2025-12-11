@@ -77,21 +77,21 @@ export async function bindCommands(client: Client) {
                 log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
             } catch (e) {
                 throw e;
-                let err = `Errore durante l'esecuzione di ${interactionName}: ${e}`;
-                if (e instanceof Error) {
-                    err += `\nStack trace:\n${e.stack}`;
-                }
-                logError(err);
-                try {
-                    if (interaction.isRepliable() && !interaction.replied) {
-                        await interaction.reply({
-                            content: "Si è verificato un errore durante l'esecuzione del comando.",
-                            ephemeral: true,
-                        });
-                    }
-                } catch (e) {
-                    //skip
-                }
+                // let err = `Errore durante l'esecuzione di ${interactionName}: ${e}`;
+                // if (e instanceof Error) {
+                //     err += `\nStack trace:\n${e.stack}`;
+                // }
+                // logError(err);
+                // try {
+                //     if (interaction.isRepliable() && !interaction.replied) {
+                //         await interaction.reply({
+                //             content: "Si è verificato un errore durante l'esecuzione del comando.",
+                //             ephemeral: true,
+                //         });
+                //     }
+                // } catch (e) {
+                //     //skip
+                // }
             }
         }
     });

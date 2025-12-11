@@ -36,7 +36,7 @@ export async function bindCommands(client: Client) {
         );
     }
 
-    bindCommandsInner(client).catch((e)=> {throw new Error()});
+    bindCommandsInner(client);
     client.on(Events.InteractionCreate, async (interaction) => {
         let interactionName = "";
         if (interaction instanceof AutocompleteInteraction) {
@@ -65,34 +65,16 @@ export async function bindCommands(client: Client) {
         }
 
         else {
-            
-                const result = handler(interaction);
+            const result = handler(interaction);
 
-                // Nulla di strano, controlla solo se la funzione è async 💀
-                if (typeof (result as any)?.then !== "function") {
-                    throw new TypeError(`Handler per ${interactionName} non restituisce una Promise`);
-                }
+            // Nulla di strano, controlla solo se la funzione è async 💀
+            if (typeof (result as any)?.then !== "function") {
+                throw new TypeError(`Handler per ${interactionName} non restituisce una Promise`);
+            }
 
-                await result;
-                log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
-    } 
-                // let err = `Errore durante l'esecuzione di ${interactionName}: ${e}`;
-                // if (e instanceof Error) {
-                //     err += `\nStack trace:\n${e.stack}`;
-                // }
-                // logError(err);
-                // try {
-                //     if (interaction.isRepliable() && !interaction.replied) {
-                //         await interaction.reply({
-                //             content: "Si è verificato un errore durante l'esecuzione del comando.",
-                //             ephemeral: true,
-                //         });
-                //     }
-                // } catch (e) {
-                //     //skip
-                // }
-    
-}
+            //await result;
+            log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
+        }
         
-    );
-}
+    
+})}

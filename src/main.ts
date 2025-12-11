@@ -3,12 +3,22 @@ import { log, logError } from "./log.js";
 import express, { application } from "express"
 import dotenv from "dotenv"
 import { Globals } from "./globals";
+import { FeatureFlagKeys, FeatureFlagsManager } from "./feature_flags_manager";
 
 function handleError(error: Error) {
     logError(`\nFATAL ERROR:\n${error.message}`
         +`\n\nStack trace:\n${error.stack}`
     ).catch(console.error);
-    //process.exit(1);
+    FeatureFlagsManager.getBooleanValueFor(FeatureFlagKeys.ExitOnUnhandledError, true)
+    .then((val) => {
+        if(val) {
+            process.exit(1);
+        }
+    })
+    .catch((e)=> {
+        logError(`Error retrieving feature flag value: ${e.message}`).catch(console.error);
+        process.exit(1);
+    })
 }
 
 async function main() {
@@ -43,7 +53,7 @@ function processTermination(app: Application, signal: string) {
         log("Cleanup complete. Exiting...");
         process.exit(0);
     }).catch((error) => {
-        log(`Error during cleanup: ${error.message}`);
+        logError(`Error during cleanup: ${error.message}`);
         process.exit(1);
     });
 }

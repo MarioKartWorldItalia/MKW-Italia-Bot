@@ -11,6 +11,7 @@ function handleError(error: Error) {
     ).catch(console.error);
     FeatureFlagsManager.getBooleanValueFor(FeatureFlagKeys.ExitOnUnhandledError, true)
     .then((val) => {
+        log("feature flag: "+val);
         if(val) {
             process.exit(1);
         }

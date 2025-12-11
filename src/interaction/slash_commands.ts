@@ -36,7 +36,7 @@ export async function bindCommands(client: Client) {
         );
     }
 
-    bindCommandsInner(client).catch(e => logError(e));
+    bindCommandsInner(client);
     client.on(Events.InteractionCreate, async (interaction) => {
         let interactionName = "";
         if (interaction instanceof AutocompleteInteraction) {
@@ -65,7 +65,7 @@ export async function bindCommands(client: Client) {
         }
 
         else {
-            try {
+            
                 const result = handler(interaction);
 
                 // Nulla di strano, controlla solo se la funzione è async 💀
@@ -75,8 +75,7 @@ export async function bindCommands(client: Client) {
 
                 await result;
                 log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
-            } catch (e) {
-                throw new Error();
+    } 
                 // let err = `Errore durante l'esecuzione di ${interactionName}: ${e}`;
                 // if (e instanceof Error) {
                 //     err += `\nStack trace:\n${e.stack}`;
@@ -92,7 +91,8 @@ export async function bindCommands(client: Client) {
                 // } catch (e) {
                 //     //skip
                 // }
-            }
-        }
-    });
+    
+}
+        
+    );
 }

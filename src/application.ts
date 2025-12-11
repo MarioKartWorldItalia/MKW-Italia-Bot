@@ -10,6 +10,7 @@ import { Database } from "./database/database.js";
 import express from "express"
 import { Server } from "http";
 import { Collection } from "mongoose";
+import { FeatureFlagsManager } from "./feature_flags_manager.js";
 
 export class Application {
     private static instance: Application;
@@ -17,11 +18,13 @@ export class Application {
     private client: Client;
     private webServer!: Server;
     private db: Database;
+    private featureFlagsManager: FeatureFlagsManager;
 
 
     public constructor() {
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS, ws: {large_threshold: 250} });
         this.db = new Database(undefined);
+        this.featureFlagsManager = new FeatureFlagsManager();
     }
 
     public async getMainGuild(): Promise<Guild> {
@@ -50,10 +53,11 @@ export class Application {
         return this.db;
     }
 
-    public async start() {
-        
+    public async start() {   
         await this.db.init();
+        await this.featureFlagsManager.waitForInitialization();
         this.tournamentManager = new TournamentManager();
+
         this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
         //the client is not supposed to join guilds
         this.client.on(Events.GuildCreate, () => exit(1));

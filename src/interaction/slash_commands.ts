@@ -36,7 +36,7 @@ export async function bindCommands(client: Client) {
         );
     }
 
-    bindCommandsInner(client);
+    bindCommandsInner(client).catch((e)=> {throw new Error()});
     client.on(Events.InteractionCreate, async (interaction) => {
         let interactionName = "";
         if (interaction instanceof AutocompleteInteraction) {

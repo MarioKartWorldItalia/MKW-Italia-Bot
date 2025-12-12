@@ -1,18 +1,14 @@
 import { init, LDClient, LDContext } from "@launchdarkly/node-server-sdk";
-import { Globals } from "./globals";
-import { assertCond } from "./assert";
-import { log } from "./log";
-import { validate } from "uuid";
+import { Globals } from "../globals";
+import { assertCond } from "../assert";
+import { log } from "../log";
+import { FeatureFlagKeys } from "./feature_flag_keys"
 
 export class FeatureFlagError extends Error {
     constructor(message: string) {
         super(message);
         this.name = "FeatureFlagError";
     }
-}
-
-export enum FeatureFlagKeys {
-    ExitOnUnhandledError = "exit_process_on_unhandled_error",
 }
 
 export class FeatureFlagsManager {

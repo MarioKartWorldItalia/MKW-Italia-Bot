@@ -3,7 +3,8 @@ import { log, logError } from "./log.js";
 import express, { application } from "express"
 import dotenv from "dotenv"
 import { Globals } from "./globals";
-import { FeatureFlagKeys, FeatureFlagsManager } from "./feature_flags_manager";
+import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager";
+import { FeatureFlagKeys } from "./feature_flags/feature_flag_keys";
 
 function handleError(error: Error) {
     logError(`\nFATAL ERROR:\n${error.message}`

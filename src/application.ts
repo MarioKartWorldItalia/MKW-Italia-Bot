@@ -10,7 +10,7 @@ import { Database } from "./database/database.js";
 import express from "express"
 import { Server } from "http";
 import { Collection } from "mongoose";
-import { FeatureFlagsManager } from "./feature_flags_manager.js";
+import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager.js";
 
 export class Application {
     private static instance: Application;

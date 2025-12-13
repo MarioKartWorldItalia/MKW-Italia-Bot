@@ -69,10 +69,15 @@ export class Application {
         //initial fetch, then refresh every 35 secs to avoid rate limits
         await (await this.getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError);
         
-        setInterval(async () => {log("DEBUG: Cached members" + (await (this.getMainGuild())).members.cache.size)}, 5 * 60 * 1000);
+        setInterval(async () => {
+            let guild = await (await Application.getInstance().getMainGuild()).fetch();
+            if(!(guild.members.cache.size >= guild.memberCount)) {
+                logError("Error checking members cache size: \nCache size: " + guild.members.cache.size + "\nMember count: " + guild.memberCount);
+            }
+        }, 15 * 60 * 1000);
         //comment out to updates the cache periodically
         //setInterval(async ()=>{(await Application.getInstance().getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError)}, 300*1000);
-
+        
 
         //TODO: TEMPORANEO
         //IN ORDINE: SCEGLI_FAZIONE

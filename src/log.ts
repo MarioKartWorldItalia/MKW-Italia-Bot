@@ -2,10 +2,22 @@ import { Colors, EmbedBuilder } from "discord.js";
 import { Application } from "./application";
 import { Globals } from "./globals";
 import { tz } from "moment-timezone";
+import { standardDiscordTimeFormat } from "./utils";
 
 class Logger {
-    static log(...args: any[]) {
+    static async log(...args: any[]) {
         console.log(...args);
+
+        let server = await Application.getInstance().getMainGuild();
+        let channel = await server.channels.fetch(Globals.LOG_REPORT_CHANNEL_ID!);
+        if (channel && channel.isTextBased()) {
+            let time = standardDiscordTimeFormat(new Date());
+            for (let arg of args) {
+                let content = String(arg);
+                let format = `[${time}] ${content}`;
+                await channel.send(format);
+            }
+        }
     }
 
     static async logError(...args: any[]) {
@@ -16,7 +28,7 @@ class Logger {
                 await this.printErrToServer(args[i]);
             }
         }
-        catch(e) {
+        catch (e) {
             console.error("Failed to log error to server:", e);
         }
     }
@@ -48,8 +60,10 @@ class Logger {
     }
 }
 
-export function log(...args: any[]) {
-    Logger.log(...args);
+
+export async function log(...args: any[]) {
+    try { await Logger.log(...args); }
+    catch (e) { /* logError("Failed to log:", e); */ }
 }
 
 export async function logError(...args: any[]) {

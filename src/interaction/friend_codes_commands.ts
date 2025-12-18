@@ -224,6 +224,8 @@ async function onAdminGetAllFc(interaction: Interaction) {
 }
 
 async function onSearchFc(interaction: Interaction) {
+    let replyInteraction: ModalSubmitInteraction | undefined = undefined;
+
     if (!interaction.isButton())
         return;
     const modal = new ModalBuilder()
@@ -239,7 +241,7 @@ async function onSearchFc(interaction: Interaction) {
             )
         )
     await interaction.showModal(modal);
-    const replyInteraction = await awaitModalSubmit(interaction);
+    replyInteraction = await awaitModalSubmit(interaction);
     if (!replyInteraction) {
         log("Modal submit for friend code search timed out");
         return;

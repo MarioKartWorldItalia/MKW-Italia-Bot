@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction, GuildMember, Interaction, MessageFlags, ModalSubmitInteraction, Role, User } from "discord.js";
+import { ButtonInteraction, ChatInputCommandInteraction, GuildMember, Interaction, MessageComponentInteraction, MessageFlags, ModalSubmitInteraction, Role, User } from "discord.js";
 import { log, logError } from "./log";
 import { Application } from "./application";
 
@@ -56,4 +56,17 @@ export async function utilFetchUser(userId: string): Promise<User | undefined> {
     else {
         return undefined;
     }
+}
+
+export async function awaitModalSubmit(interaction: MessageComponentInteraction, timeout?: number): Promise<ModalSubmitInteraction | undefined> {
+   const STANDARD_TIMEOUT = 15 * 60 * 1000;
+   if(!timeout) { timeout = STANDARD_TIMEOUT; }
+   let retInteraction: ModalSubmitInteraction | undefined = undefined;
+
+   try { retInteraction = await interaction.awaitModalSubmit({time: timeout})}
+   catch (e) {
+         //skip
+   }
+
+   return retInteraction;
 }

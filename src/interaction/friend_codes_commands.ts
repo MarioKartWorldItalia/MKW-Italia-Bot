@@ -1,6 +1,6 @@
 import { ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, ChannelType, Client, codeBlock, EmbedBuilder, inlineCode, Interaction, ModalBuilder, ModalSubmitInteraction, Options, SlashCommandBuilder, SlashCommandStringOption, TextChannel, TextInputBuilder, TextInputStyle } from "discord.js";
 import { dBAddFriendCode, dbGetAllFriendCodes, dBGetFriendCode, dBRemoveFriendCode, FriendCode, FriendCodeResult, InvalidFriendCode } from "../frend_codes";
-import { replyEphemeral } from "../utils";
+import { awaitModalSubmit, replyEphemeral } from "../utils";
 import { log, logError } from "../log";
 import { BotDefaults, Globals } from "../globals";
 import { Application } from "../application";
@@ -83,7 +83,7 @@ export async function bindFCCommands(client: Client): Promise<Map<String, (i: In
 }
 
 async function onAddFc(interaction: Interaction) {
-    let replyInteraction: Interaction = interaction;
+    let replyInteraction = interaction;
     let code;
     if (interaction.isChatInputCommand()) {
         code = interaction.options.getString("codice", true);
@@ -102,9 +102,15 @@ async function onAddFc(interaction: Interaction) {
                         .setStyle(TextInputStyle.Paragraph)
                 )
             )
+        
         await interaction.showModal(modal);
-        replyInteraction = await interaction.awaitModalSubmit({ time: 1000 * 60 * 5 });
-        code = replyInteraction.fields.getTextInputValue("codice");
+        
+        let modalResponse = await awaitModalSubmit(interaction);
+        if(!modalResponse) {
+            log("Modal submit for friend code addition timed out");
+            return;
+        }
+        code = modalResponse.fields.getTextInputValue("codice");
     }
     else {
         throw new Error();
@@ -233,7 +239,12 @@ async function onSearchFc(interaction: Interaction) {
             )
         )
     await interaction.showModal(modal);
-    const replyInteraction = await interaction.awaitModalSubmit({ time: 1000 * 60 * 5 });
+    const replyInteraction = await awaitModalSubmit(interaction);
+    if (!replyInteraction) {
+        log("Modal submit for friend code search timed out");
+        return;
+    }
+    
     const userTag = replyInteraction.fields.getTextInputValue("user_tag").toLowerCase();
 
     const guild = await Application.getInstance().getMainGuild();

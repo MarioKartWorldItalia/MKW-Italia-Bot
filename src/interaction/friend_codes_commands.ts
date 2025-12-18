@@ -83,7 +83,7 @@ export async function bindFCCommands(client: Client): Promise<Map<String, (i: In
 }
 
 async function onAddFc(interaction: Interaction) {
-    let replyInteraction = interaction;
+    let replyInteraction: ModalSubmitInteraction | undefined = undefined;
     let code;
     if (interaction.isChatInputCommand()) {
         code = interaction.options.getString("codice", true);
@@ -105,12 +105,12 @@ async function onAddFc(interaction: Interaction) {
         
         await interaction.showModal(modal);
         
-        let modalResponse = await awaitModalSubmit(interaction);
-        if(!modalResponse) {
+        let replyInteraction = await awaitModalSubmit(interaction);
+        if(!replyInteraction) {
             log("Modal submit for friend code addition timed out");
             return;
         }
-        code = modalResponse.fields.getTextInputValue("codice");
+        code = replyInteraction.fields.getTextInputValue("codice");
     }
     else {
         throw new Error();
@@ -119,11 +119,11 @@ async function onAddFc(interaction: Interaction) {
     try {
         const fc = new FriendCode(code);
         await dBAddFriendCode(interaction.user, fc);
-        await replyEphemeral(replyInteraction, `Codice amico ${fc.toString()} aggiunto correttamente. Se era già presente un codice amico, questo verrà sovrascritto`);
+        await replyEphemeral(replyInteraction!, `Codice amico ${fc.toString()} aggiunto correttamente. Se era già presente un codice amico, questo verrà sovrascritto`);
     }
     catch (e) {
         if (e instanceof InvalidFriendCode) {
-            await replyEphemeral(replyInteraction, "Il codice amico inserito non è valido. Assicurati di averlo scritto correttamente come mostrato sulla console (es. SW-1234-5678-9012)");
+            await replyEphemeral(replyInteraction!, "Il codice amico inserito non è valido. Assicurati di averlo scritto correttamente come mostrato sulla console (es. SW-1234-5678-9012)");
             return;
         }
         throw e;

@@ -81,117 +81,117 @@ export class Application {
 
         //TODO: TEMPORANEO
         //IN ORDINE: SCEGLI_FAZIONE
-        const CHANNEL_IDS = ["1412775711105875968"];
-        const MSG_IDS: string[] = ["1416807683285061633"];
-        const fetchChannels = await (await this.getMainGuild()).channels.fetch();
-        const channels = CHANNEL_IDS.map((c) => fetchChannels.find((c1) => c1!.id == c));
-        const roles = await (await this.getMainGuild()).roles.fetch();
-        const confirmedRole = roles.find((val) => val.id == "1409561282755166218");
+        // const CHANNEL_IDS = ["1412775711105875968"];
+        // const MSG_IDS: string[] = ["1416807683285061633"];
+        // const fetchChannels = await (await this.getMainGuild()).channels.fetch();
+        // const channels = CHANNEL_IDS.map((c) => fetchChannels.find((c1) => c1!.id == c));
+        // const roles = await (await this.getMainGuild()).roles.fetch();
+        // const confirmedRole = roles.find((val) => val.id == "1409561282755166218");
 
-        const cymRoles = roles.filter((val) => {
-            return val.id == "1402793516500783124"
-                || val.id == "1402793599661506590"
-                || val.id == "1402793806558134323"
-                || val.id == "1402793755211464786"
-                || val.name == "Jolly";
-        }
-        );
-        //log("LENGTH: " + cymRoles.size);
-        const guildEmojis = await (await this.getMainGuild()).emojis.fetch();
-        const botEmojis = await this.client.application?.emojis.fetch();
-        const bulletMk = guildEmojis.find((e) => e.name == "bulletmk");
-        const cross = botEmojis?.find((e)=>e.name == "cross");
-        const check = botEmojis?.find((e)=>e.name=="check");
+        // const cymRoles = roles.filter((val) => {
+        //     return val.id == "1402793516500783124"
+        //         || val.id == "1402793599661506590"
+        //         || val.id == "1402793806558134323"
+        //         || val.id == "1402793755211464786"
+        //         || val.name == "Jolly";
+        // }
+        // );
+        // //log("LENGTH: " + cymRoles.size);
+        // const guildEmojis = await (await this.getMainGuild()).emojis.fetch();
+        // const botEmojis = await this.client.application?.emojis.fetch();
+        // const bulletMk = guildEmojis.find((e) => e.name == "bulletmk");
+        // const cross = botEmojis?.find((e)=>e.name == "cross");
+        // const check = botEmojis?.find((e)=>e.name=="check");
 
-        await this.client.application?.emojis.fetch();
-        const emojis = this.client.application?.emojis.cache;
-        let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
-        roleToEmoji.set("1402793516500783124", emojis!.find((val) => val.id == "1412791661737803907"));
-        roleToEmoji.set("1402793599661506590", emojis!.find((val) => val.id == "1412791639017128007"));
-        roleToEmoji.set("1402793806558134323", emojis!.find((val) => val.id == "1412791619320676414"));
-        roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
+        // await this.client.application?.emojis.fetch();
+        // const emojis = this.client.application?.emojis.cache;
+        // let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
+        // roleToEmoji.set("1402793516500783124", emojis!.find((val) => val.id == "1412791661737803907"));
+        // roleToEmoji.set("1402793599661506590", emojis!.find((val) => val.id == "1412791639017128007"));
+        // roleToEmoji.set("1402793806558134323", emojis!.find((val) => val.id == "1412791619320676414"));
+        // roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
 
-        async function refreshChooseYourMemeMsg() {
-            let castChannels!: Array<TextChannel>;
+        // async function refreshChooseYourMemeMsg() {
+        //     let castChannels!: Array<TextChannel>;
 
-            castChannels = channels.map((c) => c as TextChannel);
-            if (true) {
-                let msgs = [];
-                for (let i = 0; i < castChannels.length; i++) {
-                    msgs.push(await castChannels[i].messages.fetch(MSG_IDS[i]));
-                }
+        //     castChannels = channels.map((c) => c as TextChannel);
+        //     if (true) {
+        //         let msgs = [];
+        //         for (let i = 0; i < castChannels.length; i++) {
+        //             msgs.push(await castChannels[i].messages.fetch(MSG_IDS[i]));
+        //         }
 
-                let rolesMembers = new Map<String, String>();
+        //         let rolesMembers = new Map<String, String>();
 
-                for (const _role of cymRoles) {
-                    const role = _role[1];
-                    let msg = "";
+        //         for (const _role of cymRoles) {
+        //             const role = _role[1];
+        //             let msg = "";
 
-                    const members = role.members;
-                    const confirmedMembers = confirmedRole?.members.filter((m) => members.find((m1) => m1.id == m.id) != undefined);
-                    let unconfirmedMembers = undefined;
-                    if (confirmedMembers != undefined) {
-                        unconfirmedMembers = members.difference(confirmedMembers);
-                    }
+        //             const members = role.members;
+        //             const confirmedMembers = confirmedRole?.members.filter((m) => members.find((m1) => m1.id == m.id) != undefined);
+        //             let unconfirmedMembers = undefined;
+        //             if (confirmedMembers != undefined) {
+        //                 unconfirmedMembers = members.difference(confirmedMembers);
+        //             }
 
-                    if (confirmedMembers && confirmedMembers.size != 0) {
-                        let trail = "";
-                        msg += `> ${check} Confermati (${confirmedMembers.size}): `
-                        for (const m of confirmedMembers) {
-                            msg += trail;
-                            msg += `<@${m[1].id}>`;
-                            trail = ", "
-                        }
-                        msg+="\n";
-                    }
+        //             if (confirmedMembers && confirmedMembers.size != 0) {
+        //                 let trail = "";
+        //                 msg += `> ${check} Confermati (${confirmedMembers.size}): `
+        //                 for (const m of confirmedMembers) {
+        //                     msg += trail;
+        //                     msg += `<@${m[1].id}>`;
+        //                     trail = ", "
+        //                 }
+        //                 msg+="\n";
+        //             }
 
-                    if (unconfirmedMembers && unconfirmedMembers.size != 0) {
-                        let trail = "";
-                        msg += `> ${cross} Non confermati (${unconfirmedMembers.size}): `
-                        for (const m of unconfirmedMembers) {
-                            msg += trail;
-                            msg += `<@${m[1].id}>`;
-                            trail = ", "
-                        }
-                    }
-                    if(roleToEmoji.get(role.id) != undefined)
-                        rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
-                    else
-                        rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
-                }
+        //             if (unconfirmedMembers && unconfirmedMembers.size != 0) {
+        //                 let trail = "";
+        //                 msg += `> ${cross} Non confermati (${unconfirmedMembers.size}): `
+        //                 for (const m of unconfirmedMembers) {
+        //                     msg += trail;
+        //                     msg += `<@${m[1].id}>`;
+        //                     trail = ", "
+        //                 }
+        //             }
+        //             if(roleToEmoji.get(role.id) != undefined)
+        //                 rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
+        //             else
+        //                 rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
+        //         }
 
-                let finalMsg = "";
-                let trail = "";
-                finalMsg += "## TABELLA LIVE ISCRIZIONI\n\u200b\n";
-                for (const entry of rolesMembers) {
-                    finalMsg += trail;
-                    finalMsg += entry[0] + "\n";
-                    finalMsg += entry[1];
-                    trail = "\n\n";
-                }
+        //         let finalMsg = "";
+        //         let trail = "";
+        //         finalMsg += "## TABELLA LIVE ISCRIZIONI\n\u200b\n";
+        //         for (const entry of rolesMembers) {
+        //             finalMsg += trail;
+        //             finalMsg += entry[0] + "\n";
+        //             finalMsg += entry[1];
+        //             trail = "\n\n";
+        //         }
 
-                const embed = new EmbedBuilder()
-                .setColor(Globals.STANDARD_HEX_COLOR)
-                .setDescription(finalMsg)
-                .toJSON();
+        //         const embed = new EmbedBuilder()
+        //         .setColor(Globals.STANDARD_HEX_COLOR)
+        //         .setDescription(finalMsg)
+        //         .toJSON();
 
-                for (const msg of msgs) {
-                    if (!msg) {
-                        return;
-                    }
-                    await msg.edit({
-                        content: null,
-                        embeds: [embed]
-                    })
-                }
-            }
+        //         for (const msg of msgs) {
+        //             if (!msg) {
+        //                 return;
+        //             }
+        //             await msg.edit({
+        //                 content: null,
+        //                 embeds: [embed]
+        //             })
+        //         }
+        //     }
 
-            else {
-                for (const ch of castChannels) { await ch.send({ content: "." }); }
-            }
-        }
-        refreshChooseYourMemeMsg();
-        this.client.on("guildMemberUpdate", refreshChooseYourMemeMsg);
+        //     else {
+        //         for (const ch of castChannels) { await ch.send({ content: "." }); }
+        //     }
+        // }
+        // refreshChooseYourMemeMsg();
+        // this.client.on("guildMemberUpdate", refreshChooseYourMemeMsg);
 
 
 

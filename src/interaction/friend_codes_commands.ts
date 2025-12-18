@@ -105,7 +105,7 @@ async function onAddFc(interaction: Interaction) {
         
         await interaction.showModal(modal);
         
-        let replyInteraction = await awaitModalSubmit(interaction);
+        replyInteraction = await awaitModalSubmit(interaction);
         if(!replyInteraction) {
             log("Modal submit for friend code addition timed out");
             return;

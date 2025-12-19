@@ -53,9 +53,11 @@ export class Application {
         return this.db;
     }
 
-    public async start() {   
-        await this.db.init();
-        await this.featureFlagsManager.waitForInitialization();
+    public async start() {
+        let startFunctions: Array<Promise<void>> = [];
+
+        startFunctions.push(this.db.init());
+        startFunctions.push(this.featureFlagsManager.waitForInitialization());
         this.tournamentManager = new TournamentManager();
 
         this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
@@ -64,6 +66,8 @@ export class Application {
 
         this.client.on(Events.Warn, log);
         this.client.on(Events.Error, logError);
+
+        await Promise.all(startFunctions);
         await this.client.login(Globals.BOT_TOKEN);
         
         //initial fetch, then refresh every 35 secs to avoid rate limits

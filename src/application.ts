@@ -56,8 +56,13 @@ export class Application {
     public async start() {
         let startFunctions: Array<Promise<void>> = [];
 
+        let t = performance.now();
         startFunctions.push(this.db.init());
+        log(`db.init() setup: ${performance.now() - t}ms`);
+        
+        t = performance.now();
         startFunctions.push(this.featureFlagsManager.waitForInitialization());
+        log(`featureFlagsManager.waitForInitialization() setup: ${performance.now() - t}ms`);
 
         this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
         //the client is not supposed to join guilds
@@ -66,15 +71,21 @@ export class Application {
         this.client.on(Events.Warn, log);
         this.client.on(Events.Error, logError);
 
+        t = performance.now();
         await Promise.all(startFunctions);
+        log(`Promise.all(startFunctions): ${performance.now() - t}ms`);
 
+        t = performance.now();
         this.tournamentManager = new TournamentManager();
+        log(`TournamentManager initialization: ${performance.now() - t}ms`);
         
+        t = performance.now();
         await this.client.login(Globals.BOT_TOKEN);
+        log(`client.login(): ${performance.now() - t}ms`);
         
-        //initial fetch, then refresh every 35 secs to avoid rate limits
+        t = performance.now();
         await (await this.getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError);
-        
+        log(`Initial members.fetch(): ${performance.now() - t}ms`);
         setInterval(async () => {
             let guild = await (await Application.getInstance().getMainGuild()).fetch();
             if(!(guild.members.cache.size >= guild.memberCount)) {

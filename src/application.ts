@@ -54,7 +54,11 @@ export class Application {
     }
 
     public async start() {
+        log("PRECISION TIME APP START: " + new Date().toISOString());
+        let tstart = performance.now();
+        log("Starting application...");
         let startFunctions: Array<Promise<void>> = [];
+        log(`Application start() setup time: ${performance.now() - tstart}ms`);
 
         let t = performance.now();
         startFunctions.push(this.db.init());

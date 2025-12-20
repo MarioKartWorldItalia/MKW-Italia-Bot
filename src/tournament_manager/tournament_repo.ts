@@ -1,5 +1,4 @@
 import { Document, Model, Schema } from "mongoose";
-import { TournamentSchema } from "../database/models/tournament_model";
 import { Application } from "../application";
 import { Tournament } from "./tournaments";
 import { ObjectId } from "mongodb";
@@ -14,11 +13,9 @@ export class TournamentRepo {
     }
 
     public async updateTournament(tournament: Tournament) {
-        let schema = new TournamentSchema();
-        schema.setValues(tournament);
         const update = await this.tournaments.updateOne(
             {_id: tournament.getId()},
-            {$set: schema},
+            {$set: tournament},
             {upsert: true}
         ).exec();
     }
@@ -32,16 +29,16 @@ export class TournamentRepo {
 
         let tArr = new Array<Tournament>();
         for (let i = 0; i < res.length; i++) {
-            tArr.push(await Tournament.fromSchema(res[i]));
+            tArr.push(res[i].toObject());
         }
         return tArr;
     }
 
-    public async getTouruamentById(id: ObjectId) {
+    public async getTouruamentById(id: ObjectId): Promise<Tournament | undefined> {
         let res = await this.tournaments.findById(id).exec();
 
         if (res) {
-            return Tournament.fromSchema(res);
+            return res.toObject();
         }
     }
 }

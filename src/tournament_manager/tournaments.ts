@@ -2,7 +2,6 @@ import { managerToFetchingStrategyOptions, Message, ThreadMemberFlagsBitField } 
 import { Application } from "../application";
 import { ObjectId } from "mongodb";
 import { TournamentRepo } from "./tournament_repo";
-import { TournamentSchema } from "../database/models/tournament_model";
 import { log } from "../log";
 import { prop } from "@typegoose/typegoose";
 
@@ -19,19 +18,40 @@ export class TournamentPlayerEntry {
 }
 
 export class Tournament {
+    @prop({ required: true, type: Date })
     private dateTime: Date;
+
+    @prop({ required: true, type: Date })
+    public bracket2Date?: Date;
+
+    @prop({ required: true, type: String })
     private name: string;
+
+    @prop({ required: true, type: ObjectId })
     private id?: ObjectId;
+
+    @prop({ required: true, type: Array<TournamentPlayerEntry> })
     private players: TournamentPlayerEntry[] = [];
+
+    @prop({ required: false, type: String })
     private description?: string;
-    private serverMessage: Message | undefined;
+
+    @prop({ required: false, type: String })
+    private serverMessage?: Message;
+
+    @prop({ required: true, type: Boolean })
     public isTournament: boolean = true;
 
-    public bracket2Date?: Date;
-    private eventPlanners: Map<string, string> = new Map();
+    @prop({ required: true, type: Map })
     private mode?: String;
+
+    @prop({ required: false, type: Number })
     private nRaces?: Number;
+    
+    @prop({ required: false, type: Number })
     private minPlayers?: Number;
+
+    @prop({ required: false, type: Number })
     private maxPlayers?: Number;
 
     public constructor(dateTime: Date, name: string) {
@@ -39,14 +59,6 @@ export class Tournament {
         this.name = name;
 
         this.id = new ObjectId();
-    }
-
-    public addEventPlanner(userId: string, friendCode?: string) {
-        this.eventPlanners.set(userId, friendCode || "");
-    }
-
-    public getEventPlanners() {
-        return this.eventPlanners;
     }
 
     public setId(id: ObjectId) {
@@ -91,33 +103,6 @@ export class Tournament {
 
     public getMaxPlayers() {
         return this.maxPlayers;
-    }
-
-    public static async fromSchema(doc: TournamentSchema): Promise<Tournament> {
-        let ret = new Tournament(doc.startDateTime, doc.tournamentName.toString());
-        ret.isTournament = doc.isTournament as boolean;
-        ret.setId(doc._id);
-        ret.setDescription(doc.description?.toString());
-        if (doc.serverMessageId && doc.serverMessageChannelId) {
-            const mainGuild = await Application.getInstance().getMainGuild();
-            const channel = await mainGuild.channels.fetch(doc.serverMessageChannelId.toString());
-            if (channel?.isTextBased()) {
-                const msg = await channel.messages.fetch(doc.serverMessageId.toString());
-                ret.serverMessage = msg;
-            }
-        }
-        const eventPlanners = doc.eventPlanners;
-        if (eventPlanners) {
-            ret.eventPlanners = eventPlanners.toObject();
-        }
-        ret.players = doc.parteciparingPlayers;
-        ret.mode = doc.mode;
-        ret.nRaces = doc.nRaces;
-        ret.minPlayers = doc.minPlayers;
-        ret.maxPlayers = doc.maxPlayers;
-        ret.bracket2Date = doc.bracket2Date;
-
-        return ret;
     }
 
     public setServerMessage(msg?: Message) {

@@ -24,7 +24,7 @@ COPY --from=builder /app/dist ./dist
 
 USER node
 
-EXPOSE 80
+EXPOSE 443
 
 # entry point
 CMD ["node", "dist/main.js"]

@@ -15,7 +15,7 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production \
-    PORT=80
+    PORT=443
 
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --production

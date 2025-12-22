@@ -4,6 +4,7 @@ import { Tournament } from "./tournaments";
 import { ObjectId } from "mongodb";
 import { errors } from "@typegoose/typegoose";
 import { log } from "../log";
+import { assertCond } from "../assert";
 
 export class TournamentRepo {
     private tournaments;
@@ -13,32 +14,37 @@ export class TournamentRepo {
     }
 
     public async updateTournament(tournament: Tournament) {
-        const update = await this.tournaments.updateOne(
-            {_id: tournament.getId()},
-            {$set: tournament},
-            {upsert: true}
-        ).exec();
+        let t = await this.tournaments.findById(tournament.getId()).exec();
+        
+        if(!t) {
+            await this.tournaments.create(tournament);
+            log(`Created tournament ${tournament.getId()}`);
+            return;
+        }
+        await this.tournaments.findByIdAndUpdate(tournament.getId(), tournament).exec();
+        log(`Updated tournament ${tournament.getId()}`);
     }
 
     public async removeTournament(tournament: Tournament) {
         await this.tournaments.findByIdAndDelete(tournament.getId()).exec();
     }
 
-    public async getAllTournaments(includeOtherEvents: boolean): Promise<Tournament[]> {
-        let res = await this.tournaments.find().exec();
-
-        let tArr = new Array<Tournament>();
-        for (let i = 0; i < res.length; i++) {
-            tArr.push(res[i].toObject());
+    public async getAllTournaments(includeOtherEvents: boolean) {
+        const res = await this.tournaments.find().exec();
+        let tournaments: Tournament[] = [];
+        
+        for (const doc of res) {
+            const tournament = (doc as any) as Tournament;
+            tournaments.push(tournament);
         }
-        return tArr;
+        return tournaments;
     }
 
     public async getTouruamentById(id: ObjectId): Promise<Tournament | undefined> {
         let res = await this.tournaments.findById(id).exec();
 
         if (res) {
-            return res.toObject();
+            return (res as any) as Tournament;
         }
     }
 }

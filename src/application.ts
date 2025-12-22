@@ -205,6 +205,7 @@ export class Application {
 
 
         let server = express();
+        server.get("/", (req, res) => { res.send("MKW Italia Bot is running") });
         server.get("/ping", (req, res) => { res.send("pong") });
         this.webServer = server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
     }

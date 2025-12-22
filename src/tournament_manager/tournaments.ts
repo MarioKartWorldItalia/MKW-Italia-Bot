@@ -18,51 +18,51 @@ export class TournamentPlayerEntry {
 }
 
 export class Tournament {
+    @prop({ required: true, type: Boolean })
+    public isCompiled: boolean = false;
+    
     @prop({ required: true, type: Date })
-    private dateTime: Date;
+    public dateTime: Date;
 
     @prop({ required: true, type: Date })
     public bracket2Date?: Date;
 
     @prop({ required: true, type: String })
-    private name: string;
+    public name: string;
 
     @prop({ required: true, type: ObjectId })
-    private id?: ObjectId;
+    public _id?: ObjectId;
 
     @prop({ required: true, type: Array<TournamentPlayerEntry> })
     private players: TournamentPlayerEntry[] = [];
 
     @prop({ required: false, type: String })
-    private description?: string;
+    public description?: string;
 
     @prop({ required: false, type: String })
-    private serverMessage?: Message;
+    public serverMessage?: Message;
 
-    @prop({ required: true, type: Boolean })
-    public isTournament: boolean = true;
-
-    @prop({ required: true, type: Map })
-    private mode?: String;
+    @prop({ required: true, type: String })
+    public mode?: String;
 
     @prop({ required: false, type: Number })
-    private nRaces?: Number;
+    public nRaces?: Number;
     
     @prop({ required: false, type: Number })
-    private minPlayers?: Number;
+    public minPlayers?: Number;
 
     @prop({ required: false, type: Number })
-    private maxPlayers?: Number;
+    public maxPlayers?: Number;
 
     public constructor(dateTime: Date, name: string) {
         this.dateTime = dateTime;
         this.name = name;
 
-        this.id = new ObjectId();
+        this._id = new ObjectId();
     }
 
     public setId(id: ObjectId) {
-        this.id = id;
+        this._id = id;
     }
 
     public setSecondBracketDate(date: Date) {
@@ -160,7 +160,7 @@ export class Tournament {
     }
 
     public getId() {
-        return this.id;
+        return this._id;
     }
 
     public getPlayers(): TournamentPlayerEntry[] {
@@ -185,14 +185,14 @@ export class TournamentManager {
     }
 
     public async updateTournament(tournament: Tournament) {
-        this.addTournament(tournament);
+        this.tournaments.updateTournament(tournament);
     }
 
     public async removeTournament(tournament: Tournament) {
         return this.tournaments.removeTournament(tournament);
     }
 
-    public async getTournaments(includeOtherEvents: boolean = true): Promise<Tournament[]> {
+    public async getTournaments(includeOtherEvents: boolean = true) {
         return this.tournaments.getAllTournaments(includeOtherEvents);
     }
 

@@ -74,7 +74,7 @@ export class Application {
         
         //initial fetch, then refresh every 35 secs to avoid rate limits
         await (await this.getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError);
-        
+
         setInterval(async () => {
             let guild = await (await Application.getInstance().getMainGuild()).fetch();
             if(!(guild.members.cache.size >= guild.memberCount)) {

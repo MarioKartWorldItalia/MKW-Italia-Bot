@@ -14,6 +14,10 @@ export class Globals {
             GatewayIntentBits.GuildMembers,
     ]
 
+    //Meta
+    static readonly META_VERIFY_TOKEN = env.META_VERIFY_TOKEN!;
+    static readonly META_APP_SECRET = env.META_APP_SECRET!;
+
     static readonly FEATURE_FLAGS_SDK_KEY = env.FEATURE_FLAGS_SDK_KEY || (() => { throw new Error("FEATURE_FLAGS_SDK_KEY environment variable is not set") })();
     static readonly MAX_SERVERS = 1;
     static readonly BOT_TOKEN = env.DISCORD_BOT_TOKEN;

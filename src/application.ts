@@ -11,6 +11,7 @@ import express from "express"
 import { Server } from "http";
 import { Collection } from "mongoose";
 import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager.js";
+import { onWebhooks } from "./meta_webhooks.js";
 
 export class Application {
     private static instance: Application;
@@ -207,6 +208,7 @@ export class Application {
         let server = express();
         server.get("/", (req, res) => { res.send("MKW Italia Bot is running") });
         server.get("/ping", (req, res) => { res.send("pong") });
+        server.all("/webhooks", onWebhooks);
         this.webServer = server.listen(process.env.PORT, () => { log("Webserver started on port: " + process.env.PORT); });
     }
 

@@ -8,18 +8,21 @@ import { FeatureFlagKeys } from "./feature_flags/feature_flag_keys";
 
 function handleError(error: Error) {
     logError(`\nFATAL ERROR:\n${error.message}`
-        +`\n\nStack trace:\n${error.stack}`
-    ).catch(console.error);
-    FeatureFlagsManager.getBooleanValueFor(FeatureFlagKeys.ExitOnUnhandledError, true)
-    .then((val) => {
-        if(val) {
-            process.exit(1);
-        }
-    })
-    .catch((e)=> {
-        logError(`Error retrieving feature flag value: ${e.message}`).catch(console.error);
-        process.exit(1);
-    })
+        + `\n\nStack trace:\n${error.stack}`
+    ).catch(console.error)
+        .then(() => {
+            FeatureFlagsManager.getBooleanValueFor(FeatureFlagKeys.ExitOnUnhandledError, true)
+                .then((val) => {
+                    if (val) {
+                        process.exit(1);
+                    }
+                })
+                .catch((e) => {
+                    logError(`Error retrieving feature flag value: ${e.message}`).catch(console.error);
+                    process.exit(1);
+                })
+        })
+
 }
 
 async function main() {

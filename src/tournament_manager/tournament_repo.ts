@@ -27,6 +27,7 @@ export class TournamentRepo {
 
     public async removeTournament(tournament: Tournament) {
         await this.tournaments.findByIdAndDelete(tournament.getId()).exec();
+        log(`Removed tournament ${tournament.getId()}`);
     }
 
     public async getAllTournaments(includeOtherEvents: boolean) {

@@ -4,11 +4,14 @@ import { ObjectId } from "mongodb";
 import { TournamentRepo } from "./tournament_repo";
 import { log } from "../log";
 import { prop } from "@typegoose/typegoose";
+import { TournamentEvent } from "./events";
+import { removeTournamentThread, updateTournamentName, updateTournamentTable } from "../interaction/tournament_commands/common";
 
 export class TournamentPlayerEntry {
     public playerId: string;
     public joinDateTime: Date;
     public displayName: string;
+    public checkedIn: boolean = false;
 
     public constructor(playerId: string, joinDateTime: Date, displayName: string = "") {
         this.playerId = playerId;
@@ -19,22 +22,25 @@ export class TournamentPlayerEntry {
 
 export class Tournament {
     @prop({ required: true, type: Boolean })
-    public isCompiled: boolean = false;
-    
+    public isCompiled: boolean = true;
+
+    @prop({ type: String })
+    public checkinMsg?: string;
+
     @prop({ required: true, type: Date })
     public dateTime: Date;
 
-    @prop({ required: true, type: Date })
+    @prop({ required: false, type: Date })
     public bracket2Date?: Date;
 
-    @prop({ required: true, type: String })
+    @prop({ required: true })
     public name: string;
 
-    @prop({ required: true, type: ObjectId })
+    @prop({ required: false, type: ObjectId })
     public _id?: ObjectId;
 
-    @prop({ required: true, type: Array<TournamentPlayerEntry> })
-    private players: TournamentPlayerEntry[] = [];
+    @prop({ required: false, type: Array<TournamentPlayerEntry> })
+    public players: TournamentPlayerEntry[] = [];
 
     @prop({ required: false, type: String })
     public description?: string;
@@ -42,21 +48,28 @@ export class Tournament {
     @prop({ required: false, type: String })
     public serverMessage?: Message;
 
-    @prop({ required: true, type: String })
-    public mode?: String;
+    @prop({ required: true })
+    public mode: string;
 
     @prop({ required: false, type: Number })
     public nRaces?: Number;
-    
+
     @prop({ required: false, type: Number })
     public minPlayers?: Number;
 
     @prop({ required: false, type: Number })
     public maxPlayers?: Number;
 
-    public constructor(dateTime: Date, name: string) {
+    @prop({ required: false, type: String })
+    public tournamentChannelId?: string;
+
+    @prop({ required: false, type: String })
+    public tableMsgId?: string;
+
+    public constructor(dateTime: Date, name: string, mode: string) {
         this.dateTime = dateTime;
         this.name = name;
+        this.mode = mode;
 
         this._id = new ObjectId();
     }
@@ -151,7 +164,7 @@ export class Tournament {
         this.dateTime = dateTime;
     }
 
-    public getName(): string {
+    public getName(): String {
         return this.name;
     }
 
@@ -170,9 +183,13 @@ export class Tournament {
 
 export class TournamentManager {
     tournaments: TournamentRepo;
+    emitter: TournamentEvent = new TournamentEvent();
 
     public constructor() {
         this.tournaments = new TournamentRepo();
+        this.emitter.on("update", updateTournamentName);
+        this.emitter.on("update", updateTournamentTable);
+        this.emitter.on("remove", removeTournamentThread);
     }
 
     public async setDefaultAddRole(id: string) {
@@ -182,13 +199,16 @@ export class TournamentManager {
 
     public async addTournament(tournament: Tournament) {
         this.tournaments.updateTournament(tournament);
+        this.emitter.emit("update", tournament);
     }
 
     public async updateTournament(tournament: Tournament) {
         this.tournaments.updateTournament(tournament);
+        this.emitter.emit("update", tournament);
     }
 
     public async removeTournament(tournament: Tournament) {
+        this.emitter.emit("remove", tournament);
         return this.tournaments.removeTournament(tournament);
     }
 

@@ -9,6 +9,7 @@
     "mongodb": "6.17",
     "mongoose": "^8.16.5",
     "node.js": "^0.0.1-security",
+    "tiny-typed-emitter": "^2.1.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

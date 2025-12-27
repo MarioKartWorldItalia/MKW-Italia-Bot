@@ -3,7 +3,7 @@ import { ActionRowBuilder, APIEmbedField, ApplicationEmoji, ButtonBuilder, Butto
 import { log, logError } from "./log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
-import { bindCommands } from "./interaction/slash_commands.js";
+import { bindCommands } from "./interaction/commands.js";
 import "process"
 import { abort, exit } from "process";
 import { Database } from "./database/database.js";
@@ -20,6 +20,8 @@ export class Application {
     private webServer!: Server;
     private db: Database;
     private featureFlagsManager: FeatureFlagsManager;
+
+    
 
 
     public constructor() {
@@ -88,168 +90,168 @@ export class Application {
 
         //TODO: TEMPORANEO
         //IN ORDINE: SCEGLI_FAZIONE
-        const CHANNEL_IDS = ["1412775711105875968"];
-        const MSG_IDS: string[] = ["1461352569543852247"];
-        const fetchChannels = await (await this.getMainGuild()).channels.fetch();
-        const channels = CHANNEL_IDS.map((c) => fetchChannels.find((c1) => c1!.id == c));
-        const roles = await (await this.getMainGuild()).roles.fetch();
-        const confirmedRole = roles.find((val) => val.id == "1409561282755166218");
+//         const CHANNEL_IDS = ["1412775711105875968"];
+//         const MSG_IDS: string[] = ["1461352569543852247"];
+//         const fetchChannels = await (await this.getMainGuild()).channels.fetch();
+//         const channels = CHANNEL_IDS.map((c) => fetchChannels.find((c1) => c1!.id == c));
+//         const roles = await (await this.getMainGuild()).roles.fetch();
+//         const confirmedRole = roles.find((val) => val.id == "1409561282755166218");
 
-        const cymRoles = roles.filter((val) => {
-            return val.id == "1402793516500783124"
-                || val.id == "1402793599661506590"
-                || val.id == "1402793806558134323"
-                || val.id == "1402793755211464786"
-                || val.name == "Jolly";
-        }
-        );
-        log("LENGTH: " + cymRoles.size);
-        const guildEmojis = await (await this.getMainGuild()).emojis.fetch();
-        const botEmojis = await this.client.application?.emojis.fetch();
-        const bulletMk = guildEmojis.find((e) => e.name == "bulletmk");
-        const cross = botEmojis?.find((e) => e.name == "cross");
-        const check = botEmojis?.find((e) => e.name == "check");
+//         const cymRoles = roles.filter((val) => {
+//             return val.id == "1402793516500783124"
+//                 || val.id == "1402793599661506590"
+//                 || val.id == "1402793806558134323"
+//                 || val.id == "1402793755211464786"
+//                 || val.name == "Jolly";
+//         }
+//         );
+//         log("LENGTH: " + cymRoles.size);
+//         const guildEmojis = await (await this.getMainGuild()).emojis.fetch();
+//         const botEmojis = await this.client.application?.emojis.fetch();
+//         const bulletMk = guildEmojis.find((e) => e.name == "bulletmk");
+//         const cross = botEmojis?.find((e) => e.name == "cross");
+//         const check = botEmojis?.find((e) => e.name == "check");
 
-        await this.client.application?.emojis.fetch();
-        const emojis = this.client.application?.emojis.cache;
-        let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
-        roleToEmoji.set("1402793516500783124", emojis!.find((val) => val.id == "1412791661737803907"));
-        roleToEmoji.set("1402793599661506590", emojis!.find((val) => val.id == "1412791639017128007"));
-        roleToEmoji.set("1402793806558134323", emojis!.find((val) => val.id == "1412791619320676414"));
-        roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
+//         await this.client.application?.emojis.fetch();
+//         const emojis = this.client.application?.emojis.cache;
+//         let roleToEmoji = new Map<String, ApplicationEmoji | undefined>();
+//         roleToEmoji.set("1402793516500783124", emojis!.find((val) => val.id == "1412791661737803907"));
+//         roleToEmoji.set("1402793599661506590", emojis!.find((val) => val.id == "1412791639017128007"));
+//         roleToEmoji.set("1402793806558134323", emojis!.find((val) => val.id == "1412791619320676414"));
+//         roleToEmoji.set("1402793755211464786", emojis!.find((val) => val.id == "1412791676229128355"));
 
-        this.client.on("interactionCreate", async (interaction) => {
-            if (!interaction.isButton()) {
-                return;
-            }
-            if (cymRoles.find((role) => { return role.id == interaction.customId }) == undefined) {
-                return;
-            }
+//         this.client.on("interactionCreate", async (interaction) => {
+//             if (!interaction.isButton()) {
+//                 return;
+//             }
+//             if (cymRoles.find((role) => { return role.id == interaction.customId }) == undefined) {
+//                 return;
+//             }
 
-            const foundRole = cymRoles.find((role) => { return role.id == interaction.customId })!;
-            const member = await (await this.getMainGuild()).members.fetch(interaction.user.id);
-            if (member.roles.cache.has(foundRole.id)) {
-                await member.roles.remove(foundRole);
-                await replyEphemeral(interaction, "Ruoli modificati");
-                return;
-            }
-            else {
-                for(const role of cymRoles) {
-                    if(member.roles.cache.has(role[1].id)){
-                        await member.roles.remove(role);
-                    }
-                }
-                await member.roles.add(foundRole);
-                await replyEphemeral(interaction, "Ruoli modificati");
-            }
-        })
+//             const foundRole = cymRoles.find((role) => { return role.id == interaction.customId })!;
+//             const member = await (await this.getMainGuild()).members.fetch(interaction.user.id);
+//             if (member.roles.cache.has(foundRole.id)) {
+//                 await member.roles.remove(foundRole);
+//                 await replyEphemeral(interaction, "Ruoli modificati");
+//                 return;
+//             }
+//             else {
+//                 for(const role of cymRoles) {
+//                     if(member.roles.cache.has(role[1].id)){
+//                         await member.roles.remove(role);
+//                     }
+//                 }
+//                 await member.roles.add(foundRole);
+//                 await replyEphemeral(interaction, "Ruoli modificati");
+//             }
+//         })
 
-        async function refreshChooseYourMemeMsg() {
-            let castChannels!: Array<TextChannel>;
+//         async function refreshChooseYourMemeMsg() {
+//             let castChannels!: Array<TextChannel>;
 
-            castChannels = channels.map((c) => c as TextChannel);
-            if (true) {
-                let msgs = [];
-                for (let i = 0; i < castChannels.length; i++) {
-                    msgs.push(await castChannels[i].messages.fetch(MSG_IDS[i]));
-                }
+//             castChannels = channels.map((c) => c as TextChannel);
+//             if (true) {
+//                 let msgs = [];
+//                 for (let i = 0; i < castChannels.length; i++) {
+//                     msgs.push(await castChannels[i].messages.fetch(MSG_IDS[i]));
+//                 }
 
-                let rolesMembers = new Map<String, String>();
+//                 let rolesMembers = new Map<String, String>();
 
-                for (const _role of cymRoles) {
-                    const role = _role[1];
-                    let msg = "";
+//                 for (const _role of cymRoles) {
+//                     const role = _role[1];
+//                     let msg = "";
 
-                    const members = role.members;
+//                     const members = role.members;
 
-                    if (true) {
-                        let trail = "";
-                        let counter = 1;
-                        for (const m of members!) {
-                            let checkin = "" as any;
-                            if (m[1].roles.cache.has(confirmedRole!.id)) {
-                                checkin = check as any;
-                            }
-                            msg += trail;
-                            msg += `> ${inlineCode(counter.toString() + ".")} <@${m[1].id}>${checkin}`;
-                            counter += 1;
-                            msg += "\n";
-                        }
+//                     if (true) {
+//                         let trail = "";
+//                         let counter = 1;
+//                         for (const m of members!) {
+//                             let checkin = "" as any;
+//                             if (m[1].roles.cache.has(confirmedRole!.id)) {
+//                                 checkin = check as any;
+//                             }
+//                             msg += trail;
+//                             msg += `> ${inlineCode(counter.toString() + ".")} <@${m[1].id}>${checkin}`;
+//                             counter += 1;
+//                             msg += "\n";
+//                         }
 
-                    }
+//                     }
 
-                    if (false)
-                        rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
-                    else
-                        rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
-                }
+//                     if (false)
+//                         rolesMembers.set(`${bulletMk} ${roleToEmoji.get(role.id)} **${role.name}** (${role.members.size})`, msg);
+//                     else
+//                         rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
+//                 }
 
-                let finalMsg = "";
-                let trail = "";
-                finalMsg += "## TABELLA LIVE ISCRIZIONI\n\u200b\n";
-                for (const entry of rolesMembers) {
-                    finalMsg += trail;
-                    finalMsg += entry[0] + "\n";
-                    finalMsg += entry[1];
-                    trail = "\n";
-                }
+//                 let finalMsg = "";
+//                 let trail = "";
+//                 finalMsg += "## TABELLA LIVE ISCRIZIONI\n\u200b\n";
+//                 for (const entry of rolesMembers) {
+//                     finalMsg += trail;
+//                     finalMsg += entry[0] + "\n";
+//                     finalMsg += entry[1];
+//                     trail = "\n";
+//                 }
 
-                const embed = new EmbedBuilder()
-                    .setColor(Globals.STANDARD_HEX_COLOR)
-                    .setDescription(finalMsg)
-                    .toJSON();
+//                 const embed = new EmbedBuilder()
+//                     .setColor(Globals.STANDARD_HEX_COLOR)
+//                     .setDescription(finalMsg)
+//                     .toJSON();
 
-                for (const msg of msgs) {
-                    if (!msg) {
-                        return;
-                    }
-                    await msg.edit({
-                        content: null,
-                        embeds: [embed]
-                    })
-                }
-            }
+//                 for (const msg of msgs) {
+//                     if (!msg) {
+//                         return;
+//                     }
+//                     await msg.edit({
+//                         content: null,
+//                         embeds: [embed]
+//                     })
+//                 }
+//             }
 
-            else {
-                for (const ch of castChannels) { await ch.send({ content: "." }); }
-                let roles = [];
-                for (const role of cymRoles) {
-                    roles.push(role[1]);
-                }
-                sendButtonsMsg(roles, channels[0]!);
-            }
-        }
+//             else {
+//                 for (const ch of castChannels) { await ch.send({ content: "." }); }
+//                 let roles = [];
+//                 for (const role of cymRoles) {
+//                     roles.push(role[1]);
+//                 }
+//                 sendButtonsMsg(roles, channels[0]!);
+//             }
+//         }
 
-        function sendButtonsMsg(roles: Role[], channel: Channel) {
-            let msg = `# SCEGLI LA TUA FAZIONE
-Utilizza i pulsanti qui sotto per unirti alla fazione che preferisci e accedere al canale riservato.
-Se invece ti va bene essere inserito in qualsiasi team senza preferenze, seleziona il ruolo Jolly: sarai di grande aiuto per l’organizzazione!`;
+//         function sendButtonsMsg(roles: Role[], channel: Channel) {
+//             let msg = `# SCEGLI LA TUA FAZIONE
+// Utilizza i pulsanti qui sotto per unirti alla fazione che preferisci e accedere al canale riservato.
+// Se invece ti va bene essere inserito in qualsiasi team senza preferenze, seleziona il ruolo Jolly: sarai di grande aiuto per l’organizzazione!`;
 
-            let buttons = []
-            for (const role of roles) {
-                buttons.push(
-                    new ButtonBuilder()
-                        .setCustomId(role.id)
-                        .setLabel(role.name)
-                        .setStyle(ButtonStyle.Primary)
-                );
-            }
-            let embed = new EmbedBuilder()
-                .setDescription(msg)
-                .setColor(Globals.STANDARD_HEX_COLOR)
-                .toJSON();
+//             let buttons = []
+//             for (const role of roles) {
+//                 buttons.push(
+//                     new ButtonBuilder()
+//                         .setCustomId(role.id)
+//                         .setLabel(role.name)
+//                         .setStyle(ButtonStyle.Primary)
+//                 );
+//             }
+//             let embed = new EmbedBuilder()
+//                 .setDescription(msg)
+//                 .setColor(Globals.STANDARD_HEX_COLOR)
+//                 .toJSON();
 
-            if (channel.isSendable()) {
-                channel.send({
-                    content: undefined,
-                    embeds: [embed],
-                    components: [new ActionRowBuilder().addComponents(buttons).toJSON()]
-                })
-            }
-        }
+//             if (channel.isSendable()) {
+//                 channel.send({
+//                     content: undefined,
+//                     embeds: [embed],
+//                     components: [new ActionRowBuilder().addComponents(buttons).toJSON()]
+//                 })
+//             }
+//         }
 
-        refreshChooseYourMemeMsg();
-        this.client.on("guildMemberUpdate", refreshChooseYourMemeMsg);
+//         refreshChooseYourMemeMsg();
+//         this.client.on("guildMemberUpdate", refreshChooseYourMemeMsg);
 
 
 

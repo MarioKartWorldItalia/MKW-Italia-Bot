@@ -1,6 +1,12 @@
 import { prop } from "@typegoose/typegoose";
 import { Schema } from "mongoose";
 
+export class TournamentDefaults {
+    @prop({type: String, required: true, default: ""})
+    public categoryId!: string;
+
+}
+
 export class FriendCodesDbDefaults {
     public channelId!: string;
     public messageId?: string;
@@ -17,5 +23,7 @@ export class BotDefaultsSchema {
 
     @prop({type: Schema.Types.Mixed, default: {}})
     public friendCodesDbDefaults: FriendCodesDbDefaults = new FriendCodesDbDefaults();
-    
+ 
+    @prop({ type: () => TournamentDefaults })
+    public tournamentDefaults: TournamentDefaults = new TournamentDefaults();
 }

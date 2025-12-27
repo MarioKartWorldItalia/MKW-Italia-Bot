@@ -1,4 +1,4 @@
-import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role, InteractionCollector, InteractionEditReplyOptions, SlashCommandUserOption, Channel, underline, Emoji, EmbedField, bold, AutocompleteInteraction, ApplicationCommandChoicesData, ApplicationCommandOptionWithAutocompleteMixin, SlashCommandIntegerOption } from "discord.js";
+import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role, InteractionCollector, InteractionEditReplyOptions, SlashCommandUserOption, Channel, underline, Emoji, EmbedField, bold, AutocompleteInteraction, ApplicationCommandChoicesData, ApplicationCommandOptionWithAutocompleteMixin, SlashCommandIntegerOption, CategoryChannel, ChannelType } from "discord.js";
 import { Tournament, TournamentManager } from "../tournament_manager/tournaments.js";
 import { Application } from "../application.js";
 import { log } from "console";
@@ -555,6 +555,7 @@ async function onDisiscriviti(interaction: ChatInputCommandInteraction) {
             await confirmChannel.send({ embeds: [embed] });
         }
     }
+    await updateTournamentTable(tournament);
 }
 
 async function onModalIscriviti(interaction: Interaction) {
@@ -619,8 +620,8 @@ async function onModalIscriviti(interaction: Interaction) {
         }
     }
 
-
     log(`Giocatore ${interaction.user.id} iscritto al torneo ${tournament?.getName()}(${id})`)
+    await updateTournamentTable(tournament);
 }
 
 async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
@@ -729,6 +730,20 @@ async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
             await Application.getInstance().getTournamentManager().updateTournament(tournament);
         }
     }
+
+    let defCategory = (await BotDefaults.getDefaults()).tournamentDefaults.categoryId;
+    let guild = Application.getInstance().getMainGuild();
+    let categoryChannel = await (await guild).channels.fetch(defCategory) as CategoryChannel;
+    let formatDate = moment(tournament.getDateTime()).format('DD-MM-YYYY');
+    let newChannel = await categoryChannel.children.create(
+        {
+            name: `${tournament.getName()}  ${formatDate}`,
+            type: ChannelType.GuildText,
+        }
+    )
+    tournament.tournamentChannelId = newChannel.id;
+    await Application.getInstance().getTournamentManager().updateTournament(tournament);
+    await updateTournamentTable(tournament);
     await response.reply(`Evento **${tournament.getName()}** aggiunto con successo!`);
 }
 
@@ -755,7 +770,13 @@ async function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
         }
 
         await tManager.removeTournament(tournament);
-
+        if(tournament.tournamentChannelId) {
+            const guild = Application.getInstance().getMainGuild();
+            const channel = await (await guild).channels.fetch(tournament.tournamentChannelId);
+            if(channel) {
+                channel.delete();
+            }
+        }
         await interaction.editReply(`Il torneo "**${tournament.getName()}"** con id: **${tournament.getId()}** è stato eliminato`);
         return;
     }
@@ -891,9 +912,8 @@ async function createTournamentMessage(tournament: Tournament) {
     }
 
     const bandierina = await EmojisManager.getEmoji(BotEmojis.BANDIERINA);
-    const eventOrTournament = "Evento";
 
-    const title = `${bandierina} ${eventOrTournament} - ${tournament.getName()} - ${standardDiscordTimeFormat(tournament.getDateTime())}`;
+    const title = `${bandierina} ${tournament.getName()} - ${standardDiscordTimeFormat(tournament.getDateTime())}`;
     const embed = new EmbedBuilder()
         .setColor(Globals.STANDARD_HEX_COLOR)
         .setDescription("# " + `__**${title}**__`);
@@ -929,10 +949,48 @@ async function createTournamentMessage(tournament: Tournament) {
         .setLabel("Iscriviti")
         .setStyle(ButtonStyle.Primary);
 
-    const components = new ActionRowBuilder<ButtonBuilder>().addComponents(iscrivitiBtn);
+    const disiscrivitiBtn = new ButtonBuilder()
+        .setCustomId(DISISCRIVITI_NAME + " " + tournament.getId())
+        .setLabel("Disiscriviti")
+        .setStyle(ButtonStyle.Danger);
+
+    const components = new ActionRowBuilder<ButtonBuilder>().addComponents(iscrivitiBtn, disiscrivitiBtn);
 
     return {
         embeds: [embed],
         components: [components]
     };
+}
+
+async function updateTournamentTable(tournament: Tournament) {
+    const guild = await Application.getInstance().getMainGuild();
+    const channelId = tournament.tournamentChannelId;
+    const channel = await guild.channels.fetch(channelId!);
+
+    let msg = "";
+    if(tournament.getPlayers().length == 0) {
+        msg = "Nessun giocatore iscritto al torneo.";
+    }
+    else {
+        const players = tournament.getPlayers();
+        msg = `Giocatori iscritti all'evento **${tournament.getName()}**:\n`;
+        for(const player of players) {
+            msg += `> <@${player.playerId}> (${player.displayName})\n`;
+        }
+    }
+
+
+    if(!tournament.tableMsgId) {
+        if(channel?.isSendable()) {
+            const sentMsg = await channel.send(msg);
+            tournament.tableMsgId = sentMsg.id;
+            await Application.getInstance().getTournamentManager().updateTournament(tournament);
+        }
+    }
+    else {
+        if(channel?.isTextBased()) {
+            let table = await channel.messages.fetch(tournament.tableMsgId!);
+            await table.edit(msg);
+        }
+    }
 }

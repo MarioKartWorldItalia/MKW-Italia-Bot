@@ -34,7 +34,7 @@ export class Tournament {
     public _id?: ObjectId;
 
     @prop({ required: true, type: Array<TournamentPlayerEntry> })
-    private players: TournamentPlayerEntry[] = [];
+    public players: TournamentPlayerEntry[] = [];
 
     @prop({ required: false, type: String })
     public description?: string;
@@ -53,6 +53,12 @@ export class Tournament {
 
     @prop({ required: false, type: Number })
     public maxPlayers?: Number;
+
+    @prop()
+    public tournamentChannelId?: string;
+
+    @prop()
+    public tableMsgId?: string;
 
     public constructor(dateTime: Date, name: string) {
         this.dateTime = dateTime;

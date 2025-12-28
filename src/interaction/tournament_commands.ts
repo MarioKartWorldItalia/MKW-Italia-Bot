@@ -503,12 +503,20 @@ async function onMostraPartecipanti(interaction: ChatInputCommandInteraction) {
     });
 }
 
-async function onDisiscriviti(interaction: ChatInputCommandInteraction) {
+async function onDisiscriviti(interaction: Interaction) {
     if (await checkAndPopulateAutocomplete(interaction)) {
         return;
     }
-
-    const id = interaction.options.getString(TOURNAMENT_ID_OPTION, true);
+    let id;
+    if(interaction instanceof ChatInputCommandInteraction) {
+    id = interaction.options.getString(TOURNAMENT_ID_OPTION, true);
+    }
+    if (interaction instanceof ButtonInteraction) {
+        id = interaction.customId.split(" ")[1];
+    }
+    else {
+        throw new TypeError();
+    }
     const tournament = await Application.getInstance().getTournamentManager().getTournamentById(new ObjectId(id));
 
     if (!tournament) {

@@ -24,6 +24,6 @@ export class BotDefaultsSchema {
     @prop({type: Schema.Types.Mixed, default: {}})
     public friendCodesDbDefaults: FriendCodesDbDefaults = new FriendCodesDbDefaults();
  
-    @prop()
+    @prop({ type: () => TournamentDefaults })
     public tournamentDefaults: TournamentDefaults = new TournamentDefaults();
 }

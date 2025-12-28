@@ -9,6 +9,7 @@ export class TournamentPlayerEntry {
     public playerId: string;
     public joinDateTime: Date;
     public displayName: string;
+    public checkedIn: boolean = false;
 
     public constructor(playerId: string, joinDateTime: Date, displayName: string = "") {
         this.playerId = playerId;
@@ -21,6 +22,9 @@ export class Tournament {
     @prop({ required: true, type: Boolean })
     public isCompiled: boolean = false;
     
+    @prop({type: String })
+    public checkinMsg?: string;
+
     @prop({ required: true, type: Date })
     public dateTime: Date;
 
@@ -54,10 +58,10 @@ export class Tournament {
     @prop({ required: false, type: Number })
     public maxPlayers?: Number;
 
-    @prop()
+    @prop({required: false, type: String })
     public tournamentChannelId?: string;
 
-    @prop()
+    @prop({required: false, type: String })
     public tableMsgId?: string;
 
     public constructor(dateTime: Date, name: string) {

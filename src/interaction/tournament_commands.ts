@@ -7,7 +7,7 @@ import moment from "moment-timezone";
 import { replyEphemeral, standardDiscordTimeFormat } from "../utils.js";
 import { ObjectId } from "mongodb";
 import { BotDefaultsSchema, FriendCodesDbDefaults } from "../database/models/defaults.js";
-import { assertCond } from "../assert.js";
+import { assertCond, AssertError } from "../assert.js";
 import { BotEmojis, EmojisManager } from "../emoijs_manager.js";
 import { randomUUID } from "crypto";
 
@@ -63,7 +63,20 @@ export async function bindTournamentCommands(client: Client): Promise<Map<string
             .setName(CLEAR_BOT_SETUP_NAME)
             .setDescription("Reimposta i valori di defults del bot")
             .toJSON()
-    )
+    );
+
+    client.application?.commands.create(
+        new SlashCommandBuilder()
+            .setName("start_checkin")
+            .setDescription("Avvia il check-in per un torneo")
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName(TOURNAMENT_ID_OPTION)
+                    .setDescription("Seleziona un evento")
+                    .setAutocomplete(true)
+                    .setRequired(true)
+            ).toJSON()
+    );
 
     client.application?.commands.create(
         new SlashCommandBuilder()
@@ -219,6 +232,8 @@ export function getTournamentCommandHandlers() {
     handlers.set(ISCRIZIONE_TORNEO_MODAL_NAME, onModalIscriviti)
     handlers.set(CONFERMA_CANCELLAZIONE_NAME, onConfermaRimozioneTorneo)
     handlers.set(CLEAR_BOT_SETUP_NAME, onClearBotDefaults);
+    handlers.set("start_checkin", onStartCheckin);
+    handlers.set("checkin", onCheckin);
 
     return handlers;
 }
@@ -508,10 +523,11 @@ async function onDisiscriviti(interaction: Interaction) {
         return;
     }
     let id;
-    if(interaction instanceof ChatInputCommandInteraction) {
-    id = interaction.options.getString(TOURNAMENT_ID_OPTION, true);
+
+    if (interaction instanceof ChatInputCommandInteraction) {
+        id = interaction.options.getString(TOURNAMENT_ID_OPTION, true);
     }
-    if (interaction instanceof ButtonInteraction) {
+    else if (interaction instanceof ButtonInteraction) {
         id = interaction.customId.split(" ")[1];
     }
     else {
@@ -559,7 +575,7 @@ async function onDisiscriviti(interaction: Interaction) {
                 .setColor(Colors.Red)
                 .setDescription(`L'utente <@${interaction.user.id}> si è disiscritto dal torneo **${tournament?.getName()}**`)
                 .setTimestamp(new Date())
-                .setThumbnail(interaction.user.displayAvatarURL());
+                .setAuthor({ iconURL: interaction.user.displayAvatarURL(), name: interaction.user.username });
             await confirmChannel.send({ embeds: [embed] });
         }
     }
@@ -607,23 +623,16 @@ async function onModalIscriviti(interaction: Interaction) {
                 .setTitle("Nuova iscrizione")
                 .setDescription(`<@${interaction.user.id}> si è iscritto al torneo **${tournament.getName()}**`)
                 .setColor(Globals.STANDARD_HEX_COLOR)
-                .setAuthor({ iconURL: interaction.user.displayAvatarURL(), name: interaction.user.username });
+                .setAuthor({ iconURL: interaction.user.displayAvatarURL(), name: interaction.user.username })
+                .setTimestamp(new Date());
             //.setThumbnail(interaction.user.displayAvatarURL());
 
-            for (const field of castInteraction.fields.fields) {
-                if (field[1].customId == "" || field[1].customId == undefined) {
-                    continue;
-                }
-
-                let name = field[1].customId.split("_");
-                name[0] = name[0].charAt(0).toUpperCase() + name[0].slice(1);
-                const nameStr = name.join(" ");
-                embed.addFields({
-                    name: nameStr,
-                    value: field[0] + field[1],
-                    inline: true
-                })
-            }
+            embed.addFields([
+                { name: "Nome in game", value: displayName, inline: true },
+                { name: "Regole lette", value: castInteraction.fields.getTextInputValue(REGOLE_LETTE_OPTION), inline: true },
+                { name: "Esperienza competitiva", value: castInteraction.fields.getTextInputValue(ESPERIENZA_COMPETITIVA_OPTION) || "N/A", inline: false },
+                { name: "Squadra", value: castInteraction.fields.getTextInputValue(TEAM_OPTION) || "N/A", inline: true },
+            ])
             sendTo.send({ embeds: [embed] });
         }
     }
@@ -778,10 +787,10 @@ async function onConfermaRimozioneTorneo(interaction: ButtonInteraction) {
         }
 
         await tManager.removeTournament(tournament);
-        if(tournament.tournamentChannelId) {
+        if (tournament.tournamentChannelId) {
             const guild = Application.getInstance().getMainGuild();
             const channel = await (await guild).channels.fetch(tournament.tournamentChannelId);
-            if(channel) {
+            if (channel) {
                 channel.delete();
             }
         }
@@ -976,29 +985,112 @@ async function updateTournamentTable(tournament: Tournament) {
     const channel = await guild.channels.fetch(channelId!);
 
     let msg = "";
-    if(tournament.getPlayers().length == 0) {
+    if (tournament.getPlayers().length == 0) {
         msg = "Nessun giocatore iscritto al torneo.";
     }
     else {
         const players = tournament.getPlayers();
         msg = `Giocatori iscritti all'evento **${tournament.getName()}**:\n`;
-        for(const player of players) {
-            msg += `> <@${player.playerId}> (${player.displayName})\n`;
+        for (const player of players) {
+            const checkedIn = player.checkedIn ? await EmojisManager.getEmoji(BotEmojis.SPUNTA) : ""
+            msg += `> <@${player.playerId}> (${player.displayName})${checkedIn}\n`;
         }
     }
 
 
-    if(!tournament.tableMsgId) {
-        if(channel?.isSendable()) {
+    if (!tournament.tableMsgId) {
+        if (channel?.isSendable()) {
             const sentMsg = await channel.send(msg);
             tournament.tableMsgId = sentMsg.id;
             await Application.getInstance().getTournamentManager().updateTournament(tournament);
         }
     }
     else {
-        if(channel?.isTextBased()) {
+        if (channel?.isTextBased()) {
             let table = await channel.messages.fetch(tournament.tableMsgId!);
             await table.edit(msg);
         }
     }
 }
+
+async function onStartCheckin(interaction: Interaction) {
+    if (interaction.isAutocomplete()) {
+        checkAndPopulateAutocomplete(interaction);
+        return;
+    }
+
+    if (!(interaction instanceof ChatInputCommandInteraction)) {
+        throw new Error();
+    }
+
+    const id = interaction.options.getString(TOURNAMENT_ID_OPTION, true);
+    const tournament = await Application.getInstance().getTournamentManager().getTournamentById(id);
+    const checkinChannelid = tournament?.tournamentChannelId;
+    if (!tournament) {
+        await replyEphemeral(interaction, "Torneo non trovato");
+        return;
+    }
+
+    if (!checkinChannelid) {
+        await replyEphemeral(interaction, "Il torneo non ha un canale associato");
+        return;
+    }
+
+    const checkinMsg = "CHECKIN-MSG-TEMPLATE";
+    const guild = await Application.getInstance().getMainGuild();
+    const channel = await guild.channels.fetch(checkinChannelid);
+    let checkinBtn = new ButtonBuilder()
+        .setCustomId(`checkin ${tournament.getId()}`)
+        .setLabel("Fai check-in")
+        .setStyle(ButtonStyle.Primary);
+
+    let embed = new EmbedBuilder()
+        .setColor(Globals.STANDARD_HEX_COLOR)
+        .setTitle(`Check-in per il torneo ${tournament.getName()}`)
+        .setDescription(checkinMsg);
+
+    const components = new ActionRowBuilder<ButtonBuilder>().addComponents(checkinBtn);
+    if (channel?.isSendable()) {
+        await channel.send(
+            {
+                embeds: [embed],
+                components: [components]
+            }
+        )
+    }
+    interaction.reply({
+        content: "Check-in avviato",
+        flags: MessageFlags.Ephemeral
+    })
+}
+
+async function onCheckin(interaction: ButtonInteraction) {
+    const id = interaction.customId.split(" ")[1];
+    const tournament = await Application.getInstance().getTournamentManager().getTournamentById(id);
+    assertCond(tournament !== null);
+
+    if (tournament!.isPlayerPartecipating(interaction.user.id) === false) {
+        interaction.reply({
+            content: "Non sei iscritto a questo torneo",
+            flags: MessageFlags.Ephemeral
+        });
+        return;
+    }
+    const player = tournament!.getPlayers().find((p) => p.playerId === interaction.user.id);
+    if (player?.checkedIn) {
+        interaction.reply({
+            content: "Hai già effettuato il check-in",
+            flags: MessageFlags.Ephemeral
+        });
+        return;
+    }
+
+    player!.checkedIn = true;
+    await Application.getInstance().getTournamentManager().updateTournament(tournament!);
+
+    interaction.reply({
+        content: "Check-in effettuato con successo",
+        flags: MessageFlags.Ephemeral
+    });
+    updateTournamentTable(tournament!);
+}   

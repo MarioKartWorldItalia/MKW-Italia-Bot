@@ -1,4 +1,4 @@
-import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role, InteractionCollector, InteractionEditReplyOptions, SlashCommandUserOption, Channel, underline, Emoji, EmbedField, bold, AutocompleteInteraction, ApplicationCommandChoicesData, ApplicationCommandOptionWithAutocompleteMixin } from "discord.js";
+import { Client, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandStringOption, TextInputBuilder, TextInputStyle, ModalBuilder, RestOrArray, ActionRowBuilder, ModalSubmitInteraction, Interaction, MessageFlags, Message, SendableChannels, Embed, EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, MessagePayload, SlashCommandBooleanOption, ButtonInteraction, GuildMember, Role, InteractionCollector, InteractionEditReplyOptions, SlashCommandUserOption, Channel, underline, Emoji, EmbedField, bold, AutocompleteInteraction, ApplicationCommandChoicesData, ApplicationCommandOptionWithAutocompleteMixin, SlashCommandIntegerOption } from "discord.js";
 import { Tournament, TournamentManager } from "../tournament_manager/tournaments.js";
 import { Application } from "../application.js";
 import { log } from "console";
@@ -32,13 +32,13 @@ const AGGIUNGI_EVENTO_NAME = "aggiungi_evento";
 const AGGIOGRNA_DATA_NAME = "aggiorna_data_evento";
 const AGGIORNA_NOME_TORNEO_NAME = "aggiorna_nome_evento";
 const AGGIUNGI_DETTAGLI_NAME = "aggiungi_dettagli";
-const AGGIUNGI_DETTAGLI_MODAL_SUBMIT_NAME = "aggiungi_dettagli_submit";
-const ORGANIZZATORI_OPTION = "organizzatori";
 
-const IS_TOURNAMENT_OPTION = "evento_torneo";
 const NOME_OPTION = "nome";
 
+const MODE_OPTION = "modalità"
+
 const DATA_ORA_OPTION = "data_ora";
+const DATA_ORA_2_BRACKET_OPTION = "data_ora_secondo_girone";
 const EPHEMERAL_OPTION = "ephemeral";
 
 const CONFERMA_CANCELLAZIONE_NAME = "confirm_delete";
@@ -69,32 +69,57 @@ export async function bindTournamentCommands(client: Client): Promise<Map<string
         new SlashCommandBuilder()
             .setName(AGGIUNGI_EVENTO_NAME)
             .setDescription("Aggiungi un evento")
-            .addBooleanOption(
-                new SlashCommandBooleanOption()
-                    .setName(IS_TOURNAMENT_OPTION)
-                    .setDescription("True se è un torneo, altrimenti false")
-                    .setRequired(true)
-            )
             .addStringOption(
                 new SlashCommandStringOption()
                     .setName(NOME_OPTION)
                     .setDescription("Nome dell'evento")
-                    .setRequired(true),
+                    .setRequired(true)
             )
             .addStringOption(
                 new SlashCommandStringOption()
                     .setName(DATA_ORA_OPTION)
                     .setDescription("Data e ora dell'evento (YYYY-MM-DD HH:mm)")
-                    .setRequired(true),
+                    .setRequired(true)
             )
-            .toJSON(),
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName(DATA_ORA_2_BRACKET_OPTION)
+                    .setDescription("Data e ora del secondo girone (YYYY-MM-DD HH:mm)")
+                    .setRequired(true)
+            )
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName(MODE_OPTION)
+                    .setDescription("Modalità dell'evento (FFA/Squad etc.)")
+                    .setChoices(
+                        { name: "Knockout 150cc", value: "Knockout 150cc" },
+                        { name: "Corsa, 150 cc, FFA, no cpu", value: "Corsa, 150 cc, FFA, no cpu" },
+                        { name: "Corsa, 150 cc, FFA, cpu difficili", value: "Corsa, 150 cc, FFA, cpu difficili" },
+                        { name: "Corsa, 150 cc, A squadre, no cpu", value: "Corsa, 150 cc, A squadre, no cpu" },
+                        { name: "Corsa, 150 cc, A squadre, cpu difficili", value: "Corsa, 150 cc, A squadre, cpu difficili" },
+                    )
+                    .setRequired(true)
+            )
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                    .setName("numero_corse")
+                    .setDescription("Numero di corse del torneo")
+                    .setRequired(true)
+            )
+            .addStringOption(
+                new SlashCommandStringOption()
+                    .setName("min_max_players")
+                    .setDescription("Minimo e massimo giocatori (es. 8-16), 0 per nessun limite")
+                    .setRequired(true)
+            )
+            .toJSON()
     );
 
     //Il log non è reliable
     //TODO: Aggiungere tutti i comandi aggiunti sopra ad un array di Promise ed utilizzare Promise.all(array).then(()=>log(...)).catch(logError e potenzialmente SIGTERM)
     refreshTournaments(await Application.getInstance().getTournamentManager().getTournaments()).then(() => log("Comandi torneo aggiornati"));
 
-    return getTournamentCommandHandlers();;
+    return getTournamentCommandHandlers();
 }
 
 export async function refreshTournaments(tournaments: Tournament[]) {
@@ -146,14 +171,6 @@ export async function refreshTournaments(tournaments: Tournament[]) {
             )
             .toJSON()
     ));
-    apiCalls.push(commands?.create(
-        createTournamentsCommand(tournaments,
-            AGGIUNGI_DETTAGLI_NAME,
-            "Aggiungi ulteriori dettagli all'evento"
-        )
-
-    ));
-
     await Promise.all(apiCalls);
 }
 
@@ -201,8 +218,6 @@ export function getTournamentCommandHandlers() {
     handlers.set(MOSTRA_GIOCATORI_NAME, onMostraPartecipanti);
     handlers.set(ISCRIZIONE_TORNEO_MODAL_NAME, onModalIscriviti)
     handlers.set(CONFERMA_CANCELLAZIONE_NAME, onConfermaRimozioneTorneo)
-    handlers.set(AGGIUNGI_DETTAGLI_NAME, onAggiungiDettagli);
-    handlers.set(AGGIUNGI_DETTAGLI_MODAL_SUBMIT_NAME, onAggiungiDettagliModalSubmit);
     handlers.set(CLEAR_BOT_SETUP_NAME, onClearBotDefaults);
 
     return handlers;
@@ -542,161 +557,6 @@ async function onDisiscriviti(interaction: ChatInputCommandInteraction) {
     }
 }
 
-async function onAggiungiDettagli(interaction: Interaction) {
-    if (await checkAndPopulateAutocomplete(interaction)) {
-        return;
-    }
-
-    let castInteraction!: ChatInputCommandInteraction;
-    if (interaction instanceof ChatInputCommandInteraction) {
-        castInteraction = interaction as ChatInputCommandInteraction;
-    }
-
-    const tournamentIdOption = castInteraction.options.getString(TOURNAMENT_ID_OPTION);
-    const modal = new ModalBuilder()
-        .setCustomId(`${AGGIUNGI_DETTAGLI_MODAL_SUBMIT_NAME} ${tournamentIdOption}`)
-        .setTitle("Aggiungi ulteriori informazioni")
-        .addComponents(
-            new ActionRowBuilder<TextInputBuilder>()
-                .addComponents(
-                    new TextInputBuilder()
-                        .setCustomId("2BracketDate")
-                        .setLabel("Data secondo girone")
-                        .setPlaceholder("Inserisci la data del secondo girone (YYYY-MM-DD HH:mm)")
-                        .setRequired(false)
-                        .setStyle(TextInputStyle.Short)
-                ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-                new TextInputBuilder()
-                    .setCustomId("mode")
-                    .setLabel("Modalità")
-                    .setRequired(false)
-                    .setPlaceholder("Modalità del torneo (FFA/squad, etc.)")
-                    .setStyle(TextInputStyle.Short)
-            ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-                new TextInputBuilder()
-                    .setCustomId("nRaces")
-                    .setLabel("Numero di corse")
-                    .setPlaceholder("Numero di corse del torneo")
-                    .setRequired(false)
-                    .setStyle(TextInputStyle.Short)
-            ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-                new TextInputBuilder()
-                    .setCustomId("minMaxPlayers")
-                    .setLabel("Minimo e massimo giocatori")
-                    .setPlaceholder("Minimo e massimo giocatori (es. 8-16), 0 per nessun limite")
-                    .setRequired(false)
-                    .setStyle(TextInputStyle.Short)
-            ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-                new TextInputBuilder()
-                    .setCustomId(ORGANIZZATORI_OPTION)
-                    .setLabel("Organizzatori")
-                    .setRequired(false)
-                    .setPlaceholder("organizzatoreId/@organizzatoreUsername FC")
-                    .setStyle(TextInputStyle.Paragraph)
-            )
-
-        );
-    await castInteraction.showModal(modal);
-}
-
-async function onAggiungiDettagliModalSubmit(interaction: Interaction) {
-    const tManager = Application.getInstance().getTournamentManager();
-    const castInteraction = interaction as ModalSubmitInteraction;
-    const tournamentId = castInteraction.customId.split(" ")[1];
-    const bracket2Date = castInteraction.fields.getTextInputValue("2BracketDate");
-    const rawEventPlanners = castInteraction.fields.getTextInputValue(ORGANIZZATORI_OPTION);
-    const minMaxPlayers = castInteraction.fields.getTextInputValue("minMaxPlayers");
-    const nRaces = castInteraction.fields.getTextInputValue("nRaces");
-    const mode = castInteraction.fields.getTextInputValue("mode");
-
-    const tournament = await tManager.getTournamentById(tournamentId);
-
-    if (!tournament) {
-        replyEphemeral(interaction, "Torneo non trovato");
-        return;
-    }
-
-    if (bracket2Date != "") {
-        const dateTime = moment.tz(bracket2Date, Globals.STANDARD_TIMEZONE).toDate();
-
-        if (isNaN(dateTime.valueOf())) {
-            replyEphemeral(interaction, "Data del secondo girone non valida");
-            return;
-        }
-        tournament.setSecondBracketDate(dateTime);
-    }
-
-    if (mode != "") {
-        tournament.setMode(mode);
-    }
-
-    if (nRaces != "") {
-        const nRacesInt = parseInt(nRaces);
-        if (isNaN(nRacesInt) || nRacesInt <= 0) {
-            replyEphemeral(interaction, "Numero di corse non valido");
-            return;
-        }
-        tournament.setNumberOfRaces(nRacesInt);
-
-    }
-
-    if (minMaxPlayers != "") {
-        const split = minMaxPlayers.split("-");
-        if (split.length != 2) {
-            replyEphemeral(interaction, "Minimo e massimo giocatori non valido");
-            return;
-        }
-        const min = parseInt(split[0]);
-        const max = parseInt(split[1]);
-        if (isNaN(min) || isNaN(max) || min < 0 || max < 0 || (max != 0 && min > max)) {
-            replyEphemeral(interaction, "Minimo e massimo giocatori non valido");
-            return;
-        }
-        if (min != 0) {
-            tournament.setMinPlayers(min);
-        }
-        if (max != 0) {
-            tournament.setMaxPlayers(max);
-        }
-    }
-
-    if (rawEventPlanners != "") {
-        const rows = rawEventPlanners.split("\n");
-        for (const row of rows) {
-            const split = row.split(" ");
-            let user = split[0];
-            if (user.startsWith("@")) {
-                const fetchUser = interaction.guild?.members.cache.find((m) => m.user.username == user.slice(1));
-                if (fetchUser) {
-                    user = fetchUser.id;
-                }
-                else {
-                    replyEphemeral(interaction, `${user} non esiste`);
-                    return;
-                }
-            }
-            if (!await interaction.guild?.members.fetch(user)) {
-                replyEphemeral(interaction, "Utente non trovato");
-                return;
-            }
-
-            let fc = "";
-            if (split.length >= 1) {
-                fc = split[1];
-            }
-            tournament.addEventPlanner(user, fc);
-        }
-    }
-
-    await tManager.updateTournament(tournament);
-    await replyEphemeral(interaction, "Informazioni del torneo aggiornate");
-
-}
-
 async function onModalIscriviti(interaction: Interaction) {
     const castInteraction = interaction as ModalSubmitInteraction;
     const id = castInteraction.customId.split(" ")[1];
@@ -709,7 +569,7 @@ async function onModalIscriviti(interaction: Interaction) {
 
     const displayName = castInteraction.fields.getTextInputValue("display_name");
     tournament.addPlayer(interaction.user.id, displayName);
-    Application.getInstance().getTournamentManager().updateTournament(tournament);
+    await Application.getInstance().getTournamentManager().updateTournament(tournament);
 
     const roleAdd = (await BotDefaults.getDefaults()).defaultTournamentRoleAdd;
     if (roleAdd != "") {
@@ -764,10 +624,17 @@ async function onModalIscriviti(interaction: Interaction) {
 }
 
 async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
-    const isTournament = interaction.options.getBoolean(IS_TOURNAMENT_OPTION, true);
     const name = interaction.options.getString(NOME_OPTION, true);
     const dateTimeUnaparsed = interaction.options.getString(DATA_ORA_OPTION, true);
     const dateTime = moment.tz(dateTimeUnaparsed, Globals.STANDARD_TIMEZONE).toDate();
+
+    //2 bracket
+    const dateTime2BracketUnaparsed = interaction.options.getString(DATA_ORA_2_BRACKET_OPTION, true);
+    const dateTime2Bracket = moment.tz(dateTime2BracketUnaparsed, Globals.STANDARD_TIMEZONE).toDate();
+
+    const mode = interaction.options.getString(MODE_OPTION, true);
+    const nRaces = interaction.options.getInteger("numero_corse");
+    const minMaxPlayers = interaction.options.getString("min_max_players");
 
     if (isNaN(dateTime.valueOf())) {
         await interaction.reply({
@@ -777,14 +644,60 @@ async function onAggiungiTorneo(interaction: ChatInputCommandInteraction) {
         return;
     }
 
-    const tournament = new Tournament(dateTime, name);
-    tournament.isTournament = isTournament;
+    if (isNaN(dateTime2Bracket.valueOf())) {
+        await interaction.reply({
+            content: `La data e ora del secondo girone fornita non sono valide. Usa il formato YYYY-MM-DD HH:mm.`,
+            ephemeral: true
+        });
+        return;
+    }
+
+    let tournament = new Tournament(dateTime, name);
+    tournament.setSecondBracketDate(dateTime2Bracket);
+
+    tournament.setMode(mode);
+
+    if (nRaces) {
+        if (nRaces <= 0) {
+            await interaction.reply({
+                content: `Il numero di corse deve essere maggiore di 0.`,
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
+        tournament.setNumberOfRaces(nRaces);
+    }
+
+    if (minMaxPlayers) {
+        const split = minMaxPlayers.split("-");
+        if (split.length != 2) {
+            replyEphemeral(interaction, "Minimo e massimo giocatori non valido");
+            return;
+        }
+        const min = parseInt(split[0]);
+        const max = parseInt(split[1]);
+        if (isNaN(min) || isNaN(max) || min < 0 || max < 0 || (max != 0 && min > max)) {
+            replyEphemeral(interaction, "Minimo e massimo giocatori non valido");
+            return;
+        }
+        if (min != 0) {
+            tournament.setMinPlayers(min);
+        }
+        if (max != 0) {
+            tournament.setMaxPlayers(max);
+        }
+    }
+
+
     const otherTournaments = await Application.getInstance().getTournamentManager().getTournaments();
 
     if (otherTournaments.find(
         (v) => v.getName().toLowerCase() === tournament.getName().toLowerCase())) {
 
-        await interaction.editReply("Esiste già un torneo con questo nome");
+        await interaction.reply({
+            content: "Esiste già un torneo con questo nome",
+            flags: MessageFlags.Ephemeral
+        });
         return;
     }
 
@@ -909,9 +822,9 @@ async function onAggiornaNomeTorneo(interaction: ChatInputCommandInteraction) {
     //controlla che non ci siano tonrei identici
     const otherTournaments = await Application.getInstance().getTournamentManager().getTournaments();
     if (otherTournaments.find(
-        (t) => t.getName().toLowerCase() === newName.toLowerCase())
-    ) {
-        interaction.reply("Non puoi utilizzare lo stesso nome di un alro torneo");
+        (t) => { t.getName().toLowerCase() === newName.toLowerCase(); log(`tournament name check: ${t.getName().toLowerCase()} vs ${newName.toLowerCase()}`); return t.getName().toLowerCase() === newName.toLowerCase() }
+    )) {
+        interaction.reply("Non puoi utilizzare lo stesso nome di un altro torneo");
         return;
     }
 
@@ -921,7 +834,6 @@ async function onAggiornaNomeTorneo(interaction: ChatInputCommandInteraction) {
         await Application.getInstance().getTournamentManager().updateTournament(tournament);
     }
 
-    await refreshTournaments(await Application.getInstance().getTournamentManager().getTournaments());
     interaction.editReply({
         content: `Il nome del torneo **${id}** è stato aggiornato a **${newName}**`,
     });
@@ -979,7 +891,7 @@ async function createTournamentMessage(tournament: Tournament) {
     }
 
     const bandierina = await EmojisManager.getEmoji(BotEmojis.BANDIERINA);
-    const eventOrTournament = tournament.isTournament ? "Torneo" : "Evento";
+    const eventOrTournament = "Evento";
 
     const title = `${bandierina} ${eventOrTournament} - ${tournament.getName()} - ${standardDiscordTimeFormat(tournament.getDateTime())}`;
     const embed = new EmbedBuilder()
@@ -1010,22 +922,6 @@ async function createTournamentMessage(tournament: Tournament) {
 
     if (tournament.getSecondBracketDate()) {
         embed.addFields(createField("Data secondo girone", standardDiscordTimeFormat(tournament.getSecondBracketDate() as Date)));
-    }
-
-    const eventPlanners = tournament.getEventPlanners();
-    if (eventPlanners.size > 0) {
-        let append = "";
-        let msg = "";
-        for (const planner of eventPlanners) {
-            msg += append;
-            msg += `<@${planner[0]}>`;
-
-            if (planner[1]) {
-                msg += ` - ${planner[1]}`;
-            }
-            msg += "\n";
-        }
-        embed.addFields(createField("Organizzatori", msg));
     }
 
     const iscrivitiBtn = new ButtonBuilder()

@@ -2,7 +2,6 @@ import { managerToFetchingStrategyOptions, Message, ThreadMemberFlagsBitField } 
 import { Application } from "../application";
 import { ObjectId } from "mongodb";
 import { TournamentRepo } from "./tournament_repo";
-import { TournamentSchema } from "../database/models/tournament_model";
 import { log } from "../log";
 import { prop } from "@typegoose/typegoose";
 
@@ -19,38 +18,51 @@ export class TournamentPlayerEntry {
 }
 
 export class Tournament {
-    private dateTime: Date;
-    private name: string;
-    private id?: ObjectId;
-    private players: TournamentPlayerEntry[] = [];
-    private description?: string;
-    private serverMessage: Message | undefined;
-    public isTournament: boolean = true;
+    @prop({ required: true, type: Boolean })
+    public isCompiled: boolean = false;
+    
+    @prop({ required: true, type: Date })
+    public dateTime: Date;
 
+    @prop({ required: true, type: Date })
     public bracket2Date?: Date;
-    private eventPlanners: Map<string, string> = new Map();
-    private mode?: String;
-    private nRaces?: Number;
-    private minPlayers?: Number;
-    private maxPlayers?: Number;
+
+    @prop({ required: true, type: String })
+    public name: string;
+
+    @prop({ required: true, type: ObjectId })
+    public _id?: ObjectId;
+
+    @prop({ required: true, type: Array<TournamentPlayerEntry> })
+    public players: TournamentPlayerEntry[] = [];
+
+    @prop({ required: false, type: String })
+    public description?: string;
+
+    @prop({ required: false, type: String })
+    public serverMessage?: Message;
+
+    @prop({ required: true, type: String })
+    public mode?: String;
+
+    @prop({ required: false, type: Number })
+    public nRaces?: Number;
+    
+    @prop({ required: false, type: Number })
+    public minPlayers?: Number;
+
+    @prop({ required: false, type: Number })
+    public maxPlayers?: Number;
 
     public constructor(dateTime: Date, name: string) {
         this.dateTime = dateTime;
         this.name = name;
 
-        this.id = new ObjectId();
-    }
-
-    public addEventPlanner(userId: string, friendCode?: string) {
-        this.eventPlanners.set(userId, friendCode || "");
-    }
-
-    public getEventPlanners() {
-        return this.eventPlanners;
+        this._id = new ObjectId();
     }
 
     public setId(id: ObjectId) {
-        this.id = id;
+        this._id = id;
     }
 
     public setSecondBracketDate(date: Date) {
@@ -91,33 +103,6 @@ export class Tournament {
 
     public getMaxPlayers() {
         return this.maxPlayers;
-    }
-
-    public static async fromSchema(doc: TournamentSchema): Promise<Tournament> {
-        let ret = new Tournament(doc.startDateTime, doc.tournamentName.toString());
-        ret.isTournament = doc.isTournament as boolean;
-        ret.setId(doc._id);
-        ret.setDescription(doc.description?.toString());
-        if (doc.serverMessageId && doc.serverMessageChannelId) {
-            const mainGuild = await Application.getInstance().getMainGuild();
-            const channel = await mainGuild.channels.fetch(doc.serverMessageChannelId.toString());
-            if (channel?.isTextBased()) {
-                const msg = await channel.messages.fetch(doc.serverMessageId.toString());
-                ret.serverMessage = msg;
-            }
-        }
-        const eventPlanners = doc.eventPlanners;
-        if (eventPlanners) {
-            ret.eventPlanners = eventPlanners.toObject();
-        }
-        ret.players = doc.parteciparingPlayers;
-        ret.mode = doc.mode;
-        ret.nRaces = doc.nRaces;
-        ret.minPlayers = doc.minPlayers;
-        ret.maxPlayers = doc.maxPlayers;
-        ret.bracket2Date = doc.bracket2Date;
-
-        return ret;
     }
 
     public setServerMessage(msg?: Message) {
@@ -175,7 +160,7 @@ export class Tournament {
     }
 
     public getId() {
-        return this.id;
+        return this._id;
     }
 
     public getPlayers(): TournamentPlayerEntry[] {
@@ -200,14 +185,14 @@ export class TournamentManager {
     }
 
     public async updateTournament(tournament: Tournament) {
-        this.addTournament(tournament);
+        this.tournaments.updateTournament(tournament);
     }
 
     public async removeTournament(tournament: Tournament) {
         return this.tournaments.removeTournament(tournament);
     }
 
-    public async getTournaments(includeOtherEvents: boolean = true): Promise<Tournament[]> {
+    public async getTournaments(includeOtherEvents: boolean = true) {
         return this.tournaments.getAllTournaments(includeOtherEvents);
     }
 

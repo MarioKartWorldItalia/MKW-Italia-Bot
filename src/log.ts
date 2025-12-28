@@ -70,3 +70,8 @@ export async function logError(...args: any[]) {
     try { await Logger.logError(...args); }
     catch (e) { console.error("Failed to log error:", e); }
 }
+
+export async function logAndThrowError(...args: any[]): Promise<never> {
+    await logError(...args);
+    throw new Error(args.map(a => String(a)).join(" "));
+}

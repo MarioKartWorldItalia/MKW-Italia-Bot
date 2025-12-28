@@ -70,3 +70,9 @@ export async function awaitModalSubmit(interaction: MessageComponentInteraction,
 
    return retInteraction;
 }
+
+export async function execAndDelay<T>(func: () => Promise<T>, delayMs: number): Promise<T> {
+    const result = await func();
+    setInterval(func, delayMs);
+    return result;
+}

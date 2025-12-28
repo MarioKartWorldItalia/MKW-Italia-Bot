@@ -1,6 +1,6 @@
 import { assertCond } from "./assert.js"
 import { APIEmbedField, ApplicationEmoji, Client, EmbedBuilder, Events, Guild, GuildEmoji, SlashCommandBuilder, TextChannel } from "discord.js";
-import { log, logError } from "./log.js";
+import { log, logAndThrowError, logError } from "./log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
 import { bindCommands } from "./interaction/slash_commands.js";
@@ -11,7 +11,7 @@ import express from "express"
 import { Server } from "http";
 import { Collection } from "mongoose";
 import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager.js";
-import { onWebhooks } from "./meta_webhooks.js";
+import { execAndDelay } from "./utils.js";
 
 export class Application {
     private static instance: Application;
@@ -73,8 +73,11 @@ export class Application {
         
         await this.client.login(Globals.BOT_TOKEN);
         
+        //Periodically fetch new posts from instagram
+        execAndDelay(updateInstagramPosts, 15 * 60 * 1000);
+
         //initial fetch, then refresh every 35 secs to avoid rate limits
-        await (await this.getMainGuild()).members.fetch({time: 60 * 1000}).catch(logError);
+        await (await this.getMainGuild()).members.fetch({time: 60 * 1000}).catch(logAndThrowError);
         
         setInterval(async () => {
             let guild = await (await Application.getInstance().getMainGuild()).fetch();

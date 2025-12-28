@@ -37,7 +37,7 @@ const NOME_OPTION = "nome";
 
 const MODE_OPTION = "modalità"
 
-const DATA_ORA_OPTION = "data_ora";
+const DATA_ORA_OPTION = "data_ora_primo_girone";
 const DATA_ORA_2_BRACKET_OPTION = "data_ora_secondo_girone";
 const EPHEMERAL_OPTION = "ephemeral";
 

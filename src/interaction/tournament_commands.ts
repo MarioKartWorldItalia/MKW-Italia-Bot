@@ -619,8 +619,8 @@ async function onModalIscriviti(interaction: Interaction) {
                 name[0] = name[0].charAt(0).toUpperCase() + name[0].slice(1);
                 const nameStr = name.join(" ");
                 embed.addFields({
-                    name: field[0],
-                    value: field[1].customId + field[1],
+                    name: nameStr,
+                    value: field[0] + field[1],
                     inline: true
                 })
             }

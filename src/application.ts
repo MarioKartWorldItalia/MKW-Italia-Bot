@@ -3,7 +3,7 @@ import { ActionRowBuilder, APIEmbedField, ApplicationEmoji, ButtonBuilder, Butto
 import { log, logError } from "./log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
-import { bindCommands } from "./interaction/slash_commands.js";
+import { bindCommands } from "./interaction/commands.js";
 import "process"
 import { abort, exit } from "process";
 import { Database } from "./database/database.js";

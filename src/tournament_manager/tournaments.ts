@@ -20,7 +20,7 @@ export class TournamentPlayerEntry {
 
 export class Tournament {
     @prop({ required: true, type: Boolean })
-    public isCompiled: boolean = false;
+    public isCompiled: boolean = true;
     
     @prop({type: String })
     public checkinMsg?: string;
@@ -32,7 +32,7 @@ export class Tournament {
     public bracket2Date?: Date;
 
     @prop({ required: true, type: String })
-    public name: string;
+    public name: String;
 
     @prop({ required: true, type: ObjectId })
     public _id?: ObjectId;
@@ -161,7 +161,7 @@ export class Tournament {
         this.dateTime = dateTime;
     }
 
-    public getName(): string {
+    public getName(): String {
         return this.name;
     }
 

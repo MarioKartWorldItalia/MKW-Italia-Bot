@@ -21,8 +21,8 @@ export class TournamentPlayerEntry {
 export class Tournament {
     @prop({ required: true, type: Boolean })
     public isCompiled: boolean = true;
-    
-    @prop({type: String })
+
+    @prop({ type: String })
     public checkinMsg?: string;
 
     @prop({ required: true, type: Date })
@@ -31,7 +31,7 @@ export class Tournament {
     @prop({ required: false, type: Date })
     public bracket2Date?: Date;
 
-    @prop()
+    @prop({ required: true })
     public name: string;
 
     @prop({ required: false, type: ObjectId })
@@ -46,22 +46,22 @@ export class Tournament {
     @prop({ required: false, type: String })
     public serverMessage?: Message;
 
-    @prop()
+    @prop({ required: true })
     public mode: string;
 
     @prop({ required: false, type: Number })
     public nRaces?: Number;
-    
+
     @prop({ required: false, type: Number })
     public minPlayers?: Number;
 
     @prop({ required: false, type: Number })
     public maxPlayers?: Number;
 
-    @prop({required: false, type: String })
+    @prop({ required: false, type: String })
     public tournamentChannelId?: string;
 
-    @prop({required: false, type: String })
+    @prop({ required: false, type: String })
     public tableMsgId?: string;
 
     public constructor(dateTime: Date, name: string, mode: string) {

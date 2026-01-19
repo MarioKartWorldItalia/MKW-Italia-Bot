@@ -10,10 +10,10 @@ import { assertCond } from "../../assert";
 import { updateTournamentTable } from "../tournament_commands";
 import { log } from "../../log";
 
-const NOME_OPTION = "nome_evento";
-const DATA_ORA_OPTION = "data_ora_evento";
+const NOME_OPTION = "nome";
+const DATA_ORA_OPTION = "data_ora_primo_girone";
 const DATA_ORA_2_BRACKET_OPTION = "data_ora_secondo_girone";
-const MODE_OPTION = "modalità_evento";
+const MODE_OPTION = "modalità";
 const NUMERO_CORSE_OPTION = "numero_corse";
 const MIN_MAX_PLAYERS_OPTION = "min_max_players";
 
@@ -101,7 +101,7 @@ export class CreateEvent extends SlashCommandBase {
 
         let tournament = new Tournament(dateTime, name, mode);
         tournament.setSecondBracketDate(dateTime2Bracket);
-        log(tournament.getName().toString());
+
         if (nRaces) {
             if (nRaces <= 0) {
                 await replyEphemeral(options.interaction, `Il numero di corse deve essere maggiore di 0.`);

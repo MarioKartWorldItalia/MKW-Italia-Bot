@@ -165,7 +165,7 @@ export class CreateEvent extends SlashCommandBase {
             }
         }
 
-        await Application.getInstance().getTournamentManager().updateTournament(tournament);
+        await Application.getInstance().getTournamentManager().addTournament(tournament);
         
         const newChannel = await createChannelForTournament(tournament);
         tournament.tournamentChannelId = newChannel.id;

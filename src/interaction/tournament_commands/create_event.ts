@@ -140,9 +140,6 @@ export class CreateEvent extends SlashCommandBase {
             return;
         }
 
-
-        await Application.getInstance().getTournamentManager().addTournament(tournament);
-
         const descriptionModalUUID = randomUUID();
         const descriptionModal = new ModalBuilder()
             .setCustomId(descriptionModalUUID)

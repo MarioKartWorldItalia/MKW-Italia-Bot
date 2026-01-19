@@ -28,16 +28,16 @@ export class Tournament {
     @prop({ required: true, type: Date })
     public dateTime: Date;
 
-    @prop({ required: true, type: Date })
+    @prop({ required: false, type: Date })
     public bracket2Date?: Date;
 
     @prop({ required: true, type: String })
-    public name: String;
+    public name: string;
 
-    @prop({ required: true, type: ObjectId })
+    @prop({ required: false, type: ObjectId })
     public _id?: ObjectId;
 
-    @prop({ required: true, type: Array<TournamentPlayerEntry> })
+    @prop({ required: false, type: Array<TournamentPlayerEntry> })
     public players: TournamentPlayerEntry[] = [];
 
     @prop({ required: false, type: String })
@@ -47,7 +47,7 @@ export class Tournament {
     public serverMessage?: Message;
 
     @prop({ required: true, type: String })
-    public mode?: String;
+    public mode: string;
 
     @prop({ required: false, type: Number })
     public nRaces?: Number;
@@ -64,7 +64,7 @@ export class Tournament {
     @prop({required: false, type: String })
     public tableMsgId?: string;
 
-    public constructor(dateTime: Date, name: string, mode: string = "") {
+    public constructor(dateTime: Date, name: string, mode: string) {
         this.dateTime = dateTime;
         this.name = name;
         this.mode = mode;

@@ -4,6 +4,7 @@ import { Application } from "../../application";
 import { replyEphemeral } from "../../utils";
 import { ConfermaIscrizioneModal } from "./conferma_iscrizione";
 import { InteractionOptions, SlashCommandBase } from "../interaction_base_classes";
+import { log } from "../../log";
 
 export class Iscriviti extends SlashCommandBase {
     override get builder(): SlashCommandBuilder | RESTPostAPIChatInputApplicationCommandsJSONBody {
@@ -30,6 +31,7 @@ export class Iscriviti extends SlashCommandBase {
         }
 
         let id = options.getRequiredStringOption("tournament_id");
+        log("Iscriviti called for tournament id: " + id);
         const tournament = await Application.getInstance().getTournamentManager().getTournamentById(id);
 
         if (!tournament) {

@@ -87,6 +87,7 @@ export async function checkAndPopulateAutocomplete(interaction: Interaction): Pr
 
     for (const tournament of tournaments) {
         const id = tournament.getId() as ObjectId;
+        log(`Autocomplete tournament id: ${id.toString()}`);
 
         const ts = tournament.getDateTime();
         const formatDay = ts.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });

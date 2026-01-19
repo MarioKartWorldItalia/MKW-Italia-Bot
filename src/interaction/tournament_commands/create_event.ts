@@ -178,7 +178,7 @@ export class CreateEvent extends SlashCommandBase {
 }
 
 async function createChannelForTournament(tournament: Tournament) {
-            let defaultCategory = (await BotDefaults.getDefaults()).tournamentDefaults.categoryId;
+        let defaultCategory = (await BotDefaults.getDefaults()).tournamentDefaults.categoryId;
         let guild = Application.getInstance().getMainGuild();
         let categoryChannel = await (await guild).channels.fetch(defaultCategory) as CategoryChannel;
         let formatDate = moment(tournament.getDateTime()).format('DD-MM-YYYY');

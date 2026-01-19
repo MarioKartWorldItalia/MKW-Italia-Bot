@@ -165,13 +165,13 @@ export class CreateEvent extends SlashCommandBase {
             const description = response.fields.getTextInputValue("description");
             if (description && description != "") {
                 tournament.setDescription(description);
-                await Application.getInstance().getTournamentManager().updateTournament(tournament);
             }
         }
 
+        await Application.getInstance().getTournamentManager().updateTournament(tournament);
+        
         const newChannel = await createChannelForTournament(tournament);
         tournament.tournamentChannelId = newChannel.id;
-        await Application.getInstance().getTournamentManager().updateTournament(tournament);
         await updateTournamentTable(tournament);
         await response.reply(`Evento **${tournament.getName()}** aggiunto con successo!`);
     }

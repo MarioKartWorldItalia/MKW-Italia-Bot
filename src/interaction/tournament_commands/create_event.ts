@@ -98,10 +98,8 @@ export class CreateEvent extends SlashCommandBase {
             return;
         }
 
-        let tournament = new Tournament(dateTime, name);
+        let tournament = new Tournament(dateTime, name, mode);
         tournament.setSecondBracketDate(dateTime2Bracket);
-
-        tournament.setMode(mode);
 
         if (nRaces) {
             if (nRaces <= 0) {

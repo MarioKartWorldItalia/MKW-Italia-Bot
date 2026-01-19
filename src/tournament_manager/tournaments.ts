@@ -64,9 +64,10 @@ export class Tournament {
     @prop({required: false, type: String })
     public tableMsgId?: string;
 
-    public constructor(dateTime: Date, name: string) {
+    public constructor(dateTime: Date, name: string, mode: string = "") {
         this.dateTime = dateTime;
         this.name = name;
+        this.mode = mode;
 
         this._id = new ObjectId();
     }

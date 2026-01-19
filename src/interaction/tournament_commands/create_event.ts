@@ -8,6 +8,7 @@ import { Application } from "../../application";
 import { randomUUID } from "crypto";
 import { assertCond } from "../../assert";
 import { updateTournamentTable } from "../tournament_commands";
+import { log } from "../../log";
 
 const NOME_OPTION = "nome_evento";
 const DATA_ORA_OPTION = "data_ora_evento";
@@ -100,7 +101,7 @@ export class CreateEvent extends SlashCommandBase {
 
         let tournament = new Tournament(dateTime, name, mode);
         tournament.setSecondBracketDate(dateTime2Bracket);
-
+        log(tournament.getName().toString());
         if (nRaces) {
             if (nRaces <= 0) {
                 await replyEphemeral(options.interaction, `Il numero di corse deve essere maggiore di 0.`);

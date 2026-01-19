@@ -30,8 +30,7 @@ export class Iscriviti extends SlashCommandBase {
             return;
         }
 
-        let id = options.getRequiredStringOption("tournament_id");
-        log("Iscriviti called for tournament id: " + id);
+        let id = options.getRequiredStringOption("evento");
         const tournament = await Application.getInstance().getTournamentManager().getTournamentById(id);
 
         if (!tournament) {

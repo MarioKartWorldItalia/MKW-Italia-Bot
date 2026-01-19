@@ -31,7 +31,7 @@ export class Tournament {
     @prop({ required: false, type: Date })
     public bracket2Date?: Date;
 
-    @prop({ required: true, type: String })
+    @prop()
     public name: string;
 
     @prop({ required: false, type: ObjectId })
@@ -46,7 +46,7 @@ export class Tournament {
     @prop({ required: false, type: String })
     public serverMessage?: Message;
 
-    @prop({ required: true, type: String })
+    @prop()
     public mode: string;
 
     @prop({ required: false, type: Number })

@@ -47,7 +47,11 @@ export class CommandsManager {
                 log(`Comando eseguito: ${interactionName} [${typeof (interaction)}]`);
             }
             catch (e) {
-                logError("Can't execute command " + interactionName + ": " + e);
+                let err = "Can't execute command " + interactionName + ": " + e;
+                if(e instanceof Error) {
+                    err = err + "\nStack trace:\n" + e.stack;
+                }
+                logError(err);
                 try {
                     if (interaction.isRepliable() && !interaction.replied) {
                         await interaction.reply({

@@ -179,7 +179,7 @@ export class Application {
 
                     let line = "";
                     if (role.name == "Jolly") {
-                        line = "⏤⏤⏤⏤⏤⏤\n";
+                        line = "⏤⏤⏤⏤⏤⏤⏤\n";
                     }
                     if (true)
                         rolesMembers.set(`${line}### ${bulletMk} ${await (await Application.getInstance().getMainGuild()).client.application!.emojis.fetch(roleToEmoji.get(role.id))} **${role.name}** (${role.members.size})`, msg);

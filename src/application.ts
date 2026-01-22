@@ -112,10 +112,10 @@ export class Application {
 
         const emojis = this.client.application?.emojis.fetch();
         let roleToEmoji = new Map();
-        roleToEmoji.set("1402793806558134323", (await emojis!).find((e) => e.id == "1463136279708307522")?.id);
+        roleToEmoji.set("1402793806558134323", (await emojis!).find((e) => e.id == "1463136278156546167")?.id);
         roleToEmoji.set("1402793599661506590", (await emojis!).find((e) => e.id == "1463136281046552646")?.id);
         roleToEmoji.set("1402793755211464786", (await emojis!).find((e) => e.id == "1463136276747259934")?.id);
-        roleToEmoji.set("1402793516500783124", (await emojis!).find((e) => e.id == "1463136278156546167")?.id);
+        roleToEmoji.set("1402793516500783124", (await emojis!).find((e) => e.id == "1463136279708307522")?.id);
         roleToEmoji.set("1419071243419783358", (await emojis!).find((e) => e.id == "1463166619642499134")?.id);
         this.client.on("interactionCreate", async (interaction) => {
             if (!interaction.isButton()) {

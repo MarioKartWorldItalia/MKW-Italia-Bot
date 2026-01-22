@@ -110,13 +110,13 @@ export class Application {
         const cross = botEmojis?.find((e) => e.name == "cross");
         const check = botEmojis?.find((e) => e.name == "check");
 
-        const emojis = this.client.emojis;
+        const emojis = this.client.application?.emojis.fetch();
         let roleToEmoji = new Map();
-        roleToEmoji.set("1402793806558134323", emojis!.resolveId("1463177557418573991"));
-        roleToEmoji.set("1402793599661506590", emojis!.resolveId("1463177611126640751"));
-        roleToEmoji.set("1402793755211464786", emojis!.resolveId("1463177510048235594"));
-        roleToEmoji.set("1402793516500783124", emojis!.resolveId("1463177584211660944"));
-        roleToEmoji.set("1419071243419783358", emojis!.resolveId("1463177681104404556"));
+        roleToEmoji.set("1402793806558134323", (await emojis!).find((e) => e.id == "1463136279708307522"));
+        roleToEmoji.set("1402793599661506590", (await emojis!).find((e) => e.id == "1463136281046552646"));
+        roleToEmoji.set("1402793755211464786", (await emojis!).find((e) => e.id == "1463136276747259934"));
+        roleToEmoji.set("1402793516500783124", (await emojis!).find((e) => e.id == "1463136278156546167"));
+        roleToEmoji.set("1419071243419783358", (await emojis!).find((e) => e.id == "1463166619642499134"));
         this.client.on("interactionCreate", async (interaction) => {
             if (!interaction.isButton()) {
                 return;

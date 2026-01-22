@@ -182,7 +182,7 @@ export class Application {
                         line = "⏤⏤⏤⏤⏤⏤⏤\n";
                     }
                     if (true)
-                        rolesMembers.set(`${line}### ${bulletMk} ${await (await Application.getInstance().getMainGuild()).client.application!.emojis.fetch(roleToEmoji.get(role.id))} **${role.name}** (${role.members.size})`, msg);
+                        rolesMembers.set(`${line}### ${bulletMk} ${(await (await Application.getInstance().getMainGuild()).client.application!.emojis.fetch(roleToEmoji.get(role.id))).toString()} **${role.name}** (${role.members.size})`, msg);
                     else
                         rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
                 }

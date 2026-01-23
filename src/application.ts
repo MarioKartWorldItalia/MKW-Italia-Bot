@@ -154,8 +154,9 @@ export class Application {
                 }
 
                 let rolesMembers = new Map<String, String>();
-
+                let totalCounter = 0;
                 for (const _role of cymRoles) {
+                    totalCounter += _role[1].members.size;
                     const role = _role[1];
                     let msg = "";
 
@@ -196,6 +197,7 @@ export class Application {
                     finalMsg += entry[1];
                     trail = "";
                 }
+                finalMsg += `\n**Totale Iscritti: ${totalCounter}**`;
 
                 const embed = new EmbedBuilder()
                     .setColor(Globals.STANDARD_HEX_COLOR)

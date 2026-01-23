@@ -155,6 +155,8 @@ export class Application {
 
                 let rolesMembers = new Map<String, String>();
                 let totalCounter = 0;
+                let checkinCounter = "";
+
                 for (const _role of cymRoles) {
                     totalCounter += _role[1].members.size;
                     const role = _role[1];
@@ -189,18 +191,33 @@ export class Application {
                             counter += 1;
                             msg += "\n";
                         }
-
                     }
 
                     let line = "";
                     if (role.name == "Jolly") {
                         line = "⏤⏤⏤⏤⏤⏤⏤\n";
                     }
+
+                    if (role.name != "Jolly") {
+                        checkinCounter = "";
+                        let confirmedCount = 0;
+                        for (const m of role.members) {
+                            if (m[1].roles.cache.has(confirmedRole!.id)) {
+                                confirmedCount += 1;
+                            }
+                        }
+                        if (confirmedCount != 0) {
+                            checkinCounter = ` (${confirmedCount} ${check})`;
+                        }      
+                    }
+
                     if (true)
-                        rolesMembers.set(`${line}### ${bulletMk} ${(await (await Application.getInstance().getMainGuild()).client.application!.emojis.fetch(roleToEmoji.get(role.id)))} **${role.name}** (${role.members.size})`, msg);
+                        rolesMembers.set(`${line}### ${bulletMk} ${(await (await Application.getInstance().getMainGuild()).client.application!.emojis.fetch(roleToEmoji.get(role.id)))} **${role.name}** (${role.members.size})${checkinCounter}`, msg);
                     else
                         rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
                 }
+
+                totalCounter -= confirmedRole!.members.size ?? 0;
 
                 let finalMsg = "";
                 let trail = "";

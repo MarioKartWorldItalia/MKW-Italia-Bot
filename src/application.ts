@@ -160,7 +160,21 @@ export class Application {
                     const role = _role[1];
                     let msg = "";
 
-                    const members = role.members;
+                    let members = role.members;
+                    members.sort((a, b) => {
+                        if (a.roles.cache.has(confirmedRole!.id)
+                            && b.roles.cache.has(confirmedRole!.id)) {
+                            return 0;
+                        }
+
+                        if (a.roles.cache.has(confirmedRole!.id)) {
+                            return -1;
+                        }
+                        if (b.roles.cache.has(confirmedRole!.id)) {
+                            return 1;
+                        }
+                        return 0;
+                    });
 
                     if (true) {
                         let trail = "";
@@ -197,7 +211,7 @@ export class Application {
                     finalMsg += entry[1];
                     trail = "";
                 }
-                
+
                 const embed = new EmbedBuilder()
                     .setColor(Globals.STANDARD_HEX_COLOR)
                     .setDescription(finalMsg)

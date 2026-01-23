@@ -190,15 +190,14 @@ export class Application {
 
                 let finalMsg = "";
                 let trail = "";
-                finalMsg += "# TABELLA LIVE ISCRIZIONI\n";
+                finalMsg += `# TABELLA LIVE ISCRIZIONI (${totalCounter})\n`;
                 for (const entry of rolesMembers) {
                     finalMsg += trail;
                     finalMsg += entry[0] + "\n";
                     finalMsg += entry[1];
                     trail = "";
                 }
-                finalMsg += `\n**Totale Iscritti: ${totalCounter}**`;
-
+                
                 const embed = new EmbedBuilder()
                     .setColor(Globals.STANDARD_HEX_COLOR)
                     .setDescription(finalMsg)

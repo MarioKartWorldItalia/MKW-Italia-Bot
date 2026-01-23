@@ -155,7 +155,6 @@ export class Application {
 
                 let rolesMembers = new Map<String, String>();
                 let totalCounter = 0;
-                let checkinCounter = "";
 
                 for (const _role of cymRoles) {
                     totalCounter += _role[1].members.size;
@@ -198,8 +197,9 @@ export class Application {
                         line = "⏤⏤⏤⏤⏤⏤⏤\n";
                     }
 
+                    let checkinCounter = "";
                     if (role.name != "Jolly") {
-                        checkinCounter = "";
+
                         let confirmedCount = 0;
                         for (const m of role.members) {
                             if (m[1].roles.cache.has(confirmedRole!.id)) {

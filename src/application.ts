@@ -217,7 +217,7 @@ export class Application {
                         rolesMembers.set(`${bulletMk} **${role.name}** (${role.members.size})`, msg);
                 }
 
-                totalCounter -= confirmedRole!.members.size ?? 0;
+                totalCounter -= roles.find((role) => role.name == "Jolly")?.members.size || 0;
 
                 let finalMsg = "";
                 let trail = "";

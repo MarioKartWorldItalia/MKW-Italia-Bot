@@ -207,7 +207,7 @@ export class Application {
                             }
                         }
                         if (confirmedCount != 0) {
-                            checkinCounter = ` (${confirmedCount} ${check})`;
+                            checkinCounter = ` (${confirmedCount}${check})`;
                         }      
                     }
 

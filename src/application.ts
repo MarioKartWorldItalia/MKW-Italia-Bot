@@ -186,7 +186,7 @@ export class Application {
                                 checkin = check as any;
                             }
                             msg += trail;
-                            msg += ` > ${inlineCode(counter.toString() + ".")} <@${m[1].id}>${checkin}`;
+                            msg += ` > ${inlineCode(counter.toString() + ".")} <@${m[1].id}> (${m[1].displayName})${checkin}`;
                             counter += 1;
                             msg += "\n";
                         }

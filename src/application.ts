@@ -163,7 +163,7 @@ export class Application {
             let castChannels!: Array<TextChannel>;
 
             castChannels = channels.map((c) => c as TextChannel);
-            if (false) {
+            if (true) {
                 let msgs = [];
                 for (let i = 0; i < castChannels.length; i++) {
                     msgs.push(await castChannels[i].messages.fetch(MSG_IDS[i]));

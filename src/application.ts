@@ -143,7 +143,7 @@ export class Application {
                 return;
             }
 
-            if (true) {
+            if (false) {
                 await member.roles.remove(foundRole);
                 await replyEphemeral(interaction, "Ruoli modificati");
                 return;

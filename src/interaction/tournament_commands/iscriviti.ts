@@ -13,7 +13,7 @@ export class Iscriviti extends SlashCommandBase {
             .setDescription("Iscriviti ad un evento");
 
         let t_id = new SlashCommandStringOption()
-            .setName("tournament_id")
+            .setName("evento")
             .setDescription("Seleziona un evento")
             .setAutocomplete(true)
             .setRequired(true);

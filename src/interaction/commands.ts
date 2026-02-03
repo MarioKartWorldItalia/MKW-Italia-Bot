@@ -11,6 +11,8 @@ import { ConfermaIscrizione } from "./tournament_commands/conferma_iscrizione";
 import { Unsubscribe } from "./tournament_commands/unsubscribe";
 import { CommandsManager } from "./commands_manager";
 import { CreateEvent } from "./tournament_commands/create_event";
+import { AdminAggiungiGiocatore } from "./tournament_commands/admin_aggiungi_giocatore";
+import { AdminRimuoviGiocatore } from "./tournament_commands/admin_rimuovi_giocatore";
 
 async function bindCommandsInner(client: Client, commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
@@ -20,6 +22,8 @@ async function bindCommandsInner(client: Client, commandsManager: CommandsManage
     commandsManager.addCommand(new ConfermaIscrizione());
     commandsManager.addCommand(new Unsubscribe());
     commandsManager.addCommand(new CreateEvent());
+    commandsManager.addCommand(new AdminAggiungiGiocatore());
+    commandsManager.addCommand(new AdminRimuoviGiocatore());
 }
 
 export async function bindCommands(client: Client) {

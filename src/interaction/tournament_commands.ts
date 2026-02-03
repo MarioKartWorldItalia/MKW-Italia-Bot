@@ -11,16 +11,10 @@ import { assertCond, AssertError } from "../assert.js";
 import { BotEmojis, EmojisManager } from "../emoijs_manager.js";
 import { randomUUID } from "crypto";
 import { Iscriviti, IscrivitiBtn } from "./tournament_commands/iscriviti.js";
-import { InteractionOptions } from "./interaction_base_classes.js";
-import { Unsubscribe } from "./tournament_commands/unsubscribe.js";
 
 const SETUP_BOT_MODAL_NAME = "bot_setup_modal";
 const DEFAULT_TOURNAMENT_ROLE_ADD_OPTION = "default_role_add";
 const ON_ISCRIVITI_CHANNEL_OPTION = "conferma_iscrizione"
-
-const ADMIN_AGGIUNGI_GIOCATORE_NAME = "admin_aggiungi_giocatore";
-const ADMIN_RIMUOVI_GIOCAORE_NAME = "admin_rimuovi_giocatore";
-const USER_OPTION = "player_id";
 
 const DISISCRIVITI_NAME = "disiscriviti";
 const RIMUOVI_EVENTO_NAME = "rimuovi_evento";
@@ -64,8 +58,6 @@ export async function bindTournamentCommands(client: Client): Promise<Map<string
 export function getTournamentCommandHandlers() {
     const handlers = new Map();
 
-    handlers.set(ADMIN_AGGIUNGI_GIOCATORE_NAME, onAdminAggiungiGiocatore);
-    handlers.set(ADMIN_RIMUOVI_GIOCAORE_NAME, onAdminRimuoviGiocatore);
     handlers.set(MOSTRA_EVENTO_NAME, onMostraTorneo)
     handlers.set(RIMUOVI_EVENTO_NAME, onRimuoviTorneo);
     handlers.set(AGGIORNA_NOME_TORNEO_NAME, onAggiornaNomeTorneo);
@@ -102,51 +94,6 @@ export async function checkAndPopulateAutocomplete(interaction: Interaction): Pr
     await acInteraction.respond(choices);
     return true;
 }
-
-async function onAdminAggiungiGiocatore(interaction: Interaction) {
-    if (await checkAndPopulateAutocomplete(interaction)) {
-        return;
-    }
-
-    if (!(interaction instanceof ChatInputCommandInteraction)) {
-        throw new Error();
-    }
-    const castInteraction = interaction as ChatInputCommandInteraction;
-
-    const user = castInteraction.options.getUser(USER_OPTION);
-    if (!user) {
-        await replyEphemeral(interaction, "Giocatore non valido");
-        return;
-    }
-
-    const options = new InteractionOptions(interaction);
-    options.overrideOption("__user__", user);
-    
-    await new Iscriviti().exec(options);
-}
-
-async function onAdminRimuoviGiocatore(interaction: Interaction) {
-    if (await checkAndPopulateAutocomplete(interaction)) {
-        return;
-    }
-
-    if (!(interaction instanceof ChatInputCommandInteraction)) {
-        throw new Error();
-    }
-    let castInteraction = interaction as ChatInputCommandInteraction;
-    const user = castInteraction.options.getUser(USER_OPTION);
-    
-    if (!user) {
-        await replyEphemeral(interaction, "Giocatore non valido");
-        return;
-    }
-
-    const options = new InteractionOptions(interaction);
-    options.overrideOption("__user__", user);
-    
-    await new Unsubscribe().exec(options);
-}
-
 
 async function onMostraTorneo(interaction: Interaction) {
     if (await checkAndPopulateAutocomplete(interaction)) {

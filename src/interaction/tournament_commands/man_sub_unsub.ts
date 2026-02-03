@@ -60,8 +60,14 @@ export class ManUbsubEvent extends SlashCommandBase {
             checkAndPopulateAutocomplete(options.interaction);
             return;
         }
-
-        const user = options.getRequiredUserOption(USER_OPTION);
+        if(!options.interaction.isChatInputCommand()) { 
+            throw new TypeError();
+        }
+        const user = options.interaction.options.getUser(USER_OPTION);
+        if (!user) {
+            await replyEphemeral(options.interaction, "Giocatore non valido");
+            return;
+        }
         log(user);
         options.overrideOption("__user__", user);
 

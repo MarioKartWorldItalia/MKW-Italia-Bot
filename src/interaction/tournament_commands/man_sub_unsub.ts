@@ -61,7 +61,7 @@ export class ManUbsubEvent extends SlashCommandBase {
        }
        
         const user = (await Application.getInstance().getMainGuild()).members.fetch(
-            options.getRequiredStringOption(USER_OPTION)
+            options.getRequiredUserOption(USER_OPTION).id
         );
         options.overrideOption("__user__", user);
 

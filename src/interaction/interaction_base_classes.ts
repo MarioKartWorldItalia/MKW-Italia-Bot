@@ -41,6 +41,14 @@ export class InteractionOptions {
         return this.getOption<string>(name)!;
     }
 
+    public getUserOption(name: string, required: boolean = false): User | undefined {
+        return this.getOption<User>(name);
+    }
+
+    public getRequiredUserOption(name: string): User {
+        return this.getOption<User>(name)!;
+    }
+
     public getStringOption(name: string, required: boolean = false): string | undefined {
         return this.getOption<string>(name) as string | undefined;
     }

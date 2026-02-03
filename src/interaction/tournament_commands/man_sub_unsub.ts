@@ -5,6 +5,7 @@ import { replyEphemeral } from "../../utils";
 import { Iscriviti } from "./iscriviti";
 import { Application } from "../../application";
 import { Unsubscribe } from "./unsubscribe";
+import { log } from "../../log";
 
 const USER_OPTION = "player_id";
 
@@ -60,13 +61,8 @@ export class ManUbsubEvent extends SlashCommandBase {
             return;
         }
 
-        const user = (await Application.getInstance().getMainGuild()).members.cache.get(
-            options.getRequiredUserOption(USER_OPTION).id
-        )?.user;
-        if (!user) {
-            await replyEphemeral(options.interaction, "Giocatore non valido");
-            return;
-        }
+        const user = options.getRequiredUserOption(USER_OPTION);
+        log(user);
         options.overrideOption("__user__", user);
 
         new Unsubscribe().exec(options);

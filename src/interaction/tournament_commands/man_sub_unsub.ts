@@ -55,14 +55,18 @@ export class ManUbsubEvent extends SlashCommandBase {
     }
 
     public async exec(options: InteractionOptions): Promise<void> {
-       if(options.interaction.isAutocomplete()) {
-        checkAndPopulateAutocomplete(options.interaction);
-        return;
-       }
-       
-        const user = (await Application.getInstance().getMainGuild()).members.fetch(
+        if (options.interaction.isAutocomplete()) {
+            checkAndPopulateAutocomplete(options.interaction);
+            return;
+        }
+
+        const user = (await Application.getInstance().getMainGuild()).members.cache.get(
             options.getRequiredUserOption(USER_OPTION).id
-        );
+        )?.user;
+        if (!user) {
+            await replyEphemeral(options.interaction, "Giocatore non valido");
+            return;
+        }
         options.overrideOption("__user__", user);
 
         new Unsubscribe().exec(options);

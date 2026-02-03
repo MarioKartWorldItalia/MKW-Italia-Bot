@@ -4,8 +4,8 @@ import { Application } from "../application";
 import { resetRole } from "../utils";
 
 export async function bindGeneralCommands(client: Client): Promise<Map<string, (interaction: Interaction) => Promise<void>>> {
-    let commandsPromises = [];
-    commandsPromises.push(
+    let commandPromises = [];
+    commandPromises.push(
         client.application?.commands.create(
             new SlashCommandBuilder()
                 .setName("resetta_ruolo")
@@ -50,7 +50,7 @@ export async function bindGeneralCommands(client: Client): Promise<Map<string, (
         .toJSON()
         )
     );
-    Promise.all(commandsPromises).then(() => log("Comandi di util aggiornati")).catch(logError);
+    Promise.all(commandPromises).then(() => log("Comandi di util aggiornati")).catch(logError);
     let ret = new Map();
     ret.set("resetta_ruolo", onRoleReset);
     return ret;
@@ -81,21 +81,21 @@ async function onRoleReset(interaction: Interaction) {
     const reply = await interaction.reply(
         {
             content: `Conferma reset dei ruoli: ${roles.map(r => inlineCode(r.name)).join(", ")}?`,
-            components: [new ActionRowBuilder().addComponents(confirmBtn, abortBtn).toJSON()],
+            components: [new ActionRowBuilder<ButtonBuilder>().addComponents(confirmBtn, abortBtn).toJSON()],
             flags: MessageFlags.Ephemeral
         }
     );
 
     const response = await reply.awaitMessageComponent();
-    if (response.customId == "confirm") {
+    if (response.customId === "confirm") {
         await response.deferReply({flags: MessageFlags.Ephemeral});
         for(const role of roles) {
             await resetRole(role.id);
         }
         await response.editReply({
             content: "Ruoli resettati: " + roles.map(r => r.name).join(", "),
-        })
+        });
     }
 
-    await reply.delete()
+    await reply.delete();
 }

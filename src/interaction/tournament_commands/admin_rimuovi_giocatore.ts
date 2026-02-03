@@ -27,9 +27,8 @@ export class AdminRimuoviGiocatore extends SlashCommandBase {
         if (!(options.interaction instanceof ChatInputCommandInteraction)) {
             throw new Error();
         }
-        const castInteraction = options.interaction as ChatInputCommandInteraction;
 
-        const user = castInteraction.options.getUser("player_id");
+        const user = options.interaction.options.getUser("player_id");
         if (!user) {
             await replyEphemeral(options.interaction, "Giocatore non valido");
             return;

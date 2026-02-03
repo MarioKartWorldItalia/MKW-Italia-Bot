@@ -8,11 +8,11 @@ import { StartCheckInCommand } from "./tournament_commands/start_checkin";
 import { CheckInButton } from "./tournament_commands/checkin";
 import { Iscriviti } from "./tournament_commands/iscriviti";
 import { ConfermaIscrizione } from "./tournament_commands/conferma_iscrizione";
-import { Unsubscribe } from "./tournament_commands/unsubscribe";
-import { CommandsManager } from "./commands_manager";
-import { CreateEvent } from "./tournament_commands/create_event";
-import { AdminAggiungiGiocatore } from "./tournament_commands/admin_aggiungi_giocatore";
-import { AdminRimuoviGiocatore } from "./tournament_commands/admin_rimuovi_giocatore";
+import { Unsubscribe } from "./tournament_commands/unsubscribe.js";
+import { CommandsManager } from "./commands_manager.js";
+import { CreateEvent } from "./tournament_commands/create_event.js";
+import { AdminAggiungiGiocatore } from "./tournament_commands/admin_aggiungi_giocatore.js";
+import { AdminRimuoviGiocatore } from "./tournament_commands/admin_rimuovi_giocatore.js";
 
 async function bindCommandsInner(client: Client, commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS

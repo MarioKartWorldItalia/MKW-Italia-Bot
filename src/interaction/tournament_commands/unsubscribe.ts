@@ -25,7 +25,7 @@ export class Unsubscribe extends SlashCommandBase {
             && !(options.interaction instanceof ButtonInteraction)) {
             throw new TypeError();
         }
-        log("ID: " + id);
+
         const tournament = await Application.getInstance().getTournamentManager().getTournamentById(id);
 
         if (!tournament) {

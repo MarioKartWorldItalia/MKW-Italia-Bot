@@ -21,6 +21,8 @@ export class Unsubscribe extends SlashCommandBase {
         }
         const id = options.getRequiredStringOption("evento");
 
+        log(`Rimozione giocatore ${options.getInteractionUser().username} da torneo ${id}`);
+        
         if (!(options.interaction instanceof ChatInputCommandInteraction)
             && !(options.interaction instanceof ButtonInteraction)) {
             throw new TypeError();

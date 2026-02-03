@@ -97,5 +97,5 @@ async function onRoleReset(interaction: Interaction) {
         });
     }
 
-    await reply.delete()
+    await reply.delete();
 }

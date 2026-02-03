@@ -11,6 +11,8 @@ import { assertCond, AssertError } from "../assert.js";
 import { BotEmojis, EmojisManager } from "../emoijs_manager.js";
 import { randomUUID } from "crypto";
 import { Iscriviti, IscrivitiBtn } from "./tournament_commands/iscriviti.js";
+import { InteractionOptions } from "./interaction_base_classes.js";
+import { Unsubscribe } from "./tournament_commands/unsubscribe.js";
 
 const SETUP_BOT_MODAL_NAME = "bot_setup_modal";
 const DEFAULT_TOURNAMENT_ROLE_ADD_OPTION = "default_role_add";
@@ -117,13 +119,10 @@ async function onAdminAggiungiGiocatore(interaction: Interaction) {
         return;
     }
 
-    // modifica la proprità user di interaction temporaneamente
-    const originalUser = interaction.user;
-    Object.defineProperty(interaction, 'user', { value: user, configurable: true, writable: true });
-
-    //await onIscriviti(interaction);
-    throw new Error("uncomment the line above");
-    Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true, writable: true });
+    const options = new InteractionOptions(interaction);
+    options.overrideOption("__user__", user);
+    
+    await new Iscriviti().exec(options);
 }
 
 async function onAdminRimuoviGiocatore(interaction: Interaction) {
@@ -136,12 +135,16 @@ async function onAdminRimuoviGiocatore(interaction: Interaction) {
     }
     let castInteraction = interaction as ChatInputCommandInteraction;
     const user = castInteraction.options.getUser(USER_OPTION);
+    
+    if (!user) {
+        await replyEphemeral(interaction, "Giocatore non valido");
+        return;
+    }
 
-    const originalUser = interaction.user;
-    Object.defineProperty(interaction, 'user', { value: user, configurable: true, writable: true });
-  //  await onDisiscriviti(interaction as ChatInputCommandInteraction);
-    throw new Error("uncomment the line above");  
-  Object.defineProperty(interaction, 'user', { value: originalUser, configurable: true, writable: true });
+    const options = new InteractionOptions(interaction);
+    options.overrideOption("__user__", user);
+    
+    await new Unsubscribe().exec(options);
 }
 
 

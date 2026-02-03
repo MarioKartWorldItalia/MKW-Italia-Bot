@@ -19,7 +19,7 @@ export class Unsubscribe extends SlashCommandBase {
         if (await checkAndPopulateAutocomplete(options.interaction)) {
             return;
         }
-        const id = options.getRequiredStringOption("tournament_id");
+        const id = options.getRequiredStringOption("evento");
 
         if (!(options.interaction instanceof ChatInputCommandInteraction)
             && !(options.interaction instanceof ButtonInteraction)) {

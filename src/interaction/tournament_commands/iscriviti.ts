@@ -43,6 +43,7 @@ export class Iscriviti extends SlashCommandBase {
                 interaction,
                 `Sei già iscritto al torneo **${tournament?.getName()}**`
             )
+            return;
         }
 
         if (interaction.isChatInputCommand() || interaction.isButton()) {

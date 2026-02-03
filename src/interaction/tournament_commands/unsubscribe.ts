@@ -22,7 +22,7 @@ export class Unsubscribe extends SlashCommandBase {
         const id = options.getRequiredStringOption("evento");
 
         log(`Rimozione giocatore ${options.getInteractionUser().username} da torneo ${id}`);
-        
+
         if (!(options.interaction instanceof ChatInputCommandInteraction)
             && !(options.interaction instanceof ButtonInteraction)) {
             throw new TypeError();
@@ -42,5 +42,9 @@ export class Unsubscribe extends SlashCommandBase {
             });
             return;
         }
+
+        tournament.removePlayer(options.getInteractionUser().id);
+        await Application.getInstance().getTournamentManager().updateTournament(tournament);
+        replyEphemeral(options.interaction, "Disiscrizione avvenuta con successo, utente: " + options.getInteractionUser().username);
     }
 }

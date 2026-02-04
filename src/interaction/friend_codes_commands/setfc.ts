@@ -4,7 +4,7 @@ import { awaitModalSubmit, replyEphemeral } from "../../utils";
 import { log } from "../../log";
 import { randomUUID } from "crypto";
 import { refreshFriendCodesMessage } from "./shared";
-import { ButtonOrModalCommandBase, InteractionOptions, SlashCommandBase } from "../interaction_base_classes";
+import { InteractionOptions, SlashCommandBase } from "../interaction_base_classes";
 
 export class SetFc extends SlashCommandBase {
     override get builder(): SlashCommandBuilder | RESTPostAPIChatInputApplicationCommandsJSONBody {

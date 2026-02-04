@@ -10,14 +10,6 @@ import { Iscriviti } from "./tournament_commands/iscriviti";
 import { ConfermaIscrizione } from "./tournament_commands/conferma_iscrizione";
 import { Unsubscribe } from "./tournament_commands/unsubscribe";
 import { CommandsManager } from "./commands_manager";
-// Friend code commands
-import { SetFc } from "./friend_codes_commands/setfc";
-import { DelFc } from "./friend_codes_commands/delfc";
-import { GetFc } from "./friend_codes_commands/getfc";
-import { ManSetFc } from "./friend_codes_commands/mansetfc";
-import { ManDelFc } from "./friend_codes_commands/mandelfc";
-import { ListaFc } from "./friend_codes_commands/listafc";
-import { SearchFc } from "./friend_codes_commands/searchfc";
 
 export class InteractionOptions {
     public interaction: Interaction;

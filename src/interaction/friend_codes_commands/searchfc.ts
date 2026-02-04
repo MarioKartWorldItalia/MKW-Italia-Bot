@@ -53,7 +53,7 @@ export class SearchFc extends ButtonOrModalCommandBase {
         }
 
         if (!member) {
-            replyEphemeral(replyInteraction, "Non è stato trovato alcun giocatore con il nome inserito");
+            await replyEphemeral(replyInteraction, "Non è stato trovato alcun giocatore con il nome inserito");
         }
 
         else {

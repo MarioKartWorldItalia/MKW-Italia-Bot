@@ -43,7 +43,7 @@ export class SearchFc extends ButtonOrModalCommandBase {
 
         let member = guild.members.cache.find(m => m.user.tag.toLowerCase() === userTag);
         if (!member) {
-            member = guild.members.cache.find(m => m.user.displayName.toLowerCase() === userTag)
+            member = guild.members.cache.find(m => m.displayName.toLowerCase() === userTag)
         }
         if (!member) {
             member = guild.members.cache.find(m => m.user.globalName?.toLowerCase() === userTag)

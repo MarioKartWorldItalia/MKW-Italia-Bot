@@ -35,7 +35,7 @@ export async function refreshFriendCodesMessage() {
         await msg.edit({
             embeds: [await createFriendCodesMessageEmbed(allFCs)],
             components: [createFriendCodesButtons()]
-        })
+        });
     }
 }
 

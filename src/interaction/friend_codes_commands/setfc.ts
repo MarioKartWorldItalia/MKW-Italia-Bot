@@ -42,7 +42,7 @@ export class SetFc extends SlashCommandBase {
                             .setRequired(true)
                             .setStyle(TextInputStyle.Paragraph)
                     )
-                )
+                );
             
             await interaction.showModal(modal);
             

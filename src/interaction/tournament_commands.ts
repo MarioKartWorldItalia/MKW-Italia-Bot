@@ -343,7 +343,7 @@ async function createTournamentMessage(tournament: Tournament) {
     const iscrivitiBtn = new IscrivitiBtn(tournament._id!.toString()).createButton();
 
     const disiscrivitiBtn = new ButtonBuilder()
-        .setCustomId(DISISCRIVITI_NAME + " " + tournament.getId())
+        .setCustomId(DISISCRIVITI_NAME + " evento:" + tournament.getId())
         .setLabel("Disiscriviti")
         .setStyle(ButtonStyle.Danger);
 

@@ -31,7 +31,7 @@ export class SetFc extends SlashCommandBase {
         }
         else if (interaction.isButton()) {
             const modal = new ModalBuilder()
-                .setCustomId("setfc_modal" + " " + randomUUID())
+                .setCustomId("setfc_modal id:" + randomUUID())
                 .setTitle("Aggiungi Codice Amico")
                 .addComponents(
                     new ActionRowBuilder<TextInputBuilder>().addComponents(

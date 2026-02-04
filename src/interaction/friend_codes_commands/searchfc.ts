@@ -19,7 +19,7 @@ export class SearchFc extends ButtonOrModalCommandBase {
             return;
             
         const modal = new ModalBuilder()
-            .setCustomId("searchfc_modal" + " " + randomUUID())
+            .setCustomId("searchfc_modal id:" + randomUUID())
             .setTitle("Cerca Codice Amico Utente")
             .addComponents(
                 new ActionRowBuilder<TextInputBuilder>().addComponents(

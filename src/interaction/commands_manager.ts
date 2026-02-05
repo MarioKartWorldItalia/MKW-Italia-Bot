@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Events, MessageFlags, ModalSubmitInteraction } from "discord.js";
+import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Events, MessageFlags, ModalSubmitInteraction, SlashCommandBuilder } from "discord.js";
 import { assertCond } from "../assert";
 import { log, logError } from "../log";
 import { CommandBase, InteractionOptions, SlashCommandBase } from "./interaction_base_classes";
@@ -73,7 +73,11 @@ export class CommandsManager {
         const commandsArray = this.commands.values();
         for (const command of commandsArray) {
             if (command instanceof SlashCommandBase) {
-                client.application!.commands.create(command.builder)
+                let builder = command.builder;
+                if(command.builder instanceof SlashCommandBuilder) {
+                    builder = command.builder.toJSON();
+                }
+                client.application!.commands.create(builder)
                     .then(() => log("Registered command: " + command.commandName));
             }
         }

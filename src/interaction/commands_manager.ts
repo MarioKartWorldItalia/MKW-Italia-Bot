@@ -43,7 +43,7 @@ export class CommandsManager {
             options.overrideOption("__user__", interaction.user);
 
             try {
-                await command.exec(options);
+                 await command.exec(options);
                 log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
             }
             catch (e) {

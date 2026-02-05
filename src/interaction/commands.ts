@@ -20,7 +20,7 @@ import { ManDelFc } from "./friend_codes_commands/mandelfc";
 import { ListaFc } from "./friend_codes_commands/listafc";
 import { SearchFc } from "./friend_codes_commands/searchfc";
 
-async function bindCommandsInner(client: Client, commandsManager: CommandsManager) {
+async function bindCommandsInner(commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
     commandsManager.addCommand(new StartCheckInCommand());
     commandsManager.addCommand(new CheckInButton());
@@ -47,7 +47,8 @@ async function bindCommandsInner(client: Client, commandsManager: CommandsManage
 export async function bindCommands(client: Client) {
     let commandsManager = new CommandsManager(client);
 
-    bindCommandsInner(client, commandsManager).catch(e => logError(e));
+    await bindCommandsInner(commandsManager);
+    commandsManager.registerCommands(client).catch(e => logError(e));
 }
 
 

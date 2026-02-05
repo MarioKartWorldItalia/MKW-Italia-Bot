@@ -43,12 +43,12 @@ export class CommandsManager {
             options.overrideOption("__user__", interaction.user);
 
             try {
-                 await command.exec(options);
+                await command.exec(options);
                 log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
             }
             catch (e) {
                 let err = "Can't execute command " + interactionName + ": " + e;
-                if(e instanceof Error) {
+                if (e instanceof Error) {
                     err = err + "\nStack trace:\n" + e.stack;
                 }
                 logError(err);
@@ -73,8 +73,8 @@ export class CommandsManager {
         const commandsArray = this.commands.values();
         for (const command of commandsArray) {
             if (command instanceof SlashCommandBase) {
-                await client.application!.commands.create(command.builder);
-                log("Registered command: " + command.commandName);
+                client.application!.commands.create(command.builder)
+                    .then(() => log("Registered command: " + command.commandName));
             }
         }
     }

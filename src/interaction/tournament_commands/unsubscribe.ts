@@ -12,6 +12,14 @@ export class Unsubscribe extends SlashCommandBase {
 
     override get builder(): SlashCommandBuilder | RESTPostAPIChatInputApplicationCommandsJSONBody {
         return new SlashCommandBuilder()
+            .setName(this.commandName)
+            .setDescription("Disiscriviti da un torneo")
+            .addStringOption(option =>
+                option.setName("evento")
+                    .setDescription("ID del torneo da cui disiscriversi")
+                    .setRequired(true)
+                    .setAutocomplete(true)
+            ).toJSON();
 
     }
 

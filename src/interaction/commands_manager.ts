@@ -78,8 +78,18 @@ export class CommandsManager {
                     builder = command.builder.toJSON();
                 }
                 client.application!.commands.create(builder)
-                    .then(() => log("Registered command: " + command.commandName));
+                    .then(() => log("Registered command: " + command.commandName))
+                    .catch(e => logError("Failed to register command " + command.commandName + ": " + e));
             }
+            const commands = await client.application?.commands.fetch();
+            for(const cmd of commands?.values() ?? []) {
+            const name = cmd.name;
+            const found = this.commands.get(name);
+            if(!found) {
+                client.application?.commands.delete(cmd.id).then(() => log("Deleted command: " + name));
+            }
+            }
+        
         }
     }
 

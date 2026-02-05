@@ -64,8 +64,7 @@ export abstract class CommandBase {
     public abstract get commandName(): string;
     public abstract exec(options: InteractionOptions): Promise<void>;
 
-    public createCustomId(options?: Map<string, string>) {
-        let commandName = this.commandName;
+    public static s_CreateCustomId(commandName: string,options?: Map<string, string>): string {
         let modalName = commandName;
         if (!options) {
             return modalName;
@@ -74,6 +73,10 @@ export abstract class CommandBase {
             modalName += (" " + option[0] + ":" + option[1]);
         }
         return modalName;
+    }
+
+    public createCustomId(options?: Map<string, string>) {
+        return CommandBase.s_CreateCustomId(this.commandName, options);
     }
 }
 

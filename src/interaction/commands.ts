@@ -1,5 +1,5 @@
 import { Client } from "discord.js"
-import { logError } from "../log";
+import { log, logError } from "../log";
 import { StartCheckInCommand } from "./tournament_commands/start_checkin";
 import { CheckInButton } from "./tournament_commands/checkin";
 import { Iscriviti } from "./tournament_commands/iscriviti";
@@ -10,7 +10,7 @@ import { CreateEvent } from "./tournament_commands/create_event";
 import { AggiornaNomeTorneo } from "./tournament_commands/aggiorna_nome";
 import { RimuoviEvento } from "./tournament_commands/rimuovi_evento";
 import { ConfermaRimozioneTorneo } from "./tournament_commands/conferma_rimozione";
-import { ManSubscribeEvent as ManSubscribeEvent, ManUbsubEvent } from "./tournament_commands/man_sub_unsub";
+import { ManSubscribeEvent as ManSubscribeEvent, ManUnsubEvent } from "./tournament_commands/man_sub_unsub";
 // Friend code commands
 import { SetFc } from "./friend_codes_commands/setfc";
 import { DelFc } from "./friend_codes_commands/delfc";
@@ -19,6 +19,10 @@ import { ManSetFc } from "./friend_codes_commands/mansetfc";
 import { ManDelFc } from "./friend_codes_commands/mandelfc";
 import { ListaFc } from "./friend_codes_commands/listafc";
 import { SearchFc } from "./friend_codes_commands/searchfc";
+import { SetMMR } from "./players_commands/set_mmr";
+import { GetMMR } from "./players_commands/get_mmr";
+import { RemoveMMR } from "./players_commands/rm_mmr";
+import { AddMMRButton } from "./players_commands/add_mmr_button";
 
 async function bindCommandsInner(commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
@@ -32,7 +36,7 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new RimuoviEvento());
     commandsManager.addCommand(new ConfermaRimozioneTorneo());
     commandsManager.addCommand(new ManSubscribeEvent())
-    commandsManager.addCommand(new ManUbsubEvent())
+    commandsManager.addCommand(new ManUnsubEvent())
 
     //FRIEND CODE COMMANDS
     commandsManager.addCommand(new SetFc());
@@ -42,12 +46,19 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new ManDelFc());
     commandsManager.addCommand(new ListaFc());
     commandsManager.addCommand(new SearchFc());
+
+    //PLAYERS COMMANDS
+    commandsManager.addCommand(new SetMMR());
+    commandsManager.addCommand(new GetMMR());
+    commandsManager.addCommand(new RemoveMMR());
+    commandsManager.addCommand(new AddMMRButton());
 }
 
 export async function bindCommands(client: Client) {
     let commandsManager = new CommandsManager(client);
 
     await bindCommandsInner(commandsManager);
+    log("Aggiornamento comandi in corso...");
     commandsManager.registerCommands(client).catch(e => logError(e));
 }
 

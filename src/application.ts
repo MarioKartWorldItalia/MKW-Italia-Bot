@@ -12,6 +12,7 @@ import { Server } from "http";
 import { Collection } from "mongoose";
 import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager.js";
 import { replyEphemeral } from "./utils.js";
+import { PlayersManager } from "./player_details/PlayersManager.js";
 
 export class Application {
     private static instance: Application;
@@ -20,7 +21,7 @@ export class Application {
     private webServer!: Server;
     private db: Database;
     private featureFlagsManager: FeatureFlagsManager;
-
+    private playersManager!: PlayersManager;
     
 
 
@@ -28,6 +29,7 @@ export class Application {
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS, ws: { large_threshold: 250 } });
         this.db = new Database(undefined);
         this.featureFlagsManager = new FeatureFlagsManager();
+        this.playersManager = new PlayersManager();
     }
 
     public async getMainGuild(): Promise<Guild> {
@@ -56,6 +58,10 @@ export class Application {
         return this.db;
     }
 
+    public getPlayersManager(): PlayersManager {
+        return this.playersManager;
+    }
+
     public async start() {
         let startFunctions: Array<Promise<void>> = [];
 
@@ -70,7 +76,7 @@ export class Application {
         this.client.on(Events.Error, logError);
 
         await Promise.all(startFunctions);
-
+        await this.playersManager.start();
         this.tournamentManager = new TournamentManager();
 
         await this.client.login(Globals.BOT_TOKEN);
@@ -285,8 +291,6 @@ export class Application {
         }
 
         await bindCommands(this.client);
-        log("Aggiornamento comandi in corso...");
-
     }
 
     public async shutdown() {

@@ -4,7 +4,6 @@ import { Schema } from "mongoose";
 export class TournamentDefaults {
     @prop({type: String, required: true, default: ""})
     public categoryId!: string;
-
 }
 
 export class FriendCodesDbDefaults {
@@ -15,6 +14,21 @@ export class FriendCodesDbDefaults {
 export class BotDefaultsSchema {
     @prop({type: String})
     public defaultTournamentRoleAdd!: string;
+
+    @prop({type: Number})
+    public mkCentralSeason!: number;
+
+    @prop({type: String})
+    public MMRTableChannelId?: string;
+
+    @prop({type: String})
+    public MMRTableMessageId?: string;
+
+    @prop({type: String})
+    public staffMMRAddChannelId!: string;
+
+    @prop({type: String})
+    public publicRankChangeChannelId!: string;
 
     //server in cui verranno mandati i messaggi con le informazioni 
     //inserite nel form quando una persona si iscrive ad un torneo

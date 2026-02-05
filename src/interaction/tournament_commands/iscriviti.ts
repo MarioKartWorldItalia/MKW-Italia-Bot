@@ -19,7 +19,7 @@ export class Iscriviti extends SlashCommandBase {
             .setRequired(true);
 
         _builder.addStringOption(t_id);
-        return _builder;
+        return _builder.toJSON();
     }
 
     override async exec(options: InteractionOptions): Promise<void> {

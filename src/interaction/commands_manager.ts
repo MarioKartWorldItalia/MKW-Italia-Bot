@@ -44,7 +44,7 @@ export class CommandsManager {
 
             try {
                 await command.exec(options);
-                log(`Comando eseguito: ${interactionName} [${typeof (interaction)}]`);
+                log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
             }
             catch (e) {
                 let err = "Can't execute command " + interactionName + ": " + e;

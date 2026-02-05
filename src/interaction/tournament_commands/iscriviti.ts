@@ -18,7 +18,6 @@ export class Iscriviti extends SlashCommandBase {
             .setAutocomplete(true)
             .setRequired(true);
 
-
         _builder.addStringOption(t_id);
         return _builder;
     }

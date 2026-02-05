@@ -48,7 +48,7 @@ export async function bindCommands(client: Client) {
     let commandsManager = new CommandsManager(client);
 
     await bindCommandsInner(commandsManager);
-    commandsManager.registerCommands(client).catch(e => logError(e));
+    //commandsManager.registerCommands(client).catch(e => logError(e));
 }
 
 

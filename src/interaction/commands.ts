@@ -1,5 +1,5 @@
 import { Client } from "discord.js"
-import { logError } from "../log";
+import { log, logError } from "../log";
 import { StartCheckInCommand } from "./tournament_commands/start_checkin";
 import { CheckInButton } from "./tournament_commands/checkin";
 import { Iscriviti } from "./tournament_commands/iscriviti";
@@ -48,6 +48,7 @@ export async function bindCommands(client: Client) {
     let commandsManager = new CommandsManager(client);
 
     await bindCommandsInner(commandsManager);
+    log("Aggiornamento comandi in corso...");
     commandsManager.registerCommands(client).catch(e => logError(e));
 }
 

@@ -285,8 +285,6 @@ export class Application {
         }
 
         await bindCommands(this.client);
-        log("Aggiornamento comandi in corso...");
-
     }
 
     public async shutdown() {

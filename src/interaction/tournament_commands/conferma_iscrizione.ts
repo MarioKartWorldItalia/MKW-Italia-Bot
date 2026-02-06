@@ -103,7 +103,8 @@ export class ConfermaIscrizioneModal extends ConfermaIscrizione {
         return new ModalBuilder()
             .setCustomId(this.createCustomId(options))
             .setTitle("Iscriviti al torneo")
-            .addComponents(actionRow1, actionRow2, actionRow3, actionRow4);
-    }
+            .addComponents(actionRow1, actionRow2, actionRow3, actionRow4)
+            .toJSON();
+        }
 
 }

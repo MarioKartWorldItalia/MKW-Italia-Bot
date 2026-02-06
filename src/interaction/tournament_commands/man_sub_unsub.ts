@@ -19,7 +19,7 @@ export class ManSubscribeEvent extends SlashCommandBase {
                 .setDescription("Giocatore da aggiungere")
                 .setRequired(true))
                 .addStringOption(option => option
-                    .setName("tournament_id")
+                    .setName("evento")
                     .setDescription("ID del torneo")
                     .setAutocomplete(true)
                     .setRequired(true))
@@ -59,7 +59,7 @@ export class ManUnsubEvent extends SlashCommandBase {
                 .setDescription("Giocatore da rimuovere")
                 .setRequired(true))
             .addStringOption(option => option
-                .setName("tournament_id")
+                .setName("evento")
                 .setDescription("ID del torneo")
                 .setAutocomplete(true)
                 .setRequired(true))

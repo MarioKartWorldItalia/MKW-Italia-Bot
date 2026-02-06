@@ -80,7 +80,6 @@ export class ManUnsubEvent extends SlashCommandBase {
             await replyEphemeral(options.interaction, "Giocatore non valido");
             return;
         }
-        log(user);
         options.overrideOption("__user__", user);
 
         new Unsubscribe().exec(options);

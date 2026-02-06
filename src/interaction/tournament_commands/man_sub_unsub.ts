@@ -21,6 +21,7 @@ export class ManSubscribeEvent extends SlashCommandBase {
                 .addStringOption(option => option
                     .setName("tournament_id")
                     .setDescription("ID del torneo")
+                    .setAutocomplete(true)
                     .setRequired(true))
             .toJSON();
         return _builder;
@@ -60,6 +61,7 @@ export class ManUnsubEvent extends SlashCommandBase {
             .addStringOption(option => option
                 .setName("tournament_id")
                 .setDescription("ID del torneo")
+                .setAutocomplete(true)
                 .setRequired(true))
             .toJSON();
         return _builder;

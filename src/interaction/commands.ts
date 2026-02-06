@@ -10,7 +10,7 @@ import { CreateEvent } from "./tournament_commands/create_event";
 import { AggiornaNomeTorneo } from "./tournament_commands/aggiorna_nome";
 import { RimuoviEvento } from "./tournament_commands/rimuovi_evento";
 import { ConfermaRimozioneTorneo } from "./tournament_commands/conferma_rimozione";
-import { ManSubscribeEvent as ManSubscribeEvent, ManUbsubEvent } from "./tournament_commands/man_sub_unsub";
+import { ManSubscribeEvent as ManSubscribeEvent, ManUnsubEvent } from "./tournament_commands/man_sub_unsub";
 // Friend code commands
 import { SetFc } from "./friend_codes_commands/setfc";
 import { DelFc } from "./friend_codes_commands/delfc";
@@ -32,7 +32,7 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new RimuoviEvento());
     commandsManager.addCommand(new ConfermaRimozioneTorneo());
     commandsManager.addCommand(new ManSubscribeEvent())
-    commandsManager.addCommand(new ManUbsubEvent())
+    commandsManager.addCommand(new ManUnsubEvent())
 
     //FRIEND CODE COMMANDS
     commandsManager.addCommand(new SetFc());

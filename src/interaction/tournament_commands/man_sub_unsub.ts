@@ -43,7 +43,7 @@ export class ManSubscribeEvent extends SlashCommandBase {
     }
 }
 
-export class ManUbsubEvent extends SlashCommandBase {
+export class ManUnsubEvent extends SlashCommandBase {
     get builder(): SlashCommandBuilder | RESTPostAPIChatInputApplicationCommandsJSONBody {
         let _builder = new SlashCommandBuilder()
             .setName("admin_rimuovi_giocatore")

@@ -17,7 +17,12 @@ export class ManSubscribeEvent extends SlashCommandBase {
             .addUserOption(option => option
                 .setName(USER_OPTION)
                 .setDescription("Giocatore da aggiungere")
-                .setRequired(true)).toJSON();
+                .setRequired(true))
+                .addStringOption(option => option
+                    .setName("tournament_id")
+                    .setDescription("ID del torneo")
+                    .setRequired(true))
+            .toJSON();
         return _builder;
     }
 
@@ -51,7 +56,12 @@ export class ManUnsubEvent extends SlashCommandBase {
             .addUserOption(option => option
                 .setName(USER_OPTION)
                 .setDescription("Giocatore da rimuovere")
-                .setRequired(true)).toJSON();
+                .setRequired(true))
+            .addStringOption(option => option
+                .setName("tournament_id")
+                .setDescription("ID del torneo")
+                .setRequired(true))
+            .toJSON();
         return _builder;
     }
 

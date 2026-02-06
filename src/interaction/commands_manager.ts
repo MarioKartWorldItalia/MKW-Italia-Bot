@@ -78,7 +78,8 @@ export class CommandsManager {
                     builder = command.builder.toJSON();
                 }
                 client.application!.commands.create(builder)
-                    .then(() => log("Registered command: " + command.commandName));
+                    .then(() => log("Registered command: " + command.commandName))
+                    .catch(e => logError("Failed to register command " + command.commandName + ": " + e));
             }
         }
     }

@@ -20,5 +20,8 @@ export class GetMMR extends SlashCommandBase {
             const link = await player.getMMREntry()!.getMMRLink();
             await replyEphemeral(options.interaction, `Il tuo MMR è ${MMR}. Link: ${link}`);
         }
+        else {
+            await replyEphemeral(options.interaction, "Non hai ancora inserito il tuo MMR. Usa il comando /set_mmr per inserirlo!");
+        }
     }
 }

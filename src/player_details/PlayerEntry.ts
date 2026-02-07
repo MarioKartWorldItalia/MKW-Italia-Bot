@@ -9,7 +9,7 @@ export class PlayerEntry {
     public MMR?: MMREntry;
 
     constructor(playerid: String) {
-        this.playerId = "";
+        this.playerId = playerid;
     }
 
     public setMMREntry(MMREntry: MMREntry) {

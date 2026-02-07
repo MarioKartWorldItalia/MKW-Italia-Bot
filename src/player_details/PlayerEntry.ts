@@ -3,10 +3,10 @@ import { MMREntry } from "./MMRManager";
 
 export class PlayerEntry {
     @prop({required: true})
-    public playerId: String;
+    private playerId: String;
 
     @prop({ _id: false })
-    public MMR?: MMREntry;
+    private MMR?: MMREntry;
 
     constructor(playerid: String) {
         this.playerId = playerid;

@@ -19,6 +19,8 @@ import { ManSetFc } from "./friend_codes_commands/mansetfc";
 import { ManDelFc } from "./friend_codes_commands/mandelfc";
 import { ListaFc } from "./friend_codes_commands/listafc";
 import { SearchFc } from "./friend_codes_commands/searchfc";
+import { SetMMR } from "./players_commands/set_mmr";
+import { GetMMR } from "./players_commands/get_mmr";
 
 async function bindCommandsInner(commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
@@ -42,6 +44,10 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new ManDelFc());
     commandsManager.addCommand(new ListaFc());
     commandsManager.addCommand(new SearchFc());
+
+    //PLAYERS COMMANDS
+    commandsManager.addCommand(new SetMMR());
+    commandsManager.addCommand(new GetMMR());
 }
 
 export async function bindCommands(client: Client) {

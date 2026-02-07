@@ -67,7 +67,6 @@ export class Application {
 
         startFunctions.push(this.db.init());
         startFunctions.push(this.featureFlagsManager.waitForInitialization());
-        startFunctions.push(this.playersManager.start());
 
         this.client.once(Events.ClientReady, async (client) => await this.onReady(client));
         //the client is not supposed to join guilds
@@ -77,7 +76,7 @@ export class Application {
         this.client.on(Events.Error, logError);
 
         await Promise.all(startFunctions);
-
+        await this.playersManager.start();
         this.tournamentManager = new TournamentManager();
 
         await this.client.login(Globals.BOT_TOKEN);

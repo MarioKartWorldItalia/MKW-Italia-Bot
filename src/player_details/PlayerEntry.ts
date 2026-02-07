@@ -5,7 +5,7 @@ export class PlayerEntry {
     @prop({required: true})
     public playerId: String;
 
-    @prop()
+    @prop({ _id: false })
     public MMR?: MMREntry;
 
     constructor(playerid: String) {

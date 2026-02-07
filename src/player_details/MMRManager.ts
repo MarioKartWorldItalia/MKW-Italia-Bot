@@ -1,9 +1,13 @@
 import axios from "axios";
 import * as cheerio from 'cheerio';
 import { BotDefaults } from "../globals";
+import { prop } from "@typegoose/typegoose";
 
 export class MMREntry {
+    @prop({ required: true })
     public MCKPlayerId: string;
+    
+    @prop({ required: true })
     public MMR: number; //last fetched MMR
 
     constructor(MCKPlayerId: string, MMR: number) {

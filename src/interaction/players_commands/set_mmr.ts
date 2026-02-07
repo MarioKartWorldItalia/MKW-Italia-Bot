@@ -24,6 +24,6 @@ export class SetMMR extends SlashCommandBase {
         let player = await playersManager.getOrCreatePlayer(options.getInteractionUser().id);
         player.setMMREntry(MMR);
         await playersManager.updateOrCreatePlayer(player);
-        await replyEphemeral(options.interaction, `MMR aggiornato correttamente! Il tuo MMR è ${MMR.getMMRValue()}. Link: ${await MMR.getMMRLink()}`);
+        await replyEphemeral(options.interaction, `MMR aggiornato correttamente! Il tuo MMR è ${MMR.getMMRValue()}`);
     }
 }

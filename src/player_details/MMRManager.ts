@@ -31,12 +31,22 @@ export class MMREntry {
         return `https://lounge.mkcentral.com/mkworld/PlayerDetails/${this.MCKPlayerId}?season=${season}`;
     }
 
-    private static getPlayerIdFromUrl(url: string): string {
-        const match = url.match(/\/PlayerDetails\/(\d+)/);
-        if (!match || !match[1]) {
-            throw new Error("Invalid player details URL");
+    public static getPlayerIdFromUrl(url: string): string {
+        const cleanUrl = url.trim();
+        const patterns = [
+            /\/PlayerDetails\/(\d+)/i,
+            /PlayerDetails[\/:](\d+)/i, 
+            /player[_-]?details[\/:](\d+)/i,
+        ];
+        
+        for (const pattern of patterns) {
+            const match = cleanUrl.match(pattern);
+            if (match && match[1]) {
+                return match[1];
+            }
         }
-        return match[1];
+        
+        throw new Error(`Invalid player details URL. URL fornito: "${cleanUrl}". Formato atteso: https://lounge.mkcentral.com/mkworld/PlayerDetails/[ID]`);
     }
 
     private static async scrapeMMR(url: string) {

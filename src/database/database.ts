@@ -11,7 +11,8 @@ import { ReadConcern } from "mongodb";
 
 export enum DbCollection {
     TOURNAMENT = "tournaments",
-    BOT_DEFAULTS = "bot_defaults"
+    BOT_DEFAULTS = "bot_defaults",
+    PLAYERS = "players",
 }
 
 

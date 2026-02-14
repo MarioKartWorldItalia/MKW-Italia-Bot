@@ -23,6 +23,7 @@ import { SetMMR } from "./players_commands/set_mmr";
 import { GetMMR } from "./players_commands/get_mmr";
 import { RemoveMMR } from "./players_commands/rm_mmr";
 import { AddMMRButton } from "./players_commands/add_mmr_button";
+import { GetMMRButton } from "./players_commands/get_mmr_button";
 
 async function bindCommandsInner(commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
@@ -52,6 +53,7 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new GetMMR());
     commandsManager.addCommand(new RemoveMMR());
     commandsManager.addCommand(new AddMMRButton());
+    commandsManager.addCommand(new GetMMRButton());
 }
 
 export async function bindCommands(client: Client) {

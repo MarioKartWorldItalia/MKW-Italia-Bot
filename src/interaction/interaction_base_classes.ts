@@ -63,6 +63,28 @@ export class InteractionOptions {
 export abstract class CommandBase {
     public abstract get commandName(): string;
     public abstract exec(options: InteractionOptions): Promise<void>;
+    public async guardedExec(options: InteractionOptions): Promise<void> {
+        try {
+            return this.exec(options);
+        }  catch (e) {
+                let err = "Can't execute command " + this.commandName + ": " + e;
+                if (e instanceof Error) {
+                    err = err + "\nStack trace:\n" + e.stack;
+                }
+                logError(err);
+                const interaction = options.interaction;
+                try {
+                    if (interaction.isRepliable() && !interaction.replied) {
+                        await interaction.reply({
+                            content: "Si è verificato un errore durante l'esecuzione del comando.",
+                            flags: MessageFlags.Ephemeral,
+                        });
+                    }
+                } catch (e) {
+                    //skip
+                }
+            }
+    }
 
     public static s_CreateCustomId(commandName: string,options?: Map<string, string>): string {
         let modalName = commandName;

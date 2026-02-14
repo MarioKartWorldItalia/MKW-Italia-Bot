@@ -41,28 +41,10 @@ export class CommandsManager {
 
             let options = new InteractionOptions(interaction, overrides);
             options.overrideOption("__user__", interaction.user);
+            
+            await command.guardedExec(options);
+            log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
 
-            try {
-                await command.exec(options);
-                log(`Comando eseguito: ${interactionName} [${interaction.constructor.name}]`);
-            }
-            catch (e) {
-                let err = "Can't execute command " + interactionName + ": " + e;
-                if (e instanceof Error) {
-                    err = err + "\nStack trace:\n" + e.stack;
-                }
-                logError(err);
-                try {
-                    if (interaction.isRepliable() && !interaction.replied) {
-                        await interaction.reply({
-                            content: "Si è verificato un errore durante l'esecuzione del comando.",
-                            flags: MessageFlags.Ephemeral,
-                        });
-                    }
-                } catch (e) {
-                    //skip
-                }
-            }
 
         });
     }
@@ -74,7 +56,7 @@ export class CommandsManager {
         for (const command of commandsArray) {
             if (command instanceof SlashCommandBase) {
                 let builder = command.builder;
-                if(command.builder instanceof SlashCommandBuilder) {
+                if (command.builder instanceof SlashCommandBuilder) {
                     builder = command.builder.toJSON();
                 }
                 client.application!.commands.create(builder)
@@ -82,14 +64,14 @@ export class CommandsManager {
                     .catch(e => logError("Failed to register command " + command.commandName + ": " + e));
             }
             const commands = await client.application?.commands.fetch();
-            for(const cmd of commands?.values() ?? []) {
-            const name = cmd.name;
-            const found = this.commands.get(name);
-            if(!found) {
-                client.application?.commands.delete(cmd.id).then(() => log("Deleted command: " + name));
+            for (const cmd of commands?.values() ?? []) {
+                const name = cmd.name;
+                const found = this.commands.get(name);
+                if (!found) {
+                    client.application?.commands.delete(cmd.id).then(() => log("Deleted command: " + name));
+                }
             }
-            }
-        
+
         }
     }
 

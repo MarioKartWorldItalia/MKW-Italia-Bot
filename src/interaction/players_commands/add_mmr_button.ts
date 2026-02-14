@@ -2,6 +2,9 @@ import { LabelBuilder, ModalBuilder, TextDisplayBuilder, TextInputBuilder, TextI
 import { CommandBase, InteractionOptions } from "../interaction_base_classes";
 import { ActionRowBuilder } from "@discordjs/builders";
 import { SetMMR } from "./set_mmr";
+import { replyEphemeral } from "../../utils";
+import { response } from "express";
+import { log } from "../../log";
 
 export class AddMMRButton extends CommandBase {
     public get commandName(): string {
@@ -25,11 +28,16 @@ export class AddMMRButton extends CommandBase {
         modal.addLabelComponents(mmrLink);
         await options.interaction.showModal(modal);
 
-        const response = await options.interaction.awaitModalSubmit({ time: 60000 * 15 });
+
+        let response = await options.interaction.awaitModalSubmit({ time: 60000 * 15 }).catch(log);
+        if (!response) {
+            await replyEphemeral(options.interaction, "Tempo scaduto per inserire il link MKC. Riprova.");
+            return;
+        }
         const mkcLink = response.fields.getTextInputValue("mkc_link");
-        new SetMMR().exec(new InteractionOptions(response, options.optionsOverride.set("mkc_link", mkcLink)));
+        new SetMMR().guardedExec(new InteractionOptions(response, options.optionsOverride.set("mkc_link", mkcLink)));
 
     }
 
-
 }
+

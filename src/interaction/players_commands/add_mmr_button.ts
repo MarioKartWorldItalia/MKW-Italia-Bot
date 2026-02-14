@@ -21,7 +21,7 @@ export class AddMMRButton extends CommandBase {
             .setTextInputComponent(
                 new TextInputBuilder()
                     .setCustomId("mkc_link")
-                    .setPlaceholder("Inserisci il link al tuo profilo MKC")
+                    .setPlaceholder("Inserisci il link al tuo profilo Lounge di MKC")
                     .setRequired(true)
                     .setStyle(TextInputStyle.Paragraph)
             );

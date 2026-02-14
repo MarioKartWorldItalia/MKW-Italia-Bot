@@ -13,7 +13,7 @@ export class SetMMR extends SlashCommandBase {
             .setDescription("Inserisce l'MMR del profilo lounge di Mario Kart Central")
             .addStringOption(option =>
                 option.setName("mkc_link")
-                    .setDescription("Link al profilo di Mario Kart Central")
+                    .setDescription("Link al profilo Lounge di Mario Kart Central")
                     .setRequired(true)
             ).toJSON();
     }
@@ -42,7 +42,7 @@ export class SetMMR extends SlashCommandBase {
             }
         }
         catch (e) {
-            await replyEphemeral(options.interaction, "Link MKC non valido. Assicurati di inserire un link al tuo profilo MKC.");
+            await replyEphemeral(options.interaction, "Link MKC non valido. Assicurati di inserire un link al tuo profilo Lounge di MKC.");
             return;
         }
 

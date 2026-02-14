@@ -24,7 +24,7 @@ export class GetMMR extends SlashCommandBase {
         }
 
         let playersManager = Application.getInstance().getPlayersManager();
-        const user = options.getRequiredUserOption("player") || options.getInteractionUser();
+        const user = options.getUserOption("player") || options.getInteractionUser();
         const player = await playersManager.getPlayer(user.id);
 
         if (player && player.getMMR()) {

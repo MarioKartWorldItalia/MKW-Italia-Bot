@@ -3,6 +3,7 @@ import { InteractionOptions, SlashCommandBase } from "../interaction_base_classe
 import { PlayersManager } from "../../player_details/PlayersManager";
 import { Application } from "../../application";
 import { replyEphemeral } from "../../utils";
+import { MMR } from "../../player_details/MMRManager";
 
 export class RemoveMMR extends SlashCommandBase {
     get builder(): SlashCommandBuilder | RESTPostAPIChatInputApplicationCommandsJSONBody {
@@ -23,6 +24,7 @@ export class RemoveMMR extends SlashCommandBase {
             player.MMR = null as any;
             await Application.getInstance().getPlayersManager().updatePlayer(player);
             replyEphemeral(options.interaction, "Il tuo MMR è stato rimosso!");
+            MMR.removeRole(player);
         }
     }
 }

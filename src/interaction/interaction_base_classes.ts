@@ -32,20 +32,25 @@ export class InteractionOptions {
     }
 
     public getRequiredUserOption(name: string): User {
+        const user = this.getUserOption(name);
+        if (!user) {
+            throw new Error(`Required user option ${name} not found`);
+        }
+        return user;
+    }
+
+    public getUserOption(name: string): User | null {
         if(this.optionsOverride.has(name)) {
             return this.optionsOverride.get(name) as User;
         }
         if (this.interaction.isChatInputCommand()) {
             const user = this.interaction.options.getUser(name);
-            if (!user) {
-                throw new Error(`User option ${name} not found`);
-            }
             return user;
         }
         else if(this.interaction.isModalSubmit()) {
             const userId = this.interaction.fields.getSelectedUsers(name);
             if (!userId || userId.size === 0) {
-                throw new Error(`User option ${name} not found in modal submit`);
+                return null;
             }
             return userId.first()!;
         }

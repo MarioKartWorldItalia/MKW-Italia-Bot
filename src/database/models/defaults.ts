@@ -30,6 +30,9 @@ export class BotDefaultsSchema {
     @prop({type: String})
     public publicRankChangeChannelId!: string;
 
+    @prop()
+    public rankRoles: string[] = [];
+
     //server in cui verranno mandati i messaggi con le informazioni 
     //inserite nel form quando una persona si iscrive ad un torneo
     @prop({type: String})

@@ -25,6 +25,9 @@ import { RemoveMMR } from "./players_commands/rm_mmr";
 import { AddMMRButton } from "./players_commands/add_mmr_button";
 import { GetMMRButton } from "./players_commands/get_mmr_button";
 import { RemoveMMRButton } from "./players_commands/remove_mmr_button";
+import { MockRankUpCommand } from "./players_commands/mock_rank_up";
+import { ManSetMMR } from "./players_commands/man_set_mmr";
+import { ManRemoveMMR } from "./players_commands/man_remove_mmr";
 
 async function bindCommandsInner(commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
@@ -56,6 +59,9 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new AddMMRButton());
     commandsManager.addCommand(new GetMMRButton());
     commandsManager.addCommand(new RemoveMMRButton());
+    commandsManager.addCommand(new MockRankUpCommand());
+    commandsManager.addCommand(new ManSetMMR());
+    commandsManager.addCommand(new ManRemoveMMR());
 }
 
 export async function bindCommands(client: Client) {

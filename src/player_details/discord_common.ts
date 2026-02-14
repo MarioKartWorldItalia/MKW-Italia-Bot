@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { Application } from "../application";
 import { BotDefaults, Globals } from "../globals";
-import { Rank } from "./MMRManager";
+import { MMR, Rank } from "./MMRManager";
 import { PlayerEntry } from "./PlayerEntry";
 
 export async function onMMRSet(player: PlayerEntry) {
@@ -75,8 +75,30 @@ export async function updateMMRTable() {
     }
 }
 
-export async function onRankChange(player: PlayerEntry, oldRank: Rank, newRank: Rank) {
+export async function onRankChange(player: PlayerEntry, newRank: Rank, oldRank: Rank) {
+    const guild = await Application.getInstance().getMainGuild();
     const defaults = await BotDefaults.getDefaults();
+    const channel = await guild.channels.fetch(defaults.publicRankChangeChannelId);
+    const user = await guild.members.fetch(player.playerId.toString());
+
+    let embed = new EmbedBuilder()
+        .setColor(Globals.STANDARD_HEX_COLOR)
+        .setThumbnail(MMR.RankToImage(newRank))
+
+    if (newRank > oldRank) {
+        embed.setTitle("Rank Up!")
+            .setDescription(`Congratulazioni ${user}, sei salito al rank ${Rank[newRank]}!`);
+    }
+    else if (newRank < oldRank) {
+        embed.setTitle("Nuovo rank")
+            .setDescription(`${user} sei stato delcassato al rank ${Rank[newRank]}`);
+    }
+    else return;
+    
+    if (channel?.isSendable()) {
+        await channel.send({ embeds: [embed] });
+    }
+    MMR.setRole(player);
 }
 
 export function createTableButtons() {
@@ -95,5 +117,5 @@ export function createTableButtons() {
         .setLabel("Rimuovi MMR")
         .setStyle(ButtonStyle.Danger);
     return [addButton, getButton, removeButton];
-    
+
 }

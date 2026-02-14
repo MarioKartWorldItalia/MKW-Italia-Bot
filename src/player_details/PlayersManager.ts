@@ -8,7 +8,7 @@ import { createMMRTable, onRankChange, updateMMRTable } from "./discord_common";
 
 interface PlayerEvent {
     update: (player: PlayerEntry) => void;
-    rankChange: (player: PlayerEntry, oldRank: Rank, newRank: Rank) => void;
+    rankChange: (player: PlayerEntry, oldRank : Rank, newRank: Rank) => void;
 }
 
 export class PlayersEvent extends TypedEmitter<PlayerEvent> {
@@ -27,7 +27,7 @@ export class PlayersManager {
     public async start() {
         this.playersRepo = Application.getInstance().getDb().getModels().playersModel;
         Application.getInstance().getClient().on("ready", async () => {
-            execAndLoop(this.updateAllPlayersInfo.bind(this), 1000 * 60 * 60 * 24);
+            execAndLoop(this.updateAllPlayersInfo.bind(this), 1000 * 60 * 60);
             await createMMRTable();
             this.emitter.on("update", updateMMRTable);
             this.emitter.on("rankChange", onRankChange);
@@ -54,7 +54,7 @@ export class PlayersManager {
             throw new Error(`Player with id ${player.playerId} not found`);
         }
         if (oldPlayer.MMR && player.MMR && oldPlayer.MMR.rank !== player.MMR.rank) {
-            this.emitter.emit("rankChange", player, oldPlayer.MMR.rank, player.MMR.rank);
+            this.emitter.emit("rankChange", player, player.MMR.rank, oldPlayer.MMR.rank);
         }
 
         const res = await this.playersRepo.findOneAndUpdate({ playerId: player.playerId }, player).exec();

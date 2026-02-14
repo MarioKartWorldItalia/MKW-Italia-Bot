@@ -1,11 +1,10 @@
 import { IntentsBitField, GatewayIntentBits } from "discord.js";
 import { env } from "process";
-import { logError } from "./log";
+import { logError, log } from "./log";
 import { BotDefaultsSchema as BotDefaultsSchema } from "./database/models/defaults";
 import { Application } from "./application";
 import { ReturnModelType } from "@typegoose/typegoose";
 import { BeAnObject } from "@typegoose/typegoose/lib/types";
-import { log } from "console";
 
 export class Globals {
     static readonly DEFAULT_INTENTS = [

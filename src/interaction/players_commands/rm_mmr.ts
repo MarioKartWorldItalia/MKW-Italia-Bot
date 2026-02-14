@@ -20,7 +20,7 @@ export class RemoveMMR extends SlashCommandBase {
             return;
         }
         else {
-            player.MMR = undefined;
+            player.MMR = null as any;
             await Application.getInstance().getPlayersManager().updatePlayer(player);
             replyEphemeral(options.interaction, "Il tuo MMR è stato rimosso!");
         }

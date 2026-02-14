@@ -55,6 +55,7 @@ export async function updateMMRTable() {
             counter++;
         }
     }
+    msg += `\nUltimo aggiornamento: <t:${Math.floor(Date.now() / 1000)}:R>`
     const embed = new EmbedBuilder()
         .setDescription(msg)
         .setColor(Globals.STANDARD_HEX_COLOR);
@@ -82,11 +83,11 @@ export function createTableButtons() {
     const addButton = new ButtonBuilder()
         .setCustomId("add_mmr_button")
         .setLabel("Aggiungi MMR")
-        .setStyle(ButtonStyle.Secondary);
+        .setStyle(ButtonStyle.Primary);
 
     const getButton = new ButtonBuilder()
         .setCustomId("get_mmr_button")
-        .setLabel("Trova MMR")
+        .setLabel("Cerca MMR")
         .setStyle(ButtonStyle.Secondary);
 
     const removeButton = new ButtonBuilder()

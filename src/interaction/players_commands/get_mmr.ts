@@ -19,12 +19,12 @@ export class GetMMR extends SlashCommandBase {
     }
 
     public async exec(options: InteractionOptions): Promise<void> {
-        if(!options.interaction.isChatInputCommand()) {
+        if(!options.interaction.isChatInputCommand() && !options.interaction.isModalSubmit()) {
             throw new Error("Invalid interaction type");
         }
 
         let playersManager = Application.getInstance().getPlayersManager();
-        const user = options.interaction.options.getUser("player") || options.getInteractionUser();
+        const user = options.getRequiredUserOption("player") || options.getInteractionUser();
         const player = await playersManager.getPlayer(user.id);
 
         if (player && player.getMMR()) {

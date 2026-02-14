@@ -13,7 +13,7 @@ export class GetMMRButton extends CommandBase{
             throw new Error("Invalid interaction type");
         }
         
-        let modal = new ModalBuilder().setCustomId("get_mmr_modal").setTitle("Aggiungi MMR");
+        let modal = new ModalBuilder().setCustomId("get_mmr_modal").setTitle("Cerca MMR");
         const mmrLink = new LabelBuilder()
             .setLabel("Utente")
             .setUserSelectMenuComponent(

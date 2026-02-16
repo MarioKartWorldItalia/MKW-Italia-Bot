@@ -31,7 +31,7 @@ export class SetMMR extends SlashCommandBase {
             const mmr = await MMR.getHighestMMR(playerId);
 
 
-            let player = await playersManager.getOrCreatePlayer(options.getInteractionUser().id);
+            let player = await playersManager.getOrCreatePlayer(options.getUserOption("user")?.id || options.getInteractionUser().id);
             player.setMMR(mmr);
             await playersManager.updateOrCreatePlayer(player);
             await MMR.setRole(player);

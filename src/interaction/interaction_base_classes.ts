@@ -48,7 +48,7 @@ export class InteractionOptions {
             return user;
         }
         else if(this.interaction.isModalSubmit()) {
-            const userId = this.interaction.fields.getSelectedUsers(name);
+            const userId = this.interaction.fields.getSelectedUsers(name, false);
             if (!userId || userId.size === 0) {
                 return null;
             }

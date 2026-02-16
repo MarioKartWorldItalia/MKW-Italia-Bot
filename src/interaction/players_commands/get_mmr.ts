@@ -31,7 +31,7 @@ export class GetMMR extends SlashCommandBase {
             const MMR = player.getMMR()!;
             const link = await player.getMMR()!.getMMRLink();
             const embed = new EmbedBuilder()
-            .setDescription(`l'MMR di **${user.username}** è ${MMR.getMMRValue()}.\nRank: ${Rank[MMR.rank]}\n[MKC Link](${link})`)
+            .setDescription(`l'MMR di **${user}** è ${MMR.getMMRValue()}.\nRank: ${Rank[MMR.rank]}\n[MKC Link](${link})`)
             .setColor(Globals.STANDARD_HEX_COLOR);
 
             await options.interaction.reply({

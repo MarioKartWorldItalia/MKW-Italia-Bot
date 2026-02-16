@@ -13,7 +13,7 @@ function handleError(error: Error) {
         .then(() => {
             FeatureFlagsManager.getBooleanValueFor(FeatureFlagKeys.ExitOnUnhandledError, true)
                 .then((val) => {
-                    if (val) {
+                    if (false/*val*/) {
                         process.exit(1);
                     }
                 })

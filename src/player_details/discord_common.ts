@@ -3,6 +3,7 @@ import { Application } from "../application";
 import { BotDefaults, Globals } from "../globals";
 import { MMR, Rank } from "./MMRManager";
 import { PlayerEntry } from "./PlayerEntry";
+import { BotEmojis, EmojisManager } from "../emoijs_manager";
 
 export async function onMMRSet(player: PlayerEntry) {
     const defaults = await BotDefaults.getDefaults();
@@ -17,10 +18,11 @@ export async function createMMRTable() {
         return;
     }
 
-    const buttons = createTableButtons();
+    const buttons = await createTableButtons();
 
     const channel = await (await Application.getInstance().getMainGuild()).channels.fetch(defaults.MMRTableChannelId);
     if (channel && channel.isTextBased()) {
+        await channel.send("https://cdn.discordapp.com/attachments/1376213461251526797/1472964352028967064/4WzwX5f.png?ex=69947c73&is=69932af3&hm=a56c1efbf19a494a6406a5df3953a6fdf208e2c627545c3d050181d9724499ac&");
         const msg = await channel.send(
             {
                 content: "Caricamento tabella MMR...",
@@ -51,11 +53,11 @@ export async function updateMMRTable() {
             throw new Error(`User with id ${player.playerId} not found in guild`);
         }
         if (player.MMR) {
-            msg += `\`${counter}\` **${dsUser.displayName}** - ${player.MMR.getMMRValue()} MMR (${Rank[player.MMR.rank]})\n`;
+            msg += `\`${counter}.\` ${dsUser} (${dsUser.displayName}) - MMR: \`${player.MMR.getMMRValue()}\` ${Rank[player.MMR.rank]} ${await MMR.rankToEmoji(player.MMR.rank)}\n`;
             counter++;
         }
     }
-    msg += `\nUltimo aggiornamento: <t:${Math.floor(Date.now() / 1000)}:R>`
+    msg += `-# Ultimo aggiornamento: <t:${Math.floor(Date.now() / 1000)}:R>`
     const embed = new EmbedBuilder()
         .setDescription(msg)
         .setColor(Globals.STANDARD_HEX_COLOR);
@@ -101,20 +103,23 @@ export async function onRankChange(player: PlayerEntry, newRank: Rank, oldRank: 
     MMR.setRole(player);
 }
 
-export function createTableButtons() {
+export async function createTableButtons() {
     const addButton = new ButtonBuilder()
         .setCustomId("add_mmr_button")
         .setLabel("Aggiungi MMR")
-        .setStyle(ButtonStyle.Primary);
+        .setEmoji(await EmojisManager.getEmoji(BotEmojis.MKADD))
+        .setStyle(ButtonStyle.Success);
 
     const getButton = new ButtonBuilder()
         .setCustomId("get_mmr_button")
         .setLabel("Cerca MMR")
+        .setEmoji(await EmojisManager.getEmoji(BotEmojis.MKFIND))
         .setStyle(ButtonStyle.Secondary);
 
     const removeButton = new ButtonBuilder()
         .setCustomId("remove_mmr_button")
         .setLabel("Rimuovi MMR")
+        .setEmoji(await EmojisManager.getEmoji(BotEmojis.MKDEL))
         .setStyle(ButtonStyle.Danger);
     return [addButton, getButton, removeButton];
 

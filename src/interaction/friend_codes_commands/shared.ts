@@ -2,6 +2,7 @@ import { ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, ChannelType, Em
 import { dbGetAllFriendCodes, FriendCode } from "../../frend_codes";
 import { BotDefaults, Globals } from "../../globals";
 import { Application } from "../../application";
+import { BotEmojis, EmojisManager } from "../../emoijs_manager";
 
 export async function refreshFriendCodesMessage() {
     const allFCs = await dbGetAllFriendCodes();
@@ -19,9 +20,11 @@ export async function refreshFriendCodesMessage() {
     }
 
     if (!msgId) {
+        const firstMsg = "https://cdn.discordapp.com/attachments/1376213461251526797/1473061687866167316/Lc4MvTM.png?ex=69957fda&is=69942e5a&hm=fdeb5511f47914e2a17450a4a1cf5e29e1cb9ff45bf26f9297a25ed8967daf59&";
+        await channel.send(firstMsg);
         const sentMsg = await channel.send({
             embeds: [await createFriendCodesMessageEmbed(allFCs)],
-            components: [createFriendCodesButtons()]
+            components: [await createFriendCodesButtons()]
         });
         defaults.friendCodesDbDefaults.messageId = sentMsg.id;
         await BotDefaults.setDefaults(defaults);
@@ -34,7 +37,7 @@ export async function refreshFriendCodesMessage() {
 
         await msg.edit({
             embeds: [await createFriendCodesMessageEmbed(allFCs)],
-            components: [createFriendCodesButtons()]
+            components: [await createFriendCodesButtons()]
         });
     }
 }
@@ -75,20 +78,23 @@ ${await joinFriendCodes(friendCodes)}
     return embed.toJSON();
 }
 
-export function createFriendCodesButtons() {
+export async function createFriendCodesButtons() {
     const addFCButton = new ButtonBuilder()
         .setCustomId("setfc")
         .setLabel("Aggiungi")
+        .setEmoji(await EmojisManager.getEmoji(BotEmojis.MKADD))
         .setStyle(ButtonStyle.Success);
 
     const removeFCButton = new ButtonBuilder()
         .setCustomId("delfc")
         .setLabel("Rimuovi")
+        .setEmoji(await EmojisManager.getEmoji(BotEmojis.MKDEL))
         .setStyle(ButtonStyle.Danger);
 
     const searchFCButton = new ButtonBuilder()
         .setCustomId("searchfc")
         .setLabel("Cerca Utente")
+        .setEmoji(await EmojisManager.getEmoji(BotEmojis.MKFIND))
         .setStyle(ButtonStyle.Secondary);
 
     return new ActionRowBuilder().addComponents(addFCButton, removeFCButton, searchFCButton).toJSON();

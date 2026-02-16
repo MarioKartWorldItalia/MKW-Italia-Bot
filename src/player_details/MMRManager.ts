@@ -5,6 +5,7 @@ import { prop } from "@typegoose/typegoose";
 import { log, logError } from "../log";
 import { PlayerEntry } from "./PlayerEntry";
 import { Application } from "../application";
+import { BotEmojis, EmojisManager } from "../emoijs_manager";
 
 export enum Rank {
     Iron = 0,
@@ -47,6 +48,10 @@ export class MMR {
 
     public getMMRValue(): number {
         return this.MMR;
+    }
+    
+    public static async rankToEmoji(rank: Rank): Promise<string> {
+        return await EmojisManager.getEmoji(BotEmojis[Rank[rank].toUpperCase() as keyof typeof BotEmojis]);
     }
 
     public static RankToImage(rank: Rank): string {

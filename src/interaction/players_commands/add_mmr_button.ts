@@ -28,7 +28,6 @@ export class AddMMRButton extends CommandBase {
         modal.addLabelComponents(mmrLink);
         await options.interaction.showModal(modal);
 
-
         let response = await options.interaction.awaitModalSubmit({ time: 60000 * 15 }).catch(log);
         if (!response) {
             await replyEphemeral(options.interaction, "Tempo scaduto per inserire il link MKC. Riprova.");
@@ -36,7 +35,6 @@ export class AddMMRButton extends CommandBase {
         }
         const mkcLink = response.fields.getTextInputValue("mkc_link");
         new SetMMR().guardedExec(new InteractionOptions(response, options.optionsOverride.set("mkc_link", mkcLink)));
-
     }
 
 }

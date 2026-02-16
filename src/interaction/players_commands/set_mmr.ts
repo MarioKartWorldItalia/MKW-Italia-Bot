@@ -30,7 +30,6 @@ export class SetMMR extends SlashCommandBase {
             const playerId = MMR.getPlayerIdFromUrl(mkcLink);
             const mmr = await MMR.getHighestMMR(playerId);
 
-
             let player = await playersManager.getOrCreatePlayer(options.getUserOption("user")?.id || options.getInteractionUser().id);
             player.setMMR(mmr);
             await playersManager.updateOrCreatePlayer(player);
@@ -40,7 +39,7 @@ export class SetMMR extends SlashCommandBase {
                 .setDescription(`Il tuo MMR è stato aggiornato a ${mmr.getMMRValue()}.\n Rank: ${Rank[mmr.rank]}\n[Link](${mkcLink})\n In caso avessi falsificato (volontariamente o non) il tuo mmr uno staff si appresterà a correggerlo`)
                 .setColor(Globals.STANDARD_HEX_COLOR);
             if (options.interaction.isRepliable()) {
-                options.interaction.reply({
+                options.interaction.editReply({
                     embeds: [embed]
                 })
             }

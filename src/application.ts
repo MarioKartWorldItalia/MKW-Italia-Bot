@@ -12,6 +12,7 @@ import { Server } from "http";
 import { Collection } from "mongoose";
 import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager.js";
 import { replyEphemeral } from "./utils.js";
+import { PlayersManager } from "./player_details/PlayersManager.js";
 
 export class Application {
     private static instance: Application;

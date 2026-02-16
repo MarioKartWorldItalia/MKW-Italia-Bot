@@ -24,7 +24,7 @@ export class RemoveMMR extends SlashCommandBase {
             player.MMR = null as any;
             await Application.getInstance().getPlayersManager().updatePlayer(player);
             replyEphemeral(options.interaction, "Il tuo MMR è stato rimosso!");
-            MMR.removeRole(player);
+            await MMR.removeRole(player);
         }
     }
 }

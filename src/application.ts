@@ -3,7 +3,7 @@ import { ActionRowBuilder, APIEmbedField, ApplicationEmoji, ButtonBuilder, Butto
 import { log, logError } from "./log.js";
 import { Globals } from "./globals.js";
 import { TournamentManager } from "./tournament_manager/tournaments.js";
-import { bindCommands } from "./interaction/slash_commands.js";
+import { bindCommands } from "./interaction/commands.js";
 import "process"
 import { abort, exit } from "process";
 import { Database } from "./database/database.js";
@@ -20,12 +20,15 @@ export class Application {
     private webServer!: Server;
     private db: Database;
     private featureFlagsManager: FeatureFlagsManager;
+    private playersManager!: PlayersManager;
+    
 
 
     public constructor() {
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS, ws: { large_threshold: 250 } });
         this.db = new Database(undefined);
         this.featureFlagsManager = new FeatureFlagsManager();
+        this.playersManager = new PlayersManager();
     }
 
     public async getMainGuild(): Promise<Guild> {
@@ -54,6 +57,10 @@ export class Application {
         return this.db;
     }
 
+    public getPlayersManager(): PlayersManager {
+        return this.playersManager;
+    }
+
     public async start() {
         let startFunctions: Array<Promise<void>> = [];
 
@@ -68,7 +75,7 @@ export class Application {
         this.client.on(Events.Error, logError);
 
         await Promise.all(startFunctions);
-
+        await this.playersManager.start();
         this.tournamentManager = new TournamentManager();
 
         await this.client.login(Globals.BOT_TOKEN);
@@ -431,8 +438,6 @@ Se invece ti va bene essere inserito in qualsiasi squadra senza preferenze, sele
         }
 
         await bindCommands(this.client);
-        log("Aggiornamento comandi in corso...");
-
     }
 
     public async shutdown() {

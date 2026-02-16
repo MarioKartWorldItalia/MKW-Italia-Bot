@@ -2,6 +2,8 @@
   "dependencies": {
     "@launchdarkly/node-server-sdk": "^9.10.4",
     "@typegoose/typegoose": "^12.17.0",
+    "axios": "^1.13.4",
+    "cheerio": "^1.2.0",
     "discord.js": "^14.25.1",
     "dotenv": "^17.2.1",
     "express": "^5.2.0",
@@ -9,12 +11,13 @@
     "mongodb": "6.17",
     "mongoose": "^8.16.5",
     "node.js": "^0.0.1-security",
+    "tiny-typed-emitter": "^2.1.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/uuid": "^10.0.0",
-    "tsx": "^4.20.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

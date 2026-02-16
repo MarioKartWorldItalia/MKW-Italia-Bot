@@ -4,6 +4,7 @@ import { ApplicationEmoji } from "discord.js"
 export enum BotEmojis {
     BANDIERINA = "bandierina",
     FRECCIA_MINORE = "arrowleft",
+    SPUNTA = "check",
 }
 
 export class EmojisManager {

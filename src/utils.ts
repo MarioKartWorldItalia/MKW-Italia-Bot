@@ -70,3 +70,8 @@ export async function awaitModalSubmit(interaction: MessageComponentInteraction,
 
    return retInteraction;
 }
+
+export async function execAndLoop(fn: () => Promise<void>, delay: number) {
+    await fn();
+    setTimeout(() => execAndLoop(fn, delay), delay);
+}

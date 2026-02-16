@@ -16,7 +16,7 @@ export class MockRankUpCommand extends SlashCommandBase {
             let player = new PlayerEntry(options.getInteractionUser().id);
             const oldRank = Rank.Iron;
             player.MMR = new MMR("test", 100, 12, i);
-            Application.getInstance().getPlayersManager().emitter.emit("rankChange", player, oldRank, player.MMR.rank);
+            Application.getInstance().getPlayersManager().emitter.emit("rankChange", player, player.MMR.rank, oldRank);
         }
 
         for (let i = 9; i >= 0; i--) {

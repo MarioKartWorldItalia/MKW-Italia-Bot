@@ -11,6 +11,11 @@ export class ManSetMMR extends SlashCommandBase {
                 option.setName("mkc_link")
                     .setDescription("Link al profilo Lounge di Mario Kart Central")
                     .setRequired(true)
+            )
+            .addUserOption(option =>
+                option.setName("user")
+                    .setDescription("Utente di cui inserire l'MMR")
+                    .setRequired(true)
             ).toJSON();
     }
 

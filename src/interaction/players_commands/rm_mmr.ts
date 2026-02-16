@@ -7,7 +7,7 @@ import { MMR } from "../../player_details/MMRManager";
 export class RemoveMMR extends SlashCommandBase {
     get builder(): SlashCommandBuilder | RESTPostAPIChatInputApplicationCommandsJSONBody {
         return new SlashCommandBuilder()
-            .setName("removemmr")
+            .setName("delmmr")
             .setDescription("Rimuove l'MMR del profilo lounge di Mario Kart Central")
             .toJSON();
     }

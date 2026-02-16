@@ -33,7 +33,6 @@ export class SetMMR extends SlashCommandBase {
             let player = await playersManager.getOrCreatePlayer(options.getUserOption("user")?.id || options.getInteractionUser().id);
             player.setMMR(mmr);
             await playersManager.updateOrCreatePlayer(player);
-            await MMR.setRole(player);
             const embed = new EmbedBuilder()
                 .setTitle("MMR aggiornato")
                 .setDescription(`Il tuo MMR è stato aggiornato a ${mmr.getMMRValue()}.\n Rank: ${Rank[mmr.rank]}\n[Link](${mkcLink})\n In caso avessi falsificato (volontariamente o non) il tuo mmr uno staff si appresterà a correggerlo`)
@@ -53,6 +52,7 @@ export class SetMMR extends SlashCommandBase {
             if (staffMMRChannel && staffMMRChannel.isSendable()) {
                 staffMMRChannel.send({ embeds: [staffEmbed] });
             }
+            await MMR.setRole(player);
         }
         catch (e) {
             await options.interaction.editReply("Link MKC non valido. Assicurati di inserire un link al tuo profilo Lounge di MKC.");

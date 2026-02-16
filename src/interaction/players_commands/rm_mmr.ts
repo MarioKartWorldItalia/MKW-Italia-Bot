@@ -1,6 +1,5 @@
 import { SlashCommandBuilder, RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord.js";
 import { InteractionOptions, SlashCommandBase } from "../interaction_base_classes";
-import { PlayersManager } from "../../player_details/PlayersManager";
 import { Application } from "../../application";
 import { replyEphemeral } from "../../utils";
 import { MMR } from "../../player_details/MMRManager";

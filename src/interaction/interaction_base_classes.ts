@@ -1,7 +1,6 @@
 import { ApplicationIntegrationType, AutocompleteInteraction, ButtonBuilder, ButtonInteraction, ChatInputCommandInteraction, Client, Events, Interaction, InteractionCollector, MessageFlags, MessagePayload, ModalAssertions, ModalBuilder, ModalSubmitInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder, User } from "discord.js"
 import { log, logError } from "../log";
 import { assertCond } from "../assert";
-import { bindGeneralCommands } from "./util_commands";
 import { StartCheckInCommand } from "./tournament_commands/start_checkin";
 import { CheckInButton } from "./tournament_commands/checkin";
 import { Iscriviti } from "./tournament_commands/iscriviti";

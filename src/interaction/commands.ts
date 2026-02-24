@@ -27,6 +27,7 @@ import { GetMMRButton } from "./players_commands/get_mmr_button";
 import { RemoveMMRButton } from "./players_commands/remove_mmr_button";
 import { ManSetMMR } from "./players_commands/man_set_mmr";
 import { ManRemoveMMR } from "./players_commands/man_remove_mmr";
+import { ResetRole } from "./util_commands/reset_role";
 
 async function bindCommandsInner(commandsManager: CommandsManager) {
     //TOURNAMENT COMMANDS
@@ -60,6 +61,9 @@ async function bindCommandsInner(commandsManager: CommandsManager) {
     commandsManager.addCommand(new RemoveMMRButton());
     commandsManager.addCommand(new ManSetMMR());
     commandsManager.addCommand(new ManRemoveMMR());
+
+    //UTIL COMMANDS
+    commandsManager.addCommand(new ResetRole());
 }
 
 export async function bindCommands(client: Client) {

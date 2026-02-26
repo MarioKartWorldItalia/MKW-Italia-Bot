@@ -5,6 +5,7 @@ import dotenv from "dotenv"
 import { Globals } from "./globals";
 import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager";
 import { FeatureFlagKeys } from "./feature_flags/feature_flag_keys";
+import * as Sentry from "@sentry/node";
 
 function handleError(error: Error) {
     logError(`\nFATAL ERROR:\n${error.message}`
@@ -26,6 +27,12 @@ function handleError(error: Error) {
 }
 
 async function main() {
+    Sentry.init({
+        dsn: Globals.SENTRY_DSN,
+        sendDefaultPii: true,
+        tracesSampleRate: 1.0,
+        enableLogs: true,
+    });
 
     process.on("uncaughtException", (e) => {
         log("ERROR: uncaughtException");

@@ -3,6 +3,7 @@ import { Application } from "./application";
 import { Globals } from "./globals";
 import { tz } from "moment-timezone";
 import { standardDiscordTimeFormat } from "./utils";
+import { captureException, logger } from "@sentry/node";
 
 class Logger {
     static async log(...args: any[]) {
@@ -62,11 +63,14 @@ class Logger {
 
 
 export async function log(...args: any[]) {
+    const str = args.map(arg => String(arg)).join('\n');
+    logger.info(str); //sentry
     try { await Logger.log(...args); }
     catch (e) { /* logError("Failed to log:", e); */ }
 }
 
 export async function logError(...args: any[]) {
+    captureException(args); //sentry
     try { await Logger.logError(...args); }
     catch (e) { console.error("Failed to log error:", e); }
 }

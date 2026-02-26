@@ -27,6 +27,8 @@ export class Globals {
     static readonly ERR_REPORT_CHANNEL_ID = env.ERROR_LOGS_CHANNEL;
     static readonly ERR_REPORT_USER_ID = env.ERROR_REPORTS_USER;
     static readonly LOG_REPORT_CHANNEL_ID = env.LOG_REPORT_CHANNEL_ID;
+    
+    static readonly SENTRY_DSN = env.SENTRY_DSN || (() => { throw new Error("SENTRY_DSN environment variable is not set") })();
 
     static readonly STANDARD_HEX_COLOR = "#ffc809";
     static readonly STANDARD_TIMEZONE = "Europe/Rome";

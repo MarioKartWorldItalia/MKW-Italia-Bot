@@ -13,6 +13,7 @@ import { Collection } from "mongoose";
 import { FeatureFlagsManager } from "./feature_flags/feature_flags_manager.js";
 import { replyEphemeral } from "./utils.js";
 import { PlayersManager } from "./player_details/PlayersManager.js";
+import * as Sentry from "@sentry/node";
 
 export class Application {
     private static instance: Application;
@@ -22,8 +23,6 @@ export class Application {
     private db: Database;
     private featureFlagsManager: FeatureFlagsManager;
     private playersManager!: PlayersManager;
-    
-
 
     public constructor() {
         this.client = new Client({ intents: Globals.DEFAULT_INTENTS, ws: { large_threshold: 250 } });

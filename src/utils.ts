@@ -71,7 +71,15 @@ export async function awaitModalSubmit(interaction: MessageComponentInteraction,
    return retInteraction;
 }
 
-export async function execAndLoop(fn: () => Promise<void>, delay: number) {
-    await fn();
+export async function execAndLoop(fn: () => Promise<void>, delay: number, stopOnError?: boolean) {
+    try {
+        await fn();
+    }
+    catch(e) {
+        if(stopOnError && stopOnError === true)
+            throw e;
+        else 
+            logError(e);
+    }
     setTimeout(() => execAndLoop(fn, delay), delay);
 }

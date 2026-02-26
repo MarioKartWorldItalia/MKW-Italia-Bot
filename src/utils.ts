@@ -81,5 +81,5 @@ export async function execAndLoop(fn: () => Promise<void>, delay: number, stopOn
         else 
             logError(e);
     }
-    setTimeout(() => execAndLoop(fn, delay), delay);
+    setTimeout(() => execAndLoop(fn, delay, stopOnError), delay);
 }

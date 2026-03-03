@@ -29,6 +29,28 @@ export class Application {
         this.db = new Database(undefined);
         this.featureFlagsManager = new FeatureFlagsManager();
         this.playersManager = new PlayersManager();
+
+        this.client.rest.on('response', (request, response) => {
+            const data: Record<string, unknown> = {
+                method: request.method,
+                url: request.path,
+                status_code: response.status,
+            };
+            if (request.data.body !== undefined && request.data.body !== null) {
+                const serialized = JSON.stringify(request.data.body);
+                data.body = serialized.length > 2048 ? serialized.slice(0, 2048) + '…' : serialized;
+            }
+            if (request.data.files && request.data.files.length > 0) {
+                data.files = request.data.files.map((f) => f.name);
+            }
+            Sentry.addBreadcrumb({
+                category: 'discord.api',
+                type: 'http',
+                message: `${request.method} ${request.path}`,
+                data,
+                level: response.ok ? 'info' : 'warning',
+            });
+        });
     }
 
     public async getMainGuild(): Promise<Guild> {

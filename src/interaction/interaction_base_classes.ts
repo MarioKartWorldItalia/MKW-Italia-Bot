@@ -1,6 +1,7 @@
 import { ApplicationIntegrationType, AutocompleteInteraction, ButtonBuilder, ButtonInteraction, ChatInputCommandInteraction, Client, Events, Interaction, InteractionCollector, MessageFlags, MessagePayload, ModalAssertions, ModalBuilder, ModalSubmitInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder, User } from "discord.js"
 import { log, logError } from "../log";
 import { assertCond } from "../assert";
+import * as Sentry from "@sentry/node";
 import { StartCheckInCommand } from "./tournament_commands/start_checkin";
 import { CheckInButton } from "./tournament_commands/checkin";
 import { Iscriviti } from "./tournament_commands/iscriviti";
@@ -96,8 +97,23 @@ export abstract class CommandBase {
                 if (e instanceof Error) {
                     err = err + "\nStack trace:\n" + e.stack;
                 }
-                logError(err);
                 const interaction = options.interaction;
+                Sentry.withScope((scope) => {
+                    const payload: Record<string, unknown> = {
+                        commandName: this.commandName,
+                        interactionType: interaction.constructor.name,
+                        interactionId: interaction.id,
+                        userId: interaction.user.id,
+                        userTag: interaction.user.tag,
+                        guildId: interaction.guildId,
+                        channelId: interaction.channelId,
+                    };
+                    if (interaction.isChatInputCommand()) {
+                        payload.options = interaction.options.data;
+                    }
+                    scope.setContext("discord_interaction", payload);
+                    logError(err);
+                });
                 try {
                     if (interaction.isRepliable() && !interaction.replied) {
                         await interaction.reply({

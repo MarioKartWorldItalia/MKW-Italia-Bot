@@ -32,6 +32,22 @@ async function main() {
         sendDefaultPii: true,
         tracesSampleRate: 1.0,
         enableLogs: true,
+        beforeBreadcrumb(breadcrumb, hint) {
+            if (breadcrumb.category === 'http' && hint?.request) {
+                const body = hint.request.body;
+                if (Buffer.isBuffer(body)) {
+                    try {
+                        breadcrumb.data = {
+                            ...breadcrumb.data,
+                            'request.body': body.toString('utf-8'),
+                        };
+                    } catch {
+                        // ignore body decode errors
+                    }
+                }
+            }
+            return breadcrumb;
+        },
     });
 
     process.on("uncaughtException", (e) => {
